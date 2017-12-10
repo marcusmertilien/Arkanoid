@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp spec="1.0" xmlns:jfx="http://javafx.com" href="csc413_RainbowReef_Team03.jnlp">
+  <information>
+    <title>csc413_RainbowReef_Team03</title>
+    <vendor>mmertilien</vendor>
+    <description>null</description>
+    <offline-allowed/>
+  </information>
+  <resources>
+    <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
+    <jar href="csc413_RainbowReef_Team03.jar" size="2480" download="eager" />
+  </resources>
+  <applet-desc  width="800" height="600" main-class="com.javafx.main.NoJavaFXFallback"  name="csc413_RainbowReef_Team03" >
+    <param name="requiredFXVersion" value="8.0+"/>
+  </applet-desc>
+  <jfx:javafx-desc  width="800" height="600" main-class="csc413_rainbowreef_team03.Csc413_RainbowReef_Team03"  name="csc413_RainbowReef_Team03" />
+  <update check="always"/>
+</jnlp>
