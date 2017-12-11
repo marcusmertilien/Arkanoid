@@ -60,13 +60,13 @@ public class GameEngine extends JPanel implements Runnable {
     private SoundManager soundManager;
 
     // Players
-    private static Tank player1;
-    private static Tank player2;
+    private static Paddle player1;
+    //private static Paddle player2;
     private HashMap<Integer, Controls> p1Keys;
     private HashMap<Integer, Controls> p2Keys;
 
     // Data collections
-    private ArrayList<Tank> players;
+    private ArrayList<Paddle> players;
     private ArrayList<Projectile> projectiles;
     private ArrayList<Prop> boulders;
     private ArrayList<Prop> breakableBoulders;
@@ -198,7 +198,7 @@ public class GameEngine extends JPanel implements Runnable {
 
     private void setupData() {
         // Collections.
-        players = new ArrayList<Tank>();
+        players = new ArrayList<Paddle>();
         projectiles = new ArrayList<Projectile>();
         boulders = new ArrayList<Prop>();
         breakableBoulders = new ArrayList<Prop>();
@@ -206,15 +206,15 @@ public class GameEngine extends JPanel implements Runnable {
 
         // Players
         Point p1Start = new Point(40, 80);
-        String p1AssetPath = TANK_ASSET_PATH + "RedTank1.png";
-        player1 = new Tank(p1Start.x, p1Start.y, 5, TILE_SIZE, p1AssetPath, p1Keys);
+        String p1AssetPath = TANK_ASSET_PATH + "RedPaddle1.png";
+        player1 = new Paddle(p1Start.x, p1Start.y, 5, TILE_SIZE, p1AssetPath, p1Keys);
         player1shots = new ArrayList<Projectile>();
         eventManager.addObserver(player1);
         players.add(player1);
 
         Point p2Start = new Point(WORLD_WIDTH-60, WORLD_HEIGHT-80);
-        String p2AssetPath = TANK_ASSET_PATH + "GreenTank1.png";
-        player2 = new Tank(p2Start.x, p2Start.y, 5, TILE_SIZE, p2AssetPath, p2Keys);
+        String p2AssetPath = TANK_ASSET_PATH + "GreenPaddle1.png";
+        player2 = new Paddle(p2Start.x, p2Start.y, 5, TILE_SIZE, p2AssetPath, p2Keys);
         player2shots = new ArrayList<Projectile>();
         eventManager.addObserver(player2);
         players.add(player2);
@@ -650,7 +650,7 @@ public class GameEngine extends JPanel implements Runnable {
         for (Prop _bb : breakableBoulders) _bb.draw(g2d);
         for (Projectile _p : player1shots) _p.draw(g2d);
         for (Projectile _p : player2shots) _p.draw(g2d);
-        for (Tank _p: players) _p.draw(g2d);
+        for (Paddle _p: players) _p.draw(g2d);
     }
 
     private void drawFXObjects(Graphics2D g2d) {
@@ -732,7 +732,7 @@ public class GameEngine extends JPanel implements Runnable {
         g.drawImage(miniMap, WINDOW_WIDTH - (mapWidth + paddingSize), paddingSize, mapWidth, mapHeight, this);
     }
     
-    private boolean damage(Tank attacker, Tank deffender){
+    private boolean damage(Paddle attacker, Paddle deffender){
         int pointDif = 20; //PointDifferential
         //Damage Health
         deffender.health -= pointDif;

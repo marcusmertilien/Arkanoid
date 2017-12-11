@@ -20,15 +20,15 @@ public class Paddle extends GameObject implements Observer {
 
     private int speed = 2;
     protected int score = 0;
-    protected int health = 100;
+    //protected int health = 100;
     protected int lives = 3;
     private int direction = 0;
-    private int shotCooldown = 0;
+    //private int shotCooldown = 0;
     private int startingX =0;
     private int startingY =0;
 
-    private static final int FIRING_SPEED = 30;
-    private static int TANK_SIZE = 30;
+    //private static final int FIRING_SPEED = 30;
+    private static int PADDLE_SIZE = 30;
 
     private SoundManager soundManager;
 
@@ -104,7 +104,7 @@ public class Paddle extends GameObject implements Observer {
             prevX = x;
         }
 
-        // Y-axis movement.
+        /* Y-axis movement.
         if (buttonStates.get(Controls.UP)) {
             ySpeed = -speed;
             prevY = y;
@@ -116,13 +116,13 @@ public class Paddle extends GameObject implements Observer {
         } else {
             ySpeed = 0;
             prevY = y;
-        }
+        }*/
     }
 
     private void _updateDirection() {
 
         // Set tank direction based on input.
-        if (buttonStates.get(Controls.UP)) {
+       /* if (buttonStates.get(Controls.UP)) {
 
             direction = buttonStates.get(Controls.LEFT) ? 315 :
                         buttonStates.get(Controls.RIGHT) ? 45 :
@@ -133,18 +133,18 @@ public class Paddle extends GameObject implements Observer {
             direction = buttonStates.get(Controls.LEFT) ? 225 :
                         buttonStates.get(Controls.RIGHT) ? 135 :
                         180;
-        } else {
+        } else {*/
 
             direction = buttonStates.get(Controls.LEFT) ? 270 :
                         buttonStates.get(Controls.RIGHT) ? 90 :
                         direction;
 
-        }
+        //}
     }
 
     private void _updateShoot(ArrayList<Projectile> shots){
 
-        if (shotCooldown <= 0 && buttonStates.get(Controls.SHOOT)) {
+        if (buttonStates.get(Controls.SHOOT)) {
 
             int projX;
             int projY;
@@ -154,22 +154,22 @@ public class Paddle extends GameObject implements Observer {
 
             switch (direction) {
                 case 0:
-                    projX = x + (TANK_SIZE-projSize)/2;
+                    projX = x + (PADDLE_SIZE-projSize)/2;
                     projY = y;
                     projXSpeed = xSpeed;
-                    projYSpeed = ySpeed;
+                    //projYSpeed = ySpeed;
                     break;
 
                 case 45:
-                    projX = x + (TANK_SIZE+projSize)/2;
+                    projX = x + (PADDLE_SIZE+projSize)/2;
                     projY = y;
                     projXSpeed = xSpeed;
-                    projYSpeed = ySpeed;
+                    //projYSpeed = ySpeed;
                     break;
 
                 case 90:
-                    projX = x + TANK_SIZE;
-                    projY = y + (TANK_SIZE-projSize)/2;
+                    projX = x + PADDLE_SIZE;
+                    projY = y + (PADDLE_SIZE-projSize)/2;
                     projXSpeed = xSpeed;
                     projYSpeed = 0;
                     break;
@@ -178,59 +178,59 @@ public class Paddle extends GameObject implements Observer {
                     projX = x;
                     projY = y;
                     projXSpeed = xSpeed;
-                    projYSpeed = ySpeed;
+                    //projYSpeed = ySpeed;
                     break;
 
                 case 180:
-                    projX = x + (TANK_SIZE-projSize)/2;
-                    projY = y + TANK_SIZE;
+                    projX = x + (PADDLE_SIZE-projSize)/2;
+                    projY = y + PADDLE_SIZE;
                     projXSpeed = 0;
-                    projYSpeed = ySpeed;
+                    //projYSpeed = ySpeed;
                     break;
 
                 case 225:
-                    projX = x + (TANK_SIZE+projSize)/2;
+                    projX = x + (PADDLE_SIZE+projSize)/2;
                     projY = y;
                     projXSpeed = xSpeed;
-                    projYSpeed = ySpeed;
+                    //projYSpeed = ySpeed;
                     break;
 
                 case 270:
                     projX = x;
-                    projY = y + (TANK_SIZE-projSize)/2;
+                    projY = y + (PADDLE_SIZE-projSize)/2;
                     projXSpeed = xSpeed;
-                    projYSpeed = 0;
+                    //projYSpeed = 0;
                     break;
 
                 case 315:
                     projX = x;
                     projY = y;
                     projXSpeed = xSpeed;
-                    projYSpeed = ySpeed;
+                    //projYSpeed = ySpeed;
                     break;
 
                 default:
                     projX = x;
                     projY = y;
                     projXSpeed = xSpeed;
-                    projYSpeed = ySpeed;
+                    //projYSpeed = ySpeed;
                     break;
             }
 
-            shots.add(new Projectile(direction, projX, projY, xSpeed, ySpeed));
+            shots.add(new Projectile(direction, projX, projY, xSpeed));
             soundManager.playShot();
 
-            shotCooldown = FIRING_SPEED;
+            //shotCooldown = FIRING_SPEED;
 
-            if (DebugState.showShotDebugActive) {
+            /*if (DebugState.showShotDebugActive) {
                 System.out.printf(
                     "new shot with player <%d, %d> and proj <%d, %d>\n",
                     this.x, this.y, projX, projY
                 );
-            }
+            }*/
         }
 
-        shotCooldown--;
+        //shotCooldown--;
     }
 
 
@@ -239,11 +239,11 @@ public class Paddle extends GameObject implements Observer {
     @Override
     public void draw(Graphics2D g2d) {
         if (this.isVisible()) {
-            if (DebugState.showBoundsActive) {
-                _debugDraw(g2d);
-            } else {
+            //if (DebugState.showBoundsActive) {
+            //    _debugDraw(g2d);
+            //} else {
                 _draw(g2d);
-            }
+            //}
         }
     }
 
