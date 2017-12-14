@@ -19,11 +19,11 @@ import javax.imageio.ImageIO;
 public class GameEngine extends JPanel implements Runnable {
     
     // Game world size.
-    private static final int TILE_SIZE = 30;
-    private static final int WORLD_Y_TILE_COUNT = 14;
-    private static final int WORLD_X_TILE_COUNT = 24;
-    private static final int WORLD_WIDTH = WORLD_X_TILE_COUNT * TILE_SIZE;
-    private static final int WORLD_HEIGHT = WORLD_Y_TILE_COUNT * TILE_SIZE;
+    public static final int TILE_SIZE = 30;
+    public static final int WORLD_Y_TILE_COUNT = 14;
+    public static final int WORLD_X_TILE_COUNT = 24;
+    public static final int WORLD_WIDTH = WORLD_X_TILE_COUNT * TILE_SIZE;
+    public static final int WORLD_HEIGHT = WORLD_Y_TILE_COUNT * TILE_SIZE;
 
     // Player screen size.
     private static final int VIEW_SIZE = WORLD_HEIGHT;
@@ -60,25 +60,27 @@ public class GameEngine extends JPanel implements Runnable {
     private SoundManager soundManager;
 
     // Players
-    private static Paddle player1;
-    //private static Paddle player2;
+    private static Tank player1;
+    private static Tank player2;
     private HashMap<Integer, Controls> p1Keys;
     private HashMap<Integer, Controls> p2Keys;
 
     // Data collections
-    private ArrayList<Paddle> players;
+    private ArrayList<Tank> players;
     private ArrayList<Projectile> projectiles;
-    private ArrayList<Prop> boulders;
-    private ArrayList<Prop> breakableBoulders;
-    private ArrayList<Projectile> player1shots;
-    private ArrayList<Projectile> player2shots;
+    private ArrayList<Boulder> boulders;
+    private ArrayList<Projectile> player1Shots;
+    private ArrayList<Projectile> player2Shots;
     private ArrayList<Explosion> explosions;
-    
+    private ArrayList<PowerUp> powerUps;
+
     // Assets
     public static String ASSET_PATH = "resources/";
     public static String TANK_ASSET_PATH = ASSET_PATH + "tanks/";
     public static String ENV_ASSET_PATH = ASSET_PATH + "environment/";
     public static String SOUND_ASSET_PATH = ASSET_PATH + "sounds/";
+    public static String EXPLOSION_PATH = ASSET_PATH + "explosion/";
+    public static String POWERUP_PATH = ASSET_PATH + "powerUps/";
 
     private BufferedImage backgroundBuffer;
 
@@ -198,66 +200,70 @@ public class GameEngine extends JPanel implements Runnable {
 
     private void setupData() {
         // Collections.
-        players = new ArrayList<Paddle>();
+        players = new ArrayList<Tank>();
         projectiles = new ArrayList<Projectile>();
-        boulders = new ArrayList<Prop>();
-        breakableBoulders = new ArrayList<Prop>();
         explosions = new ArrayList<Explosion>();
+        boulders = new ArrayList<Boulder>();
+        powerUps = new ArrayList<PowerUp>();
 
         // Players
         Point p1Start = new Point(40, 80);
-        String p1AssetPath = TANK_ASSET_PATH + "RedPaddle1.png";
-        player1 = new Paddle(p1Start.x, p1Start.y, 5, TILE_SIZE, p1AssetPath, p1Keys);
-        player1shots = new ArrayList<Projectile>();
+        player1 = new Tank(p1Start.x, p1Start.y, 5, TILE_SIZE, p1Keys, Tank.Colors.RED);
+        player1Shots = new ArrayList<Projectile>();
         eventManager.addObserver(player1);
         players.add(player1);
 
         Point p2Start = new Point(WORLD_WIDTH-60, WORLD_HEIGHT-80);
-        String p2AssetPath = TANK_ASSET_PATH + "GreenPaddle1.png";
-        player2 = new Paddle(p2Start.x, p2Start.y, 5, TILE_SIZE, p2AssetPath, p2Keys);
-        player2shots = new ArrayList<Projectile>();
+        player2 = new Tank(p2Start.x, p2Start.y, 5, TILE_SIZE, p2Keys, Tank.Colors.GREEN);
+        player2Shots = new ArrayList<Projectile>();
         eventManager.addObserver(player2);
         players.add(player2);
 
         // Boulders
         Random r = new Random();
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 30; i++) {
             int rX = r.nextInt(WORLD_X_TILE_COUNT) * TILE_SIZE;
             int rY = r.nextInt(WORLD_Y_TILE_COUNT) * TILE_SIZE;
 
-            Prop b = new Prop(rX, rY, TILE_SIZE, TILE_SIZE, ENV_ASSET_PATH + "boulder.png");
+            Boulder.Type type = (i % 3 != 0 ) ? Boulder.Type.DEFAULT : Boulder.Type.BREAKABLE;
+            Boulder b = new Boulder(rX, rY, type);
 
-            // Ensure new boulder isn't placed on a player, and is in bounds.
-            if (
-                !Physics.collides(player1, b) &&
-                !Physics.collides(player2, b) &&
-                Physics.bounded(b, BOUNDS)
-            ) {
+            if (!Physics.collides(player1, b) && !Physics.collides(player2, b) && Physics.bounded(b, BOUNDS)) {
                 boulders.add(b);
             } else {
-                // If not, redo this itteration.
                 i--;
             }
         }
-
-        for (int i = 0; i < 7; i++) {
+        for(int i=0; i<3; i++){
+            
+            PowerUp.Type type =  PowerUp.Type.life;
             int rX = r.nextInt(WORLD_X_TILE_COUNT) * TILE_SIZE;
             int rY = r.nextInt(WORLD_Y_TILE_COUNT) * TILE_SIZE;
 
-            Prop bb = new Prop(rX, rY, TILE_SIZE, TILE_SIZE, ENV_ASSET_PATH + "breakableBoulder.png");
-
-            // Ensure new boulder isn't placed on a player, and is in bounds.
-            if (
-                !Physics.collides(player1, bb) &&
-                !Physics.collides(player2, bb) &&
-                Physics.bounded(bb, BOUNDS)
-            ) {
-                breakableBoulders.add(bb);
-            } else {
-                // If not, redo this itteration.
-                i--;
-            }
+            PowerUp power = new PowerUp(rX,rY,type);
+            powerUps.add(power);
         }
+        
+        for(int i=0; i<3; i++){
+            
+            PowerUp.Type type =  PowerUp.Type.damage;
+            int rX = r.nextInt(WORLD_X_TILE_COUNT) * TILE_SIZE;
+            int rY = r.nextInt(WORLD_Y_TILE_COUNT) * TILE_SIZE;
+
+            PowerUp power = new PowerUp(rX,rY,type);
+            powerUps.add(power);
+        }
+        for(int i=0; i<3; i++){
+            
+            PowerUp.Type type =  PowerUp.Type.speed;
+            int rX = r.nextInt(WORLD_X_TILE_COUNT) * TILE_SIZE;
+            int rY = r.nextInt(WORLD_Y_TILE_COUNT) * TILE_SIZE;
+
+            PowerUp power = new PowerUp(rX,rY,type);
+            powerUps.add(power);
+        }
+        
+        
     }
 
     private void setupAudio() {
@@ -279,27 +285,6 @@ public class GameEngine extends JPanel implements Runnable {
             // Switch on current GameState.
             switch (gameState) {
 
-                // Game is being created
-                case INITIALIZING:
-                {
-                    // TODO: Implement initializing view.
-                    break;
-                }
-
-                // Assets are being loaded
-                case LOADING:
-                {
-                    // TODO: Implement main menu view.
-                    break;
-                }
-
-                // The option menu is active
-                case OPTIONS_MENU:
-                {
-                    // TODO: Implement options menu view.
-                    break;
-                }
-
                 // The game is running
                 case PLAYING:
                 {
@@ -307,20 +292,6 @@ public class GameEngine extends JPanel implements Runnable {
                     checkCollisions();
                     cleanupObjects();
 
-                    break;
-                }
-
-                // The in-game pause menu is active
-                case PAUSE_MENU:
-                {
-                    // TODO: Implement pause menu view.
-                    break;
-                }
-
-                // The game has ended
-                case GAME_OVER:
-                {
-                    // TODO: Implement initializing view.
                     break;
                 }
 
@@ -364,25 +335,20 @@ public class GameEngine extends JPanel implements Runnable {
     // =================
     private void updateData() {
         // Update actors
-        player1.update(player1shots);
-        player2.update(player2shots);
+        player1.update(player1Shots);
+        player2.update(player2Shots);
 
-        for (Projectile p : player1shots) { p.update(); }
-        for (Projectile p : player2shots) { p.update(); }
-        for (Explosion e : explosions){ e.update(); }
-
+        // Update game objects.
+        for (Projectile _p : player1Shots) { _p.update(); }
+        for (Projectile _p : player2Shots) { _p.update(); }
+        for (Explosion _e : explosions){ _e.update(); }
     }
 
     private void checkCollisions() {
 
         // Player vs bounds.
-        if (!Physics.bounded(player1, BOUNDS)) {
-            player1.resetLocation();
-        }
-
-        if (!Physics.bounded(player2, BOUNDS)) {
-            player2.resetLocation();
-        }
+        if (!Physics.bounded(player1, BOUNDS)) player1.resetLocation();
+        if (!Physics.bounded(player2, BOUNDS)) player2.resetLocation();
 
         // Player vs player.
         if (Physics.collides(player1, player2)) {
@@ -390,129 +356,126 @@ public class GameEngine extends JPanel implements Runnable {
             player2.resetLocation();
         }
         
-        // Player v boulder.
-        for(Prop boulder : boulders) {
-            if (Physics.collides(boulder, player1)) {
-                player1.resetLocation();
+        //Player vs PowerUps
+        for (PowerUp p : powerUps){
+            if(Physics.collides(p,player1)){
+                player1.powerUp(p);
+                p.hide();
             }
-
-            if (Physics.collides(boulder, player2)) {
-                player2.resetLocation();
-            }
-        }
-        
-        // Player v breakable boulder
-        for (Prop bBoulder : breakableBoulders) {
-            if (
-                Physics.collides(bBoulder, player1) ||
-                Physics.collides(bBoulder, player2)
-            ) {
-                soundManager.playExplosion();
-                bBoulder.hide();
-            }
-        } 
-
-        // Check for collisions on player one shots.
-        for (Projectile projectile : player1shots) {
-
-            // Projectile vs player two.
-            if (!Physics.bounded(projectile, BOUNDS)){
-                soundManager.playExplosion();
-                projectile.hide();
-                Explosion boom = new Explosion(projectile.x, projectile.y);
-                explosions.add(boom);
+            if(Physics.collides(p,player2)){
+                player1.powerUp(p);
+                p.hide();
             }
             
-            if(Physics.collides(projectile, player2)) {
-                
-                soundManager.playExplosion();
-                projectile.hide();
-                if(damage(player1,player2)){
-                }else{
-                Explosion boom = new Explosion(player2.x, player2.y);
-                explosions.add(boom);
-                }
-            }       
+        }
         
-
-            // Projectile vs breakable boulders.
-            for(Prop bBoulder : breakableBoulders) {
-                if (Physics.collides(bBoulder, projectile)) {
-                    soundManager.playExplosion();
-                    bBoulder.hide();
-                    projectile.hide();
-                    Explosion boom = new Explosion(bBoulder.x, bBoulder.y);
-                    explosions.add(boom);
-                    //Explode
+        // Boulders
+        for (Boulder b : boulders) {
+            // Check standard boulder.
+            if (b.type == Boulder.Type.DEFAULT) {
+                if (Physics.collides(b, player1)) {
+                    player1.resetLocation();
+                } else if (Physics.collides(b, player2)) {
+                    player2.resetLocation();
                 }
+
             }
 
-            // Projectile vs boulders.
-            for (Prop boulder : boulders) {
-                if (Physics.collides(boulder, projectile)) {
+            // Check breakables.
+            else if (b.type == Boulder.Type.BREAKABLE) {
+                if (Physics.collides(b, player1)) {
+                    b.hide();
                     soundManager.playExplosion();
-                    projectile.hide();
-                    Explosion boom = new Explosion(boulder.x, boulder.y);
-                    explosions.add(boom);
+                } else if (Physics.collides(b, player2)) {
+                    b.hide();
+                    soundManager.playExplosion();
                 }
             }
         }
-        
+
+        // Check for collisions on player one shots.
+        for (Projectile p : player1Shots) {
+
+            // Check projectile bounds.
+            if (!Physics.bounded(p, BOUNDS)) {
+                p.hide();
+                soundManager.playExplosion();
+            }
+            
+            // Check hit on player 2.
+            else if (Physics.collides(p, player2)) {
+                p.hide();
+                damage(player1, player2);
+                explosions.add(new Explosion(player2.x, player2.y));
+                soundManager.playExplosion();
+            }
+
+            // Check boulder collisons.
+            else {
+
+                for (Boulder b : boulders) {
+                    if (Physics.collides(b, p)) {
+                        p.hide();
+                        explosions.add(new Explosion(b.x, b.y));
+                        soundManager.playExplosion();
+
+                        if (b.type == Boulder.Type.BREAKABLE) {
+                            b.hide();
+                            soundManager.playExplosion();
+                        }
+                    }
+                }
+
+            }
+
+        }
 
         // Check for collisions on player two shots.
-        for (Projectile projectile : player2shots) {
+        for (Projectile p : player2Shots) {
 
-            // Projectile vs player one.
-            if (!Physics.bounded(projectile, BOUNDS)){
+            // Check projectile bounds.
+            if (!Physics.bounded(p, BOUNDS)) {
+                p.hide();
                 soundManager.playExplosion();
-                projectile.hide();
-                Explosion boom = new Explosion(projectile.x, projectile.y);
-                explosions.add(boom);
             }
-                    
-            if(Physics.collides(projectile, player1)) {
+
+            // Check hit on player 1.
+            else if (Physics.collides(p, player1)) {
+                p.hide();
+                damage(player1, player2);
+                explosions.add(new Explosion(player1.x, player1.y));
                 soundManager.playExplosion();
-                projectile.hide();
-                if(damage(player2,player1)){
-                }else{
-                Explosion boom = new Explosion(player1.x, player1.y);
-                explosions.add(boom);
-                }
-            }
-        
-
-            // Projectile vs breakable boulders.
-            for (Prop bBoulder : breakableBoulders) {
-                if (Physics.collides(bBoulder, projectile)) {
-                    soundManager.playExplosion();
-                    bBoulder.hide();
-                    projectile.hide();
-                    //Explode
-                    Explosion boom = new Explosion(bBoulder.x, bBoulder.y);
-                    explosions.add(boom);
-                }
             }
 
-            // Projectile vs boulders.
-            for (Prop boulder : boulders) {
-                if (Physics.collides(boulder, projectile)) {
-                    soundManager.playExplosion();
-                    projectile.hide();
-                    //Explode
-                    Explosion boom = new Explosion(boulder.x, boulder.y);
-                    explosions.add(boom);
+            // Check boulder collisons.
+            else {
+
+                for (Boulder b : boulders) {
+                    if (Physics.collides(b, p)) {
+                        p.hide();
+                        explosions.add(new Explosion(b.x, b.y));
+                        soundManager.playExplosion();
+
+                        if (b.type == Boulder.Type.BREAKABLE) {
+                            b.hide();
+                            soundManager.playExplosion();
+                        }
+                    }
                 }
+
             }
-        }   
+
+        }
     }
-    
+
 
     private void cleanupObjects() {
         // Remove objects if hidden.
-        player1shots.removeIf(p -> p.isHidden());
-        player2shots.removeIf(p -> p.isHidden());
-        breakableBoulders.removeIf(bb -> bb.isHidden());
+        player1Shots.removeIf(p -> p.isHidden());
+        player2Shots.removeIf(p -> p.isHidden());
+        boulders.removeIf(b -> b.isHidden());
         explosions.removeIf(e -> e.isHidden());
+        powerUps.removeIf(p -> p.isHidden());
     }
 
 
@@ -530,27 +493,6 @@ public class GameEngine extends JPanel implements Runnable {
 
         // Draw based on current GameState.
         switch (gameState) {
-
-            // Game is being created
-            case INITIALIZING:
-            {
-                // TODO: Implement initializing view.
-                break;
-            }
-
-            // Assets are being loaded
-            case LOADING:
-            {
-                // TODO: Implement loading view
-                break;
-            }
-
-            // The option menu is active
-            case OPTIONS_MENU:
-            {
-                // TODO: implement options menu view
-                break;
-            }
 
             // The game is running
             case PLAYING:
@@ -582,20 +524,6 @@ public class GameEngine extends JPanel implements Runnable {
                 // Draw contents of buffer.
                 g.drawImage(windowBuffer, 0, 0, this);
 
-                break;
-            }
-
-            // The in-game pause menu is active
-            case PAUSE_MENU:
-            {
-                // TODO: implement pause menu view
-                break;
-            }
-
-            // The game has ended
-            case GAME_OVER:
-            {
-                // TODO: Implement Game over view.
                 break;
             }
 
@@ -646,11 +574,12 @@ public class GameEngine extends JPanel implements Runnable {
     }
 
     private void drawGameObjects(Graphics2D g2d) {
-        for (Prop _b : boulders) _b.draw(g2d);
-        for (Prop _bb : breakableBoulders) _bb.draw(g2d);
-        for (Projectile _p : player1shots) _p.draw(g2d);
-        for (Projectile _p : player2shots) _p.draw(g2d);
-        for (Paddle _p: players) _p.draw(g2d);
+        for (PowerUp _p : powerUps) _p.draw(g2d);
+        for (Boulder _b : boulders) _b.draw(g2d);
+        for (Projectile _p : player1Shots) _p.draw(g2d);
+        for (Projectile _p : player2Shots) _p.draw(g2d);
+        for (Tank _p: players) _p.draw(g2d);
+        
     }
 
     private void drawFXObjects(Graphics2D g2d) {
@@ -711,19 +640,15 @@ public class GameEngine extends JPanel implements Runnable {
 
         // Add locations of boulders.
         g2d.setColor(Color.GRAY);
-        for (Prop boulder : this.boulders) {
+        for (Boulder boulder : boulders) {
             Point bLoc = boulder.getLocation();
             g2d.fillRect(bLoc.x/scale, bLoc.y/scale, pinSize, pinSize);
         }
-        for (Prop boulder : this.breakableBoulders) {
-            Point bLoc = boulder.getLocation();
-            g2d.fillRect(bLoc.x/scale, bLoc.y/scale, pinSize, pinSize);
-        }
-        for (Projectile projectile : player1shots) {
+        for (Projectile projectile : player1Shots) {
             Point pLoc = projectile.getLocation();
             g2d.fillRect(pLoc.x/scale, pLoc.y/scale, projSize, projSize);
         }
-        for (Projectile projectile : player2shots) {
+        for (Projectile projectile : player2Shots) {
             Point pLoc = projectile.getLocation();
             g2d.fillRect(pLoc.x/scale, pLoc.y/scale, projSize, projSize);
         }
@@ -732,7 +657,7 @@ public class GameEngine extends JPanel implements Runnable {
         g.drawImage(miniMap, WINDOW_WIDTH - (mapWidth + paddingSize), paddingSize, mapWidth, mapHeight, this);
     }
     
-    private boolean damage(Paddle attacker, Paddle deffender){
+    private boolean damage(Tank attacker, Tank deffender){
         int pointDif = 20; //PointDifferential
         //Damage Health
         deffender.health -= pointDif;

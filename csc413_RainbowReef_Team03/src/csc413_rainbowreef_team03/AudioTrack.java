@@ -39,11 +39,7 @@ public class AudioTrack {
     // ==========
 
     public void play() {
-        new Thread(new Runnable() {
-            public void run() {
-                clip.start();
-            }
-        }).start();
+        clip.start();
     }
 
     public void stop() {

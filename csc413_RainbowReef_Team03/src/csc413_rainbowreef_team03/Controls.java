@@ -2,5 +2,5 @@ package csc413_rainbowreef_team03;
 
 
 public enum Controls {
-    LEFT, RIGHT, SHOOT
+    UP, DOWN, LEFT, RIGHT, SHOOT
 }

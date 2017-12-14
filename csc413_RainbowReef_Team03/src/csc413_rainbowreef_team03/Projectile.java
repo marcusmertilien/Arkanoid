@@ -1,14 +1,12 @@
 package csc413_rainbowreef_team03;
 
-import java.awt.Color;
-import java.awt.geom.AffineTransform;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.awt.Image;
 import javax.imageio.ImageIO;
 
 
-public class Projectile extends GameObject {
+public class Projectile extends Actor {
 
     public static int PROJECTILE_SIZE = 10;
     public static int PROJECTILE_SPEED = 5;
@@ -20,13 +18,12 @@ public class Projectile extends GameObject {
         int direction,
         int x,
         int y,
-        int xSpeed
-        //int ySpeed
+        int xSpeed,
+        int ySpeed
     ) {
         // Use super class constructor.
         // Provide all, and set visible and solid to true.
-        super(x, y, xSpeed,0,PROJECTILE_SPEED, true, true);
-        this.direction = direction;
+        super(x, y, PROJECTILE_SIZE, PROJECTILE_SIZE, xSpeed, ySpeed, PROJECTILE_SPEED, direction);
 
         // Setup test image.
         try {
@@ -42,55 +39,23 @@ public class Projectile extends GameObject {
             // Now store the scaled version as our asset.
             g2d.drawImage(tempScaledImage, 0, 0, null);
             g2d.dispose();
-
-            // Set new width and height.
-            width = sprite.getWidth();
-            height = sprite.getWidth();
-
         } catch (Exception e) {
             System.out.print("No resources are found\n");
         }
     }
 
 
-    // API
-    // ===
-    @Override
-    public void draw(Graphics2D g2d) {
-        if (this.isVisible()) {
-            //if (DebugState.showBoundsActive) {
-            //    _debugDraw(g2d);
-            //} else {
-                _draw(g2d);
-            //}
-        }
-    }
-
-    private void _debugDraw(Graphics2D g2d) {
-        AffineTransform at = new AffineTransform();
-        at.rotate(Math.toRadians(direction), (x+PROJECTILE_SIZE/2), (y+PROJECTILE_SIZE/2));
-        g2d.setTransform(at);
-        g2d.setColor(Color.WHITE);
-        g2d.fillRect(x, y, width, height);
-        g2d.drawImage(sprite, x+1, y+1, width-2, height-2, null);
-    }
-
-    private void _draw(Graphics2D g2d) {
-        AffineTransform at = new AffineTransform();
-        at.rotate(Math.toRadians(direction), (x+PROJECTILE_SIZE/2), (y+PROJECTILE_SIZE/2));
-        g2d.setTransform(at);
-        g2d.drawImage(sprite, x, y, width, height, null);
-    }
-
+    // Update API
+    // ==========
     public void update() {
         switch (direction) {
             case 0:
-                //y += ySpeed-speed;
+                y += ySpeed-speed;
                 break;
 
             case 45:
                 x += xSpeed+speed;
-                //y += ySpeed-speed;
+                y += ySpeed-speed;
                 break;
 
             case 90:
@@ -99,16 +64,16 @@ public class Projectile extends GameObject {
 
             case 135:
                 x += xSpeed+speed;
-                //y += ySpeed+speed;
+                y += ySpeed+speed;
                 break;
 
             case 180:
-               // y += ySpeed+speed;
+                y += ySpeed+speed;
                 break;
 
             case 225:
                 x += xSpeed-speed;
-                //y += ySpeed+speed;
+                y += ySpeed+speed;
                 break;
 
             case 270:
@@ -117,7 +82,7 @@ public class Projectile extends GameObject {
 
             case 315:
                 x += xSpeed-speed;
-                //y += ySpeed-speed;
+                y += ySpeed-speed;
                 break;
 
             default:

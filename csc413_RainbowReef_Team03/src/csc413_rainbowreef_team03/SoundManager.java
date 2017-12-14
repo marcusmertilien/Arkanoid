@@ -4,8 +4,7 @@ package csc413_rainbowreef_team03;
 public class SoundManager {
 
     private static SoundManager instance = null;
-    private AudioTrack soundtrack;
-
+    private AudioTrack soundtrack = null;
 
     // Constructors
     // ============
@@ -31,7 +30,9 @@ public class SoundManager {
     }
 
     public void stopSoundtrack() {
-        this.soundtrack.stop();
+        if (this.soundtrack != null) {
+            this.soundtrack.stop();
+        }
     }
 
     public void playShot() {

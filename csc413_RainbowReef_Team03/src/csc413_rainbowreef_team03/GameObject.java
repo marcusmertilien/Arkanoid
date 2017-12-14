@@ -15,13 +15,7 @@ public abstract class GameObject {
     protected int y;                 // vertical position
 
     protected int prevX;             // Previous x position
-    protected int prevY;             // Previous y position
-
-    protected int xSpeed;            // Horizontal speed
-    //protected int ySpeed;            // Vertical speed
-
-    protected int direction;         // direction the object is pointed in [0, 360]
-    protected int speed;             // current speed in direction.
+    protected int prevY;             // Previous y positiomn
 
     protected boolean isVisible;     // dictates if the object is visible
     protected boolean isSolid;       // dictates if the object is solid
@@ -29,7 +23,7 @@ public abstract class GameObject {
     protected int height = 0;
     protected int width = 0;
 
-    protected BufferedImage sprite;
+    protected BufferedImage sprite;  // the image to be drawn each frame
 
 
     // Constructors
@@ -37,9 +31,8 @@ public abstract class GameObject {
     public GameObject(
         int x,
         int y,
-        int xSpeed,
-        int ySpeed,
-        int speed,
+        int width,
+        int height,
         boolean isSolid,
         boolean isVisible
     ) {
@@ -51,9 +44,8 @@ public abstract class GameObject {
         this.y = y;
         this.prevX = x;
         this.prevY = y;
-        this.xSpeed = xSpeed;
-        //this.ySpeed = ySpeed;
-        this.speed = speed;
+        this.width = width;
+        this.height = height;
 
         // Set flags.
         this.isSolid = isSolid;
@@ -64,14 +56,11 @@ public abstract class GameObject {
     // =================
     abstract void draw(Graphics2D g2d);
 
-    // Acess
-    // =====
+    // Access
+    // ======
     public int getId() { return _id; }
     public int getX() { return x; }
     public int getY() { return y; }
-    public int getXSpeed() { return xSpeed; }
-    //public int getYSpeed() { return ySpeed; }
-    public int getSpeed() { return speed; }
     public int getHeight() { return height; }
     public int getWidth() { return width; }
 
@@ -79,9 +68,6 @@ public abstract class GameObject {
     // ======
     public void setX(int x) { x = x; }
     public void setY(int y) { y = y; }
-    public void setXSpeed(int xSpeed) { xSpeed = xSpeed; }
-    public void setYSpeed(int ySpeed) { ySpeed = ySpeed; }
-    public void setSpeed(int speed) { speed = speed; }
     public void setHeight(int height) { height = height; }
     public void setWidth(int width) { width = width; }
 
@@ -94,16 +80,6 @@ public abstract class GameObject {
 
     // Movement
     // ========
-    public void bounce() {
-        xSpeed = -xSpeed;
-        //ySpeed = -ySpeed;
-    }
-
-    public void stop() {
-        xSpeed = 0;
-        //ySpeed = 0;
-    }
-
     public void resetLocation() {
         x = prevX;
         y = prevY;
