@@ -27,6 +27,9 @@ public class Stage {
         try {
             ClassLoader cl = GameEngine.class.getClassLoader();
             BufferedImage spriteMap = ImageIO.read(cl.getResource(GameEngine.STAGE_BG_PATH + SPRITE_PATH));
+            BufferedImage rawAsset, bgMap;
+            Image tempScaledImage;
+            Graphics2D g2d;
             
             backgroundCollection = new HashMap<Rounds, BufferedImage>();
 
@@ -38,7 +41,13 @@ public class Stage {
                 if (i > 0) x += i*SPACER_WIDTH;
 
                 // Provide an image asset per enum type.
-                backgroundCollection.put(Rounds.values()[i], spriteMap.getSubimage(x, y, BG_WIDTH, BG_HEIGHT));
+                rawAsset = spriteMap.getSubimage(x, y, BG_WIDTH, BG_HEIGHT);
+                tempScaledImage = rawAsset.getScaledInstance(2*BG_WIDTH, 2*BG_HEIGHT, Image.SCALE_SMOOTH);
+                bgMap = new BufferedImage(2*BG_WIDTH, 2*BG_HEIGHT, BufferedImage.TYPE_INT_ARGB);
+                g2d = bgMap.createGraphics();
+                g2d.drawImage(tempScaledImage, 0, 0, null);
+
+                backgroundCollection.put(Rounds.values()[i], bgMap);
             }
 
         } catch (Exception e) {

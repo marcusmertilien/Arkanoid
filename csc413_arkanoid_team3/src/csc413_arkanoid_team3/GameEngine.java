@@ -17,8 +17,8 @@ public class GameEngine extends JPanel implements Runnable {
 
     // View window size.
     private static final int WINDOW_BORDER_WIDTH = 5;
-    private static final int WINDOW_WIDTH        = 324;
-    private static final int WINDOW_HEIGHT       = 340;
+    private static final int WINDOW_WIDTH        = 448;
+    private static final int WINDOW_HEIGHT       = 480;
 
     // Game loop constants.
     private static final int TARGET_FPS     = 30;
@@ -144,7 +144,7 @@ public class GameEngine extends JPanel implements Runnable {
 
     private void _setupGameData() {
         // TODO: we'll likely need to so _something_ here.
-         this.testStage = new Stage(Stage.Rounds.ROUND_5);
+         this.testStage = new Stage(Stage.Rounds.ROUND_2);
     }
 
     private void _setupGameAudio() {
@@ -271,19 +271,19 @@ public class GameEngine extends JPanel implements Runnable {
         }
     }
 
-    private void drawViews(Graphics2D g2d, BufferedImage gameWorldBuffer) {
+    private void _drawViews(Graphics2D g2d, BufferedImage gameWorldBuffer) {
         // Assess if we actually needs x2 players here, might be cool but more work.
     }
 
-    private void drawBackground(Graphics2D g2d) {
+    private void _drawBackground(Graphics2D g2d) {
         // Draw the stages background.
     }
 
-    private void drawGameObjects(Graphics2D g2d) {
+    private void _drawGameObjects(Graphics2D g2d) {
         // Draw the stage's objects.
     }
 
-    private void drawUIPanel(Graphics g) {
+    private void _drawUIPanel(Graphics g) {
         // UI is defined as anything around the central game panel.
     }
 
