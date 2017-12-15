@@ -13,8 +13,8 @@ public abstract class GameObject extends Rectangle {
     protected int x;                 // horizontal position
     protected int y;                 // vertical position
 
-    protected int previousX;             // Previous x position
-    protected int previousY;             // Previous y position
+    protected int previousX;         // Previous x position
+    protected int previousY;         // Previous y position
 
     protected boolean isVisible;     // dictates if the object is visible
 

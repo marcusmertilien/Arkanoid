@@ -51,10 +51,12 @@ public class GameEngine extends JPanel implements Runnable {
 
     // Assets
     public static String ASSET_PATH = "resources/";
+    public static String SHIP_PATH = ASSET_PATH + "ship/";
     public static String STAGE_BG_PATH = ASSET_PATH + "stage-background/";
     public static String SOUND_ASSET_PATH = ASSET_PATH + "sounds/";
 
     // Test data
+    private Ship testShip;
     private Stage testStage;
 
 
@@ -144,7 +146,8 @@ public class GameEngine extends JPanel implements Runnable {
 
     private void _setupGameData() {
         // TODO: we'll likely need to so _something_ here.
-         this.testStage = new Stage(Stage.Rounds.ROUND_2);
+        this.testShip = new Ship(200, 400);
+        this.testStage = new Stage(Stage.Rounds.ROUND_2);
     }
 
     private void _setupGameAudio() {
@@ -254,7 +257,11 @@ public class GameEngine extends JPanel implements Runnable {
             case TESTING_STAGE_BG:
                 // Test stage draw.
                 Graphics2D g2d = (Graphics2D) windowBuffer.getGraphics();
-                this.testStage.draw(g2d);
+                // this.testStage.draw(g2d);
+                // g2d.dispose();
+
+                // g2d = (Graphics2D) windowBuffer.getGraphics();
+                this.testShip.draw(g2d);
                 g2d.dispose();
 
                 // Draw window.
