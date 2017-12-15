@@ -1,7 +1,12 @@
-# csc413-secondgame
+### CSC413 - Arkanoid (Rainbow Reef)
 
-- TODO
-- Second Game Choice : 
+Marcus Mertilien <br />
+student id: 916638845 <br />
+email: marcusmertilien@gmail.com <br />
+
+Ben Clark <br />
+student id: 917215044<br />
+email: thecalestonrift@gmail.com<br />
+
+#### TODO
 - Change the name of the repo to csc413-secondgame-teamNN where NN is your team number. Please remove the username from the repo.
-- ADD ALL members of the team to the repo (your other partner).
-- Add the namesm student id, and email to this READ ME.
