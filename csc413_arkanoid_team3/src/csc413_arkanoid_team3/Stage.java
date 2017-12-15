@@ -33,7 +33,7 @@ public class Stage {
     private static HashMap<Rounds, BufferedImage> backgroundCollection;
     static {
         try {
-            ClassLoader cl = Tank.class.getClassLoader();
+            ClassLoader cl = GameEngine.class.getClassLoader();
             BufferedImage spriteMap = ImageIO.read(cl.getResource(GameEngine.STAGE_BG_PATH + SPRITE_PATH));
             
             backgroundCollection = new HashMap<Rounds, BufferedImage>();
