@@ -3,8 +3,9 @@ package csc413_arkanoid_team3;
 
 public class SoundManager {
 
-    private static SoundManager instance = null;
-    private AudioTrack soundtrack = null;
+    private static SoundManager instance;   // the singleton instance
+    private AudioTrack soundtrack;          // the background soundtrack
+
 
     // Constructors
     // ============

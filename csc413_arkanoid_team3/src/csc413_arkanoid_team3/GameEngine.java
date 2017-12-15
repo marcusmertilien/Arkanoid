@@ -6,14 +6,8 @@ import java.util.*;
 
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.Random;
-import javax.imageio.ImageIO;
 
 
 public class GameEngine extends JPanel implements Runnable {
@@ -59,7 +53,6 @@ public class GameEngine extends JPanel implements Runnable {
     public static String ASSET_PATH = "resources/";
     public static String STAGE_BG_PATH = ASSET_PATH + "stage-background/";
     public static String SOUND_ASSET_PATH = ASSET_PATH + "sounds/";
-    private BufferedImage backgroundBuffer;
 
     // Test data
     private Stage testStage;
@@ -105,11 +98,11 @@ public class GameEngine extends JPanel implements Runnable {
     // Init
     // ====
     public void init(JFrame frame) {
-        // Setup running flags.
         isRunning = true;
+
+        // Active test mode for BG.
         gameState = GameState.TESTING_STAGE_BG;
 
-        // Get references to singletons.
         inputHandler = InputHandler.getInstance();
         soundManager = SoundManager.getInstance();
         eventManager = EventManager.getInstance();
@@ -123,19 +116,19 @@ public class GameEngine extends JPanel implements Runnable {
         this.addKeyListener(inputHandler); // attach input handler to panel
 
         // Setup player keys.
-        setupKeys();
+        _setupControls();
 
         // Setup data.
-        setupData();
+        _setupGameData();
 
         // Setup audio track.
-        setupAudio();
+        _setupGameAudio();
 
         // Add game panel instance to parent frame.
         frame.add(this, BorderLayout.CENTER);
     }
 
-    private void setupKeys() {
+    private void _setupControls() {
         // Setup player 1 key mapping
         p1Keys = new HashMap<Integer, Controls>();
         p1Keys.put(KeyEvent.VK_LEFT, Controls.LEFT);
@@ -149,12 +142,12 @@ public class GameEngine extends JPanel implements Runnable {
         p2Keys.put(KeyEvent.VK_SPACE, Controls.SHOOT);
     }
 
-    private void setupData() {
+    private void _setupGameData() {
         // TODO: we'll likely need to so _something_ here.
          this.testStage = new Stage(Stage.Rounds.ROUND_5);
     }
 
-    private void setupAudio() {
+    private void _setupGameAudio() {
         if (DebugState.playSoundtrackActive)
             soundManager.playSoundtrack();
     }
@@ -239,16 +232,22 @@ public class GameEngine extends JPanel implements Runnable {
     @Override
     protected void paintComponent(Graphics g) {
 
+        // The window's double buffer.
         BufferedImage windowBuffer = new BufferedImage(
             WINDOW_WIDTH, WINDOW_HEIGHT, BufferedImage.TYPE_INT_RGB
         );
 
+        // The game area's buffer.
         BufferedImage gameAreaBuffer = new BufferedImage(
             WINDOW_WIDTH, WINDOW_HEIGHT, BufferedImage.TYPE_INT_RGB
         );
 
         // Draw based on current GameState.
         switch (gameState) {
+            case INITIALIZING:
+                // Game open
+                // TODO: draw splash screen.
+                break;
             case PLAYING:
                 // Main application loop here
                 break;
@@ -260,6 +259,9 @@ public class GameEngine extends JPanel implements Runnable {
 
                 // Draw window.
                 g.drawImage(windowBuffer, 0, 0, this);
+                break;
+            case EXITING:
+                // Application exiting....
                 break;
             default:
                 // Somehow, we have a bad enum...

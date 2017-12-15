@@ -11,25 +11,17 @@ import javax.imageio.ImageIO;
 
 public class Stage {
 
-    // Constants
-    // =========
-
     private static String SPRITE_PATH = "background-sprite-sheet.png";
-    private static int BG_WIDTH = 224;
-    private static int BG_HEIGHT = 240;
-    private static int SPACER_WIDTH = 8;
-    private static int SPACE_HEIGHT = 20;
 
+    private static int BG_WIDTH = 224;      // width of stage area
+    private static int BG_HEIGHT = 240;     // height of stage area
+    private static int SPACER_WIDTH = 8;    // horizonatal spacer between stage bgs
+    private static int SPACE_HEIGHT = 20;   // vertical spacer between bgs
 
-    // Class statics
-    // =============
-
-    // enum dictating the round the stage represents
     public static enum Rounds {
         ROUND_1, ROUND_2, ROUND_3, ROUND_4, ROUND_5
     }
-    
-    // Static hash map for stage bg assets
+
     private static HashMap<Rounds, BufferedImage> backgroundCollection;
     static {
         try {
@@ -38,14 +30,14 @@ public class Stage {
             
             backgroundCollection = new HashMap<Rounds, BufferedImage>();
 
-            int roundCount = Rounds.values().length;
-            for (int i = 0; i < roundCount; i++) {
+            for (int i = 0; i < Rounds.values().length; i++) {
                 int x = i * BG_WIDTH;
                 int y = 0;
 
                 // Account for spacers in sprite sheet.
                 if (i > 0) x += i*SPACER_WIDTH;
 
+                // Provide an image asset per enum type.
                 backgroundCollection.put(Rounds.values()[i], spriteMap.getSubimage(x, y, BG_WIDTH, BG_HEIGHT));
             }
 
@@ -53,6 +45,7 @@ public class Stage {
             System.out.print("No resources found\n");
         }
     }
+
 
     // Class fields
     // ============

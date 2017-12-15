@@ -8,7 +8,7 @@ import javax.sound.sampled.FloatControl;
 
 public class AudioTrack {
 
-    private Clip clip;
+    private Clip clip;  // the audio clip to be played
 
 
     // Constructors

@@ -12,13 +12,15 @@ public abstract class Prop extends GameObject {
 
     // Constructors
     // ============
+
     public Prop(int x, int y, int width, int height) {
-        super(x, y, width, height, true, true);
+        super(x, y, width, height, true);
     }
 
 
     // Draw API
     // ========
+
     @Override
     public void draw(Graphics2D g2d) {
         if (DebugState.showBoundsActive)

@@ -6,8 +6,9 @@ import java.awt.event.KeyListener;
 
 public class InputHandler implements KeyListener {
 
-    private static InputHandler instance = null;
+    private static InputHandler instance;
     private static EventManager eventManager;
+
 
     // Constructors
     // ============
@@ -24,22 +25,23 @@ public class InputHandler implements KeyListener {
         return instance;
     }
 
+
     // KeyListener interface
     // =====================
 
     @Override
-    public void keyTyped(KeyEvent e) {
-        this.eventManager.keyTyped(e);
+    public void keyTyped(KeyEvent ev) {
+        eventManager.keyTyped(ev);
     }
 
     @Override
-    public void keyPressed(KeyEvent e) {
-        this.eventManager.keyPressed(e);
+    public void keyPressed(KeyEvent ev) {
+        eventManager.keyPressed(ev);
     }
 
     @Override
-    public void keyReleased(KeyEvent e) {
-        this.eventManager.keyReleased(e);
+    public void keyReleased(KeyEvent ev) {
+        eventManager.keyReleased(ev);
     }
 
 }

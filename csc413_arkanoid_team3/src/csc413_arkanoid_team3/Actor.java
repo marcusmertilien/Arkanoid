@@ -2,21 +2,20 @@ package csc413_arkanoid_team3;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.geom.AffineTransform;
 
 
 public abstract class Actor extends GameObject {
 
-    protected int xSpeed;
-    protected int ySpeed;
-    protected int speed;
-    protected int direction;
+    protected int xSpeed;   // horizontal speed
+    protected int ySpeed;   // vertical speed
+    protected int speed;    // base speed of actor
 
     protected SoundManager soundManager;
 
 
     // Constructors
     // ============
+
     public Actor(
         int x,
         int y,
@@ -24,15 +23,13 @@ public abstract class Actor extends GameObject {
         int height,
         int xSpeed,
         int ySpeed,
-        int speed,
-        int direction
+        int speed
     ) {
-        super(x, y, width, height, true, true);
+        super(x, y, width, height, true);
 
         this.xSpeed = xSpeed;
         this.ySpeed = ySpeed;
         this.speed = speed;
-        this.direction = direction;
         this.soundManager = SoundManager.getInstance();
     }
 
@@ -53,9 +50,6 @@ public abstract class Actor extends GameObject {
     }
 
     private void _draw(Graphics2D g2d) {
-        AffineTransform at = new AffineTransform();
-        at.rotate(Math.toRadians(direction), (x+width/2), (y+height/2));
-        g2d.setTransform(at);
         g2d.drawImage(sprite, x, y, width, height, null);
     }
 }

@@ -6,7 +6,7 @@ import java.util.Observable;
 
 public class EventManager extends Observable {
 
-    private static EventManager instance = null;
+    private static EventManager instance;
 
 
     // Constructors
@@ -25,7 +25,6 @@ public class EventManager extends Observable {
 
     // Public API
     // ==========
-
 
     public void keyPressed(KeyEvent e) {
         setChanged();

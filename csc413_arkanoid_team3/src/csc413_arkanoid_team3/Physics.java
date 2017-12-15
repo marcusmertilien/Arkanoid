@@ -4,19 +4,21 @@ import java.awt.Rectangle;
 
 
 public class Physics {
-    public static Boolean collides(GameObject objA, GameObject objB) {
-        return objA.getBound().intersects(objB.getBound());
+
+    public static Boolean doesCollideWith(GameObject objA, GameObject objB) {
+        return objA.getBounds().intersects(objB.getBounds());
     }
 
-    public static Boolean collides(GameObject obj, Rectangle bounds) {
-        return bounds.intersects(obj.getBound());
+    public static Boolean doesCollideWith(GameObject obj, Rectangle bounds) {
+        return bounds.intersects(obj.getBounds());
     }
 
-    public static Boolean bounded(GameObject objA, GameObject objB) {
-        return objA.getBound().contains(objB.getBound());
+    public static Boolean isBoundedBy(GameObject objA, GameObject objB) {
+        return objA.getBounds().contains(objB.getBounds());
     }
 
-    public static Boolean bounded(GameObject obj, Rectangle bounds) {
-        return bounds.contains(obj.getBound());
+    public static Boolean isBoundedBy(GameObject obj, Rectangle bounds) {
+        return bounds.contains(obj.getBounds());
     }
+
 }
