@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp spec="1.0" xmlns:jfx="http://javafx.com" href="csc413_TankGame_Team03_browser.jnlp">
+  <information>
+    <title>csc413_TankGame_Team03</title>
+    <vendor>mmertilien</vendor>
+    <description>null</description>
+    <offline-allowed/>
+  </information>
+  <resources>
+    <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
+    <jar href="csc413_TankGame_Team03.jar" size="35896211" download="eager" />
+  </resources>
+  <applet-desc  width="800" height="600" main-class="csc413_tankgame_team03.GameEngine"  name="csc413_TankGame_Team03" >
+  </applet-desc>
+  <update check="always"/>
+</jnlp>

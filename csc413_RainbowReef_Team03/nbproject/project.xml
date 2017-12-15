@@ -13,7 +13,7 @@
             </extension>
         </buildExtensions>
         <data xmlns="http://www.netbeans.org/ns/j2se-project/3">
-            <name>csc413_RainbowReef_Team03</name>
+            <name>csc413_TankGame_Team03</name>
             <source-roots>
                 <root id="src.dir"/>
             </source-roots>
