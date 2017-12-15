@@ -1,10 +1,12 @@
 ### CSC413 - Arkanoid (Rainbow Reef)
 
-Marcus Mertilien <br />
+![alt text](https://i.pinimg.com/originals/09/fe/e4/09fee4cd751f5cf53b7f07651cd8573a.jpg)
+
+#### Marcus Mertilien <br />
 student id: 916638845 <br />
 email: marcusmertilien@gmail.com <br />
 
-Ben Clark <br />
+#### Ben Clark <br />
 student id: 917215044<br />
 email: thecalestonrift@gmail.com<br />
 
