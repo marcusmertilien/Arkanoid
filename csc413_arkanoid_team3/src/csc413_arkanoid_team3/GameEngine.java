@@ -34,7 +34,7 @@ public class GameEngine extends JPanel implements Runnable {
         PAUSE_MENU,
         PLAYING,
         GAME_OVER,
-        TESTING_STAGE_BG,
+        TESTING_DRAWING,
         EXITING
     };
     private Boolean isRunning;
@@ -56,7 +56,7 @@ public class GameEngine extends JPanel implements Runnable {
     public static String SOUND_ASSET_PATH = ASSET_PATH + "sounds/";
 
     // Test data
-    private Ship testShip;
+    private Player testShip;
     private Stage testStage;
 
 
@@ -103,7 +103,7 @@ public class GameEngine extends JPanel implements Runnable {
         isRunning = true;
 
         // Active test mode for BG.
-        gameState = GameState.TESTING_STAGE_BG;
+        gameState = GameState.TESTING_DRAWING;
 
         inputHandler = InputHandler.getInstance();
         soundManager = SoundManager.getInstance();
@@ -146,8 +146,9 @@ public class GameEngine extends JPanel implements Runnable {
 
     private void _setupGameData() {
         // TODO: we'll likely need to so _something_ here.
-        this.testShip = new Ship(200, 400);
+        this.testShip = new Player(200, 420, p1Keys);
         this.testStage = new Stage(Stage.Rounds.ROUND_2);
+        eventManager.addObserver((Observer) this.testShip);
     }
 
     private void _setupGameAudio() {
@@ -174,8 +175,10 @@ public class GameEngine extends JPanel implements Runnable {
                 case PLAYING:
                     // Main game update
                     break;
-                case TESTING_STAGE_BG:
+                case TESTING_DRAWING:
                     // Test area
+                    this.testShip.update();
+                    checkCollisions();
                     break;
                 case EXITING:
                     // Game closing
@@ -209,7 +212,7 @@ public class GameEngine extends JPanel implements Runnable {
                 // Sleep until the next frame is due.
                 Thread.sleep((lastFrameTime - System.nanoTime() + OPTIMAL_TIME) / 1000000);
             } catch (Exception e) {
-                // We should probably do something graceful here...
+                System.out.println(e.toString());
             }
         }
     }
@@ -223,6 +226,9 @@ public class GameEngine extends JPanel implements Runnable {
 
     private void checkCollisions() {
         // Check stage's items again instance ball and paddle.
+        if (this.testShip.x < 12 || this.testShip.x > 370) {
+            this.testShip.resetLocation();
+        }
     }
 
 
@@ -254,18 +260,18 @@ public class GameEngine extends JPanel implements Runnable {
             case PLAYING:
                 // Main application loop here
                 break;
-            case TESTING_STAGE_BG:
+            case TESTING_DRAWING:
                 // Test stage draw.
-                Graphics2D g2d = (Graphics2D) windowBuffer.getGraphics();
-                // this.testStage.draw(g2d);
-                // g2d.dispose();
+                Graphics2D g2d = (Graphics2D) gameAreaBuffer.getGraphics();
+                this.testStage.draw(g2d);
+                g2d.dispose();
 
-                // g2d = (Graphics2D) windowBuffer.getGraphics();
+                g2d = (Graphics2D) gameAreaBuffer.getGraphics();
                 this.testShip.draw(g2d);
                 g2d.dispose();
 
                 // Draw window.
-                g.drawImage(windowBuffer, 0, 0, this);
+                g.drawImage(gameAreaBuffer, 0, 0, this);
                 break;
             case EXITING:
                 // Application exiting....
