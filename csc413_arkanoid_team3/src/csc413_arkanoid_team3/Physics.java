@@ -13,6 +13,10 @@ public class Physics {
         return bounds.intersects(obj.getBounds());
     }
 
+    public static Rectangle getIntersection(GameObject objA, GameObject objB) {
+        return objA.getBounds().intersection(objB.getBounds());
+    }
+
     public static Boolean isBoundedBy(GameObject objA, GameObject objB) {
         return objA.getBounds().contains(objB.getBounds());
     }

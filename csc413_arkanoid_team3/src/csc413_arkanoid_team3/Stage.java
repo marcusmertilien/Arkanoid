@@ -63,8 +63,9 @@ public class Stage {
     // ============
 
     private BufferedImage bgSprite;
-    private ArrayList<Block> blocks;
-    private Rounds round;
+
+    public Rounds round;
+    public ArrayList<Block> blocks;
 
 
     // Constructors

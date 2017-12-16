@@ -250,6 +250,21 @@ public class GameEngine extends JPanel implements Runnable {
             this.testBall.resetLocation();
             this.testBall.ySpeed = -(this.testBall.ySpeed);
         }
+
+        for (Block _b : this.testStage.blocks) {
+            if (Physics.doesCollideWith(_b, this.testBall)) {
+                // Find intersection
+                Rectangle _i = Physics.getIntersection(this.testBall, _b);
+
+                if ((_i.y == _b.y) || (_i.y == this.testBall.y)) {
+                    this.testBall.resetLocation();
+                    this.testBall.ySpeed = -this.testBall.ySpeed;
+                } else if ((_i.x == _b.x) || (_i.x == this.testBall.x)) {
+                    this.testBall.resetLocation();
+                    this.testBall.xSpeed = -this.testBall.xSpeed;
+                }
+            }
+        }
     }
 
 
