@@ -21,7 +21,7 @@ public abstract class GameObject extends Rectangle {
     protected int width;             // Object width
     protected int height;            // Object height
 
-    protected BufferedImage sprite;  // the image to be drawn each frame
+    protected BufferedImage sprite;  // the image to be drawn each frame.
 
 
     // Constructors

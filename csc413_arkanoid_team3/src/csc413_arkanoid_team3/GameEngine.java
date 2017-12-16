@@ -53,11 +53,13 @@ public class GameEngine extends JPanel implements Runnable {
     public static String SOUND_ASSET_PATH = ASSET_PATH + "sounds/";
     public static String GENERAL_ASSET_PATH = ASSET_PATH + "general/";
     public static String BALL_ASSET_PATH = ASSET_PATH + "ball/";
+    public static String POWERUPS_ASSET_PATH = ASSET_PATH + "power-ups/";
 
     // Test data
     private Player testShip;
     private Stage testStage;
     private Ball testBall;
+    private ArrayList<PowerUp> powerups;
     private int testScore;
 
     // Entry point
@@ -151,7 +153,14 @@ public class GameEngine extends JPanel implements Runnable {
         this.testBall = new Ball(205, 400);
         this.testBall.xSpeed = 3;
         this.testBall.ySpeed = -3;
-        eventManager.addObserver((Observer) this.testShip);
+
+        powerups = new ArrayList<PowerUp>();
+
+        for (int i = 0; i < PowerUp.Types.values().length; i++) {
+            powerups.add(new PowerUp(100+ (32*i), 25, PowerUp.Types.values()[i]));
+        }
+
+        eventManager.addObserver(this.testShip);
     }
 
     private void _setupGameAudio() {
@@ -181,6 +190,7 @@ public class GameEngine extends JPanel implements Runnable {
                     // Test area
                     this.testShip.update();
                     this.testBall.update();
+                    for (PowerUp _p : powerups) { _p.update(); }
                     checkCollisions();
                     cleanupObjects();
                     break;
@@ -259,12 +269,19 @@ public class GameEngine extends JPanel implements Runnable {
                 // Find intersection
                 Rectangle _i = Physics.getIntersection(this.testBall, _b);
 
-                // Detect which side contact was made, and flip that axis.
-                if ((_i.y == _b.y) || (_i.y == this.testBall.y)) {
-                    this.testBall.resetLocation();
+                if (_i.y == _b.y) {
                     this.testBall.ySpeed = -this.testBall.ySpeed;
-                } else if ((_i.x == _b.x) || (_i.x == this.testBall.x)) {
-                    this.testBall.resetLocation();
+                }
+
+                if (_i.y == this.testBall.y) {
+                    this.testBall.ySpeed = -this.testBall.ySpeed;
+                }
+
+                if (_i.x == _b.x) {
+                    this.testBall.xSpeed = -this.testBall.xSpeed;
+                }
+
+                if(_i.x == this.testBall.x) {
                     this.testBall.xSpeed = -this.testBall.xSpeed;
                 }
 
@@ -310,6 +327,9 @@ public class GameEngine extends JPanel implements Runnable {
 
                 this.testStage.draw(g2d);
                 this.testBall.draw(g2d);
+                for (PowerUp _p : powerups) {
+                    _p.draw(g2d);
+                }
                 this.testShip.draw(g2d);
                 drawUIPanel(g2d);
 

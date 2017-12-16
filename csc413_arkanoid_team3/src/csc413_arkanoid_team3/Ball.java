@@ -18,7 +18,7 @@ public class Ball extends Actor {
     private static int BALL_SPRITE_HEIGHT = 4;
     private static int BALL_WIDTH = 2*BALL_SPRITE_WIDTH;
     private static int BALL_HEIGHT = 2*BALL_SPRITE_HEIGHT;
-    private static int BALL_SPEED = 5;
+    public static int BALL_SPEED = 5;
 
     static {
         try {

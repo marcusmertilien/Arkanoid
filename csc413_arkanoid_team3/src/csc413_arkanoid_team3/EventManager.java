@@ -32,7 +32,7 @@ public class EventManager extends Observable {
 
          // TODO: this isn't in the right place yet - only for testing
         if (e.getKeyCode() == KeyEvent.VK_P) {
-            SoundManager.getInstance().stopSoundtrack();
+
         }
     }
 
