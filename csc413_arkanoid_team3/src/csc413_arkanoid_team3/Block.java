@@ -25,6 +25,7 @@ public class Block extends Prop {
     }
 
     private static HashMap<Types, Integer> pointMap;
+    private static HashMap<Types, Integer> hitPointsMap;
     private static HashMap<Types, BufferedImage> assetMap;
     static {
         try {
@@ -41,6 +42,18 @@ public class Block extends Prop {
             pointMap.put(Types.YELLOW, 120);
             pointMap.put(Types.SILVER, 50);
             pointMap.put(Types.GOLD, 0);
+
+            hitPointsMap = new HashMap<Types, Integer>();
+            hitPointsMap.put(Types.WHITE, 1);
+            hitPointsMap.put(Types.ORANGE, 1);
+            hitPointsMap.put(Types.CYAN, 1);
+            hitPointsMap.put(Types.GREEN, 1);
+            hitPointsMap.put(Types.RED, 1);
+            hitPointsMap.put(Types.BLUE, 1);
+            hitPointsMap.put(Types.PINK, 1);
+            hitPointsMap.put(Types.YELLOW, 1);
+            hitPointsMap.put(Types.SILVER, 2);
+            hitPointsMap.put(Types.GOLD, -1); // Gold blocks are indestructible.
 
             // Init images assets
             // ==================
@@ -75,6 +88,7 @@ public class Block extends Prop {
     private BufferedImage bgSprite;
     private Types type;
     public int points;
+    public int hitPoints;
 
     // TODO: each block might contain a powerup up that releases on destroy.
     // private PowerUp powerUp;
@@ -89,6 +103,16 @@ public class Block extends Prop {
         this.type = type;
         this.sprite = assetMap.get(this.type);
         this.points = pointMap.get(this.type);
+        this.hitPoints = hitPointsMap.get(this.type);
         // this.powerUp = ...;
+    }
+
+    public int registerHit() {
+        if (--this.hitPoints == 0) {
+            this.hide();
+            return this.points;
+        }
+
+        return 0;
     }
 }

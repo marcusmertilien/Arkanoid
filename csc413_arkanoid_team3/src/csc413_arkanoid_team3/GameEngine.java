@@ -268,8 +268,7 @@ public class GameEngine extends JPanel implements Runnable {
                     this.testBall.xSpeed = -this.testBall.xSpeed;
                 }
 
-                this.testScore += _b.points;
-                _b.hide();
+                this.testScore += _b.registerHit();
             }
         }
     }
