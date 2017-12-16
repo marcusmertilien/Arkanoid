@@ -58,7 +58,7 @@ public class GameEngine extends JPanel implements Runnable {
     private Player testShip;
     private Stage testStage;
     private Ball testBall;
-    private int testScore = 100;
+    private int testScore;
 
     // Entry point
     // ===========
@@ -306,20 +306,11 @@ public class GameEngine extends JPanel implements Runnable {
             case TESTING_DRAWING:
                 // Test stage draw.
                 Graphics2D g2d = (Graphics2D) gameAreaBuffer.getGraphics();
+
                 this.testStage.draw(g2d);
-                g2d.dispose();
-
-                g2d = (Graphics2D) gameAreaBuffer.getGraphics();
                 this.testBall.draw(g2d);
-                g2d.dispose();
-
-                g2d = (Graphics2D) gameAreaBuffer.getGraphics();
                 this.testShip.draw(g2d);
-                g2d.dispose();
-
-                g2d = (Graphics2D) gameAreaBuffer.getGraphics();
                 drawUIPanel(g2d);
-                g2d.dispose();
 
                 // Draw window.
                 g.drawImage(gameAreaBuffer, 0, 0, this);
