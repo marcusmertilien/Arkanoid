@@ -63,6 +63,7 @@ public class Stage {
     // ============
 
     private BufferedImage bgSprite;
+    private ArrayList<Block> blocks;
     private Rounds round;
 
 
@@ -72,6 +73,16 @@ public class Stage {
     public Stage(Rounds round) {
         this.round = round;
         this.bgSprite = backgroundCollection.get(this.round);
+
+        // Test data will use a data collection for the setup.
+        this.blocks = new ArrayList<Block>();
+        for (int j = 0; j < 10; j++) {
+        for (int i = 0; i < 13; i++) {
+            int x = 16 + (i*Block.BLOCK_WIDTH);
+            int y = 50 + (j*Block.BLOCK_HEIGHT);
+            Block testBlock = new Block(x, y, Block.Types.values()[i %Block.Types.values().length]);
+            blocks.add(testBlock);
+        }}
     }
 
     public void draw(Graphics2D g2d) {
@@ -85,7 +96,7 @@ public class Stage {
     }
 
     private void _drawBlocks(Graphics2D g2d) {
-        // TODO draw blocks
+        for (Block _b : blocks) _b.draw(g2d);
     }
 
     private void _drawPowerUps(Graphics2D g2d) {

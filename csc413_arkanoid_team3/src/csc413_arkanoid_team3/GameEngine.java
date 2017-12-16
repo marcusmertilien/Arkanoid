@@ -11,17 +11,14 @@ import java.util.Random;
 
 
 public class GameEngine extends JPanel implements Runnable {
-    
-    // Game world size.
-    // Define stage window's size.
 
-    // View window size.
+    // Game world size.
     private static final int WINDOW_BORDER_WIDTH = 5;
     private static final int WINDOW_WIDTH        = 448;
     private static final int WINDOW_HEIGHT       = 480;
 
     // Game loop constants.
-    private static final int TARGET_FPS     = 30;
+    private static final int TARGET_FPS     = 60;
     private static final long ONE_SECOND_NS = 1000000000;
     private static final long OPTIMAL_TIME  = ONE_SECOND_NS / TARGET_FPS;
 
@@ -54,10 +51,12 @@ public class GameEngine extends JPanel implements Runnable {
     public static String SHIP_PATH = ASSET_PATH + "ship/";
     public static String STAGE_BG_PATH = ASSET_PATH + "stage-background/";
     public static String SOUND_ASSET_PATH = ASSET_PATH + "sounds/";
+    public static String GENERAL_ASSET_PATH = ASSET_PATH + "general/";
 
     // Test data
     private Player testShip;
     private Stage testStage;
+    private ArrayList<Block> blocks;
 
 
     // Entry point
@@ -226,7 +225,7 @@ public class GameEngine extends JPanel implements Runnable {
 
     private void checkCollisions() {
         // Check stage's items again instance ball and paddle.
-        if (this.testShip.x < 12 || this.testShip.x > 370) {
+        if (this.testShip.x < 12 || (testShip.width + testShip.x + 12) > WINDOW_WIDTH) {
             this.testShip.resetLocation();
         }
     }

@@ -20,7 +20,7 @@ public class Ship extends Actor {
     private static int SHIP_WIDTH = 2*BASE_SHIP_WIDTH;
     private static int SHIP_HEIGHT = 2*BASE_SHIP_HEIGHT;
 
-    private static int SPEED = 5;
+    private static int SPEED = 3;
 
     static {
         try {
