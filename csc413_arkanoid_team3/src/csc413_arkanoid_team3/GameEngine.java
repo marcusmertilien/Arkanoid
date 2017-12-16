@@ -58,6 +58,7 @@ public class GameEngine extends JPanel implements Runnable {
     private Player testShip;
     private Stage testStage;
     private Ball testBall;
+    private int testScore = 100;
 
     // Entry point
     // ===========
@@ -182,6 +183,7 @@ public class GameEngine extends JPanel implements Runnable {
                     this.testShip.update();
                     this.testBall.update();
                     checkCollisions();
+                    cleanupObjects();
                     break;
                 case EXITING:
                     // Game closing
@@ -251,11 +253,13 @@ public class GameEngine extends JPanel implements Runnable {
             this.testBall.ySpeed = -(this.testBall.ySpeed);
         }
 
+        // Check for ball collisions with block.
         for (Block _b : this.testStage.blocks) {
             if (Physics.doesCollideWith(_b, this.testBall)) {
                 // Find intersection
                 Rectangle _i = Physics.getIntersection(this.testBall, _b);
 
+                // Detect which side contact was made, and flip that axis.
                 if ((_i.y == _b.y) || (_i.y == this.testBall.y)) {
                     this.testBall.resetLocation();
                     this.testBall.ySpeed = -this.testBall.ySpeed;
@@ -263,6 +267,9 @@ public class GameEngine extends JPanel implements Runnable {
                     this.testBall.resetLocation();
                     this.testBall.xSpeed = -this.testBall.xSpeed;
                 }
+
+                this.testScore += _b.points;
+                _b.hide();
             }
         }
     }
@@ -270,6 +277,7 @@ public class GameEngine extends JPanel implements Runnable {
 
     private void cleanupObjects() {
         // Object cleanup.
+        this.testStage.blocks.removeIf(_b -> _b.isHidden());
     }
 
 
@@ -310,6 +318,10 @@ public class GameEngine extends JPanel implements Runnable {
                 this.testShip.draw(g2d);
                 g2d.dispose();
 
+                g2d = (Graphics2D) gameAreaBuffer.getGraphics();
+                drawUIPanel(g2d);
+                g2d.dispose();
+
                 // Draw window.
                 g.drawImage(gameAreaBuffer, 0, 0, this);
                 break;
@@ -336,8 +348,15 @@ public class GameEngine extends JPanel implements Runnable {
         // Draw the stage's objects.
     }
 
-    private void _drawUIPanel(Graphics g) {
-        // UI is defined as anything around the central game panel.
+    private void drawUIPanel(Graphics2D g2d) {
+
+        // Set font for rendering stats.
+        g2d.setColor(Color.WHITE);
+        g2d.setFont(new Font("Courier", Font.BOLD, 18));
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        // Draw player 1's stats.
+        g2d.drawString("" + this.testScore, 25, 35);
     }
 
 }

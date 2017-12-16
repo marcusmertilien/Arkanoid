@@ -74,7 +74,7 @@ public class Block extends Prop {
 
     private BufferedImage bgSprite;
     private Types type;
-    private int points;
+    public int points;
 
     // TODO: each block might contain a powerup up that releases on destroy.
     // private PowerUp powerUp;
