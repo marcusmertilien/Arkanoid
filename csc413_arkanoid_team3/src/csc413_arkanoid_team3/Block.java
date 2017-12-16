@@ -13,39 +13,54 @@ public class Block extends Prop {
 
     private static String FILE_NAME = "blocks.png";
 
-    private static int BLOCK_SPRITE_WIDTH = 16;      // width of stage area
-    private static int BLOCK_SPRITE_HEIGHT = 8;     // height of stage area
-
+    // Dimensional constants.
+    private static int BLOCK_SPRITE_WIDTH = 16;             // width of stage area
+    private static int BLOCK_SPRITE_HEIGHT = 8;             // height of stage area
     public static int BLOCK_WIDTH = 2*BLOCK_SPRITE_WIDTH;
     public static int BLOCK_HEIGHT = 2*BLOCK_SPRITE_HEIGHT;
 
+    // Possible block types.
     public static enum Types {
         WHITE, YELLOW, PINK, BLUE, RED, GREEN, CYAN, ORANGE, SILVER, GOLD
     }
 
-    private static HashMap<Types, BufferedImage> blockAssetCollection;
+    private static HashMap<Types, Integer> pointMap;
+    private static HashMap<Types, BufferedImage> assetMap;
     static {
         try {
+            // Init point data
+            // ===============
+            pointMap = new HashMap<Types, Integer>();
+            pointMap.put(Types.WHITE, 50);
+            pointMap.put(Types.ORANGE, 60);
+            pointMap.put(Types.CYAN, 70);
+            pointMap.put(Types.GREEN, 80);
+            pointMap.put(Types.RED, 90);
+            pointMap.put(Types.BLUE, 100);
+            pointMap.put(Types.PINK, 110);
+            pointMap.put(Types.YELLOW, 120);
+            pointMap.put(Types.SILVER, 50);
+            pointMap.put(Types.GOLD, 0);
+
+            // Init images assets
+            // ==================
             ClassLoader cl = GameEngine.class.getClassLoader();
-            BufferedImage spriteMap = ImageIO.read(cl.getResource(GameEngine.GENERAL_ASSET_PATH + FILE_NAME));
+            BufferedImage spriteSheet;
             BufferedImage rawAsset, block;
             Image tempScaledImage;
             Graphics2D g2d;
-            
-            blockAssetCollection = new HashMap<Types, BufferedImage>();
+
+            rawAsset = ImageIO.read(cl.getResource(GameEngine.GENERAL_ASSET_PATH + FILE_NAME));
+            tempScaledImage = rawAsset.getScaledInstance(2*rawAsset.getWidth(), 2*rawAsset.getHeight(), Image.SCALE_SMOOTH);
+            spriteSheet =  new BufferedImage(2*rawAsset.getWidth(), 2*rawAsset.getHeight(), Image.SCALE_SMOOTH);
+            g2d = spriteSheet.createGraphics();
+            g2d.drawImage(tempScaledImage, 0, 0, null);
+
+            assetMap = new HashMap<Types, BufferedImage>();
 
             for (int i = 0; i < Types.values().length; i++) {
-                int x = i * BLOCK_SPRITE_WIDTH;
-                int y = 0;
-
-                // Provide an image asset per enum type.
-                rawAsset = spriteMap.getSubimage(x, y, BLOCK_SPRITE_WIDTH, BLOCK_SPRITE_HEIGHT);
-                tempScaledImage = rawAsset.getScaledInstance(BLOCK_WIDTH, BLOCK_HEIGHT, Image.SCALE_SMOOTH);
-                block = new BufferedImage(BLOCK_WIDTH, BLOCK_HEIGHT, BufferedImage.TYPE_INT_ARGB);
-                g2d = block.createGraphics();
-                g2d.drawImage(tempScaledImage, 0, 0, null);
-
-                blockAssetCollection.put(Types.values()[i], block);
+                block = spriteSheet.getSubimage(i*BLOCK_WIDTH, 0, BLOCK_WIDTH, BLOCK_HEIGHT);
+                assetMap.put(Types.values()[i], block);
             }
 
         } catch (Exception e) {
@@ -59,6 +74,10 @@ public class Block extends Prop {
 
     private BufferedImage bgSprite;
     private Types type;
+    private int points;
+
+    // TODO: each block might contain a powerup up that releases on destroy.
+    // private PowerUp powerUp;
 
 
     // Constructors
@@ -66,7 +85,9 @@ public class Block extends Prop {
 
     public Block(int x, int y, Types type) {
         super(x, y, BLOCK_WIDTH, BLOCK_HEIGHT);
+
         this.type = type;
-        this.sprite = blockAssetCollection.get(this.type);
+        this.sprite = assetMap.get(this.type);
+        this.points = pointMap.get(this.type);
     }
 }
