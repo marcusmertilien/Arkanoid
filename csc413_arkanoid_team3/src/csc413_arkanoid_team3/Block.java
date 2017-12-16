@@ -89,5 +89,6 @@ public class Block extends Prop {
         this.type = type;
         this.sprite = assetMap.get(this.type);
         this.points = pointMap.get(this.type);
+        // this.powerUp = ...;
     }
 }

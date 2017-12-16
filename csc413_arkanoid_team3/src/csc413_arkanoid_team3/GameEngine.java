@@ -52,12 +52,12 @@ public class GameEngine extends JPanel implements Runnable {
     public static String STAGE_BG_PATH = ASSET_PATH + "stage-background/";
     public static String SOUND_ASSET_PATH = ASSET_PATH + "sounds/";
     public static String GENERAL_ASSET_PATH = ASSET_PATH + "general/";
+    public static String BALL_ASSET_PATH = ASSET_PATH + "ball/";
 
     // Test data
     private Player testShip;
     private Stage testStage;
-    private ArrayList<Block> blocks;
-
+    private Ball testBall;
 
     // Entry point
     // ===========
@@ -147,6 +147,9 @@ public class GameEngine extends JPanel implements Runnable {
         // TODO: we'll likely need to so _something_ here.
         this.testShip = new Player(200, 420, p1Keys);
         this.testStage = new Stage(Stage.Rounds.ROUND_2);
+        this.testBall = new Ball(205, 400);
+        this.testBall.xSpeed = 0;
+        this.testBall.ySpeed = -1;
         eventManager.addObserver((Observer) this.testShip);
     }
 
@@ -177,6 +180,7 @@ public class GameEngine extends JPanel implements Runnable {
                 case TESTING_DRAWING:
                     // Test area
                     this.testShip.update();
+                    this.testBall.update();
                     checkCollisions();
                     break;
                 case EXITING:
@@ -263,6 +267,10 @@ public class GameEngine extends JPanel implements Runnable {
                 // Test stage draw.
                 Graphics2D g2d = (Graphics2D) gameAreaBuffer.getGraphics();
                 this.testStage.draw(g2d);
+                g2d.dispose();
+
+                g2d = (Graphics2D) gameAreaBuffer.getGraphics();
+                this.testBall.draw(g2d);
                 g2d.dispose();
 
                 g2d = (Graphics2D) gameAreaBuffer.getGraphics();

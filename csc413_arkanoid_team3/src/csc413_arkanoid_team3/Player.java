@@ -38,6 +38,10 @@ public class Player extends Ship implements Observer {
         }
     }
 
+    public void update() {
+        _updatePosition();
+    }
+
     private void _updatePosition() {
         // Store previous location.
         previousX = x;
@@ -50,10 +54,6 @@ public class Player extends Ship implements Observer {
 
         // Update location.
         x += xSpeed;
-    }
-
-    public void update() {
-        _updatePosition();
     }
 
     @Override
