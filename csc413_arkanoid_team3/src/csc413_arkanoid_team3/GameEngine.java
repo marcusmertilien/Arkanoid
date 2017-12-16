@@ -146,7 +146,7 @@ public class GameEngine extends JPanel implements Runnable {
     private void _setupGameData() {
         // TODO: we'll likely need to so _something_ here.
         this.testShip = new Player(200, 420, p1Keys);
-        this.testStage = new Stage(Stage.Rounds.ROUND_2);
+        this.testStage = new Stage(Stage.Rounds.ROUND_1);
         this.testBall = new Ball(205, 400);
         this.testBall.xSpeed = 3;
         this.testBall.ySpeed = -3;
@@ -245,6 +245,11 @@ public class GameEngine extends JPanel implements Runnable {
             this.testBall.ySpeed = -(this.testBall.ySpeed);
         }
 
+        // Check ship vs ball collision.
+        if (Physics.doesCollideWith(this.testBall, this.testShip)) {
+            this.testBall.resetLocation();
+            this.testBall.ySpeed = -(this.testBall.ySpeed);
+        }
     }
 
 
