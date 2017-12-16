@@ -148,8 +148,8 @@ public class GameEngine extends JPanel implements Runnable {
         this.testShip = new Player(200, 420, p1Keys);
         this.testStage = new Stage(Stage.Rounds.ROUND_2);
         this.testBall = new Ball(205, 400);
-        this.testBall.xSpeed = 0;
-        this.testBall.ySpeed = -1;
+        this.testBall.xSpeed = 3;
+        this.testBall.ySpeed = -3;
         eventManager.addObserver((Observer) this.testShip);
     }
 
@@ -228,10 +228,23 @@ public class GameEngine extends JPanel implements Runnable {
     }
 
     private void checkCollisions() {
-        // Check stage's items again instance ball and paddle.
-        if (this.testShip.x < 12 || (testShip.width + testShip.x + 12) > WINDOW_WIDTH) {
+        // Check ship vs boundry collision.
+        if (this.testShip.x < 24 || (testShip.width + testShip.x + 24) > WINDOW_WIDTH) {
             this.testShip.resetLocation();
         }
+
+        // Check x axis boundry collision.
+        if (this.testBall.x < 24 || this.testBall.x > WINDOW_WIDTH -24) {
+            this.testBall.resetLocation();
+            this.testBall.xSpeed = -(this.testBall.xSpeed);
+        }
+
+        // Check y axis boundery collsion.
+        if (this.testBall.y < 24 || this.testBall.y > WINDOW_HEIGHT-24) {
+            this.testBall.resetLocation();
+            this.testBall.ySpeed = -(this.testBall.ySpeed);
+        }
+
     }
 
 
