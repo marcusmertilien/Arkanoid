@@ -9,12 +9,13 @@ import javax.sound.sampled.FloatControl;
 public class AudioTrack {
 
     private Clip clip;  // the audio clip to be played
+    private Boolean shouldLoop;
 
 
     // Constructors
     // ============
 
-    public AudioTrack(String soundFilePath, Boolean loopClip) {
+    public AudioTrack(String soundFilePath, Boolean _shouldLoop) {
         try {
             ClassLoader cl = AudioTrack.class.getClassLoader();
             AudioInputStream soundStream = AudioSystem.getAudioInputStream(
@@ -22,12 +23,13 @@ public class AudioTrack {
             );
             clip = AudioSystem.getClip();
             clip.open(soundStream);
+            shouldLoop = _shouldLoop;
         } catch(Exception e) {
             System.out.println("AudioTrack::AudioTrack - error opening file");
         }
 
         // Set loop state.
-        clip.loop(loopClip ? Clip.LOOP_CONTINUOUSLY : 0);
+        setVolume(0.3f);
     }
 
     public AudioTrack(String soundFilePath) {
@@ -39,7 +41,8 @@ public class AudioTrack {
     // ==========
 
     public void play() {
-        clip.start();
+        clip.setFramePosition(0);
+        clip.loop(shouldLoop ? Clip.LOOP_CONTINUOUSLY : 0);
     }
 
     public void stop() {

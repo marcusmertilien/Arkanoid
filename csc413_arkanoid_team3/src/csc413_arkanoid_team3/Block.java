@@ -86,7 +86,7 @@ public class Block extends Prop {
     // ============
 
     private BufferedImage bgSprite;
-    private Types type;
+    public Types type;
     public int points;
     public int hitPoints;
 

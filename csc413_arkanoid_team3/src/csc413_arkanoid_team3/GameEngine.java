@@ -155,8 +155,7 @@ public class GameEngine extends JPanel implements Runnable {
     }
 
     private void _setupGameAudio() {
-        if (DebugState.playSoundtrackActive)
-            soundManager.playSoundtrack();
+        // TODO: maybe implment soundtrack;
     }
 
     // Game loop
@@ -251,6 +250,7 @@ public class GameEngine extends JPanel implements Runnable {
         if (Physics.doesCollideWith(this.testBall, this.testShip)) {
             this.testBall.resetLocation();
             this.testBall.ySpeed = -(this.testBall.ySpeed);
+            this.soundManager.playBallCollision(this.testShip);
         }
 
         // Check for ball collisions with block.
@@ -268,6 +268,7 @@ public class GameEngine extends JPanel implements Runnable {
                     this.testBall.xSpeed = -this.testBall.xSpeed;
                 }
 
+                this.soundManager.playBallCollision(_b);
                 this.testScore += _b.registerHit();
             }
         }
