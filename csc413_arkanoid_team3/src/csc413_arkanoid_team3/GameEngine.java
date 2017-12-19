@@ -37,7 +37,6 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         PAUSE_MENU,
         PLAYING,
         GAME_OVER,
-        TESTING_DRAWING,
         EXITING
     };
     private Boolean isRunning;
@@ -127,7 +126,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         isRunning = true;
 
         // Active test mode for BG.
-        gameState = GameState.TESTING_DRAWING;
+        gameState = GameState.PLAYING;
 
         inputHandler = InputHandler.getInstance();
         soundManager = SoundManager.getInstance();
@@ -220,13 +219,8 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                     // Game open
                     break;
                 case PLAYING:
-                    // Main game update
-                    break;
-                case TESTING_DRAWING:
                     // Test area
-                    testShip.update();
-                    testBall.update();
-                    for (PowerUp _p : powerups) { _p.update(); }
+                    updateData();
                     checkCollisions();
                     cleanupObjects();
                     break;
@@ -272,7 +266,9 @@ public class GameEngine extends JPanel implements Runnable, Observer {
     // Update data layer
     // =================
     private void updateData() {
-
+        testShip.update();
+        testBall.update();
+        for (PowerUp _p : powerups) _p.update();
     }
 
     private void checkCollisions() {
@@ -325,23 +321,20 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         // Check for ball collisions with block.
         for (Block _b : this.testStage.blocks) {
             if (Physics.doesCollideWith(_b, testBall)) {
-                // Find intersection
-                Rectangle _i = Physics.getIntersection(testBall, _b);
+                // Reset location before calculating.
+                testBall.resetLocation();
 
-                if (_i.y == _b.y) {
-                    testBall.ySpeed = -testBall.ySpeed;
+                if (testBall.y <= _b.y) {
+                    testBall.ySpeed = -Math.abs(testBall.ySpeed);
                 }
-
-                if (_i.y == testBall.y) {
-                    testBall.ySpeed = -testBall.ySpeed;
+                else if (testBall.y >= _b.y + _b.height) {
+                    testBall.ySpeed = Math.abs(testBall.ySpeed);
                 }
-
-                if (_i.x == _b.x) {
-                    testBall.xSpeed = -testBall.xSpeed;
+                else if (testBall.x <= _b.x) {
+                    testBall.xSpeed = -Math.abs(testBall.xSpeed);
                 }
-
-                if (_i.x == testBall.x) {
-                    testBall.xSpeed = -testBall.xSpeed;
+                else if (testBall.x >= _b.x + _b.width) {
+                    testBall.xSpeed = Math.abs(testBall.ySpeed);
                 }
 
                 this.soundManager.playBallCollision(_b);
@@ -354,6 +347,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                     ));
                 }
 
+                // Only register one collision per cycle.
                 break;
             }
         }
@@ -395,9 +389,6 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                 // TODO: draw splash screen.
                 break;
             case PLAYING:
-                // Main application loop here
-                break;
-            case TESTING_DRAWING:
                 _drawBackground(g2d);
                 _drawGameObjects(g2d);
                 _drawUIPanel(g2d);
@@ -492,7 +483,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                         gameState = GameState.PAUSE_MENU;
                         soundManager.pauseBgMusic();
                     } else {
-                        gameState = GameState.TESTING_DRAWING;
+                        gameState = GameState.PLAYING;
                         soundManager.pauseBgMusic();
                     }
                 }
