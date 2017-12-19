@@ -15,13 +15,13 @@ import javax.imageio.ImageIO;
 public class GameEngine extends JPanel implements Runnable, Observer {
 
     // Game world size.
-    private static final int WINDOW_BORDER_WIDTH = 5;
-    private static final int GAME_WINDOW_WIDTH = 448;
-    private static final int GAME_WINDOW_HEIGHT = 500;
-    private static final int UI_PANEL_WIDTH = 200;
-    private static final int UI_PANEL_HEIGHT = 200;
-    private static final int MAIN_WINDOW_WIDTH = GAME_WINDOW_WIDTH + UI_PANEL_WIDTH;
-    private static final int MAIN_WINDOW_HEIGHT = GAME_WINDOW_HEIGHT;
+    public static final int WINDOW_BORDER_WIDTH = 5;
+    public static final int GAME_WINDOW_WIDTH = 448;
+    public static final int GAME_WINDOW_HEIGHT = 500;
+    public static final int UI_PANEL_WIDTH = 200;
+    public static final int UI_PANEL_HEIGHT = 200;
+    public static final int MAIN_WINDOW_WIDTH = GAME_WINDOW_WIDTH + UI_PANEL_WIDTH;
+    public static final int MAIN_WINDOW_HEIGHT = GAME_WINDOW_HEIGHT;
 
     // Game loop constants.
     private static final int TARGET_FPS     = 60;
@@ -67,13 +67,13 @@ public class GameEngine extends JPanel implements Runnable, Observer {
     private Player testShip;
     private Stage testStage;
     private Ball testBall;
-    
     private int testScore;
     private int testLives;
-
     private ArrayList<PowerUp> testPowerUps;
     private PowerUp testActivePowerUp;
 
+
+    // Load static assets
     // TODO: move this somewhere else.
     private static BufferedImage logoImage;
     static {
@@ -84,32 +84,6 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         } catch (Exception e) {
             System.out.println(e.toString());
         }
-    }
-
-    // Entry point
-    // ===========
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            
-            @Override
-            public void run() {
-                // Initialize and start the app.
-                GameEngine engine = new GameEngine();
-
-                // Setup parent frame.
-                JFrame frame = new JFrame();
-                frame.setPreferredSize(new Dimension(MAIN_WINDOW_WIDTH, GAME_WINDOW_HEIGHT));
-                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                frame.pack();
-                frame.setLocationRelativeTo(null);
-                frame.setVisible(true);
-                frame.setIgnoreRepaint(true);
-
-                // Setup and run engine.
-                engine.init(frame);
-                engine.run();
-            }
-        });
     }
 
     // *** Runnable.run
@@ -187,7 +161,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         eventManager.addObserver(testShip);
 
         // Stage
-        this.testStage = new Stage(Stage.Rounds.ROUND_3);
+        testStage = new Stage(Stage.Rounds.ROUND_3);
 
         // Ball
         testBall = new Ball(205, 440);
@@ -206,8 +180,10 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         soundManager.playBgMusic();
     }
 
-    // Game loop
-    // =========
+    // ==========
+    // Update API
+    // ==========
+
     private void gameLoop() {
 
         long lastFrameTime = System.nanoTime(); // previous frame time
@@ -223,10 +199,9 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                     // Game open
                     break;
                 case PLAYING:
-                    // Test area
-                    updateData();
-                    checkCollisions();
-                    cleanupObjects();
+                    _updateData();
+                    _checkCollisions();
+                    _cleanupObjects();
                     break;
                 case PAUSE_MENU:
                     break;
@@ -234,7 +209,6 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                     System.exit(0);
                     break;
                 default:
-                    // Somehow, we have a bad enum...
                     System.out.println("GameEngine::gameLoop Error: bad enum");
                     break;
             }
@@ -266,16 +240,13 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         }
     }
 
-
-    // Update data layer
-    // =================
-    private void updateData() {
+    private void _updateData() {
         for (PowerUp _p : testPowerUps) _p.update();
         testShip.update();
         testBall.update();
     }
 
-    private void checkCollisions() {
+    private void _checkCollisions() {
         // Check ship vs side walls.
         if (testShip.x < 16 || (testShip.width + testShip.x + 16) > GAME_WINDOW_WIDTH) {
             testShip.resetLocation();
@@ -386,11 +357,15 @@ public class GameEngine extends JPanel implements Runnable, Observer {
     }
 
 
-    private void cleanupObjects() {
-        // Object cleanup.
+    private void _cleanupObjects() {
         testStage.blocks.removeIf(_b -> _b.isHidden());
         testPowerUps.removeIf(_p -> _p.isHidden());
     }
+
+
+    // ========
+    // Draw API
+    // ========
 
 
     // *** JPanel.paintComponent
@@ -421,7 +396,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                 break;
             default:
                 // Somehow, we have a bad enum...
-                System.out.println("GameEngine::gameLoop Error: bad enum");
+                System.out.println("GameEngine::paintComponent Error: bad enum");
                 break;
         }
 
