@@ -12,7 +12,7 @@ import java.util.Random;
 import javax.imageio.ImageIO;
 
 
-public class GameEngine extends JPanel implements Runnable {
+public class GameEngine extends JPanel implements Runnable, Observer {
 
     // Game world size.
     private static final int WINDOW_BORDER_WIDTH = 5;
@@ -52,6 +52,9 @@ public class GameEngine extends JPanel implements Runnable {
     private HashMap<Integer, Controls> p1Keys;
     private HashMap<Integer, Controls> p2Keys;
 
+    // Game interface controls.
+    private HashMap<Integer, GameActions> gameControls;
+
     // Assets
     public static String ASSET_PATH = "resources/";
     public static String SHIP_PATH = ASSET_PATH + "ship/";
@@ -80,6 +83,8 @@ public class GameEngine extends JPanel implements Runnable {
             System.out.println(e.toString());
         }
     }
+
+    BufferedImage windowBuffer = new BufferedImage(MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT, BufferedImage.TYPE_INT_RGB);
 
     // Entry point
     // ===========
@@ -162,9 +167,18 @@ public class GameEngine extends JPanel implements Runnable {
         p2Keys.put(KeyEvent.VK_F, Controls.LEFT);
         p2Keys.put(KeyEvent.VK_H, Controls.RIGHT);
         p2Keys.put(KeyEvent.VK_SPACE, Controls.SHOOT);
+
+        // Setup game action controls.
+        gameControls = new HashMap<Integer, GameActions>();
+        gameControls.put(KeyEvent.VK_P, GameActions.PAUSE);
+        gameControls.put(KeyEvent.VK_ESCAPE, GameActions.EXIT);
+        gameControls.put(KeyEvent.VK_1, GameActions.START);
     }
 
     private void _setupGameData() {
+        // Listen from game engine
+        eventManager.addObserver(this);
+
         // Ship
         testShip = new Player(200, 450, p1Keys);
         eventManager.addObserver(testShip);
@@ -215,6 +229,8 @@ public class GameEngine extends JPanel implements Runnable {
                     for (PowerUp _p : powerups) { _p.update(); }
                     checkCollisions();
                     cleanupObjects();
+                    break;
+                case PAUSE_MENU:
                     break;
                 case EXITING:
                     // Game closing
@@ -362,15 +378,8 @@ public class GameEngine extends JPanel implements Runnable {
     @Override
     protected void paintComponent(Graphics g) {
 
-        // The window's double buffer.
-        BufferedImage windowBuffer = new BufferedImage(
-            GAME_WINDOW_WIDTH, GAME_WINDOW_HEIGHT, BufferedImage.TYPE_INT_RGB
-        );
-
-        // The game area's buffer.
-        BufferedImage gameAreaBuffer = new BufferedImage(
-            GAME_WINDOW_WIDTH + UI_PANEL_WIDTH, GAME_WINDOW_HEIGHT, BufferedImage.TYPE_INT_RGB
-        );
+        windowBuffer = new BufferedImage(MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2d;
 
         // Draw based on current GameState.
         switch (gameState) {
@@ -382,19 +391,19 @@ public class GameEngine extends JPanel implements Runnable {
                 // Main application loop here
                 break;
             case TESTING_DRAWING:
-                // Test stage draw.
-                Graphics2D g2d = (Graphics2D) gameAreaBuffer.getGraphics();
-
-                this.testStage.draw(g2d);
-                testBall.draw(g2d);
-                for (PowerUp _p : powerups) {
-                    _p.draw(g2d);
-                }
-                testShip.draw(g2d);
-                drawUIPanel(g2d);
-
-                // Draw window.
-                g.drawImage(gameAreaBuffer, 0, 0, this);
+                g2d = (Graphics2D) windowBuffer.getGraphics();
+                _drawBackground(g2d);
+                _drawGameObjects(g2d);
+                _drawUIPanel(g2d);
+                g.drawImage(windowBuffer, 0, 0, this);
+                break;
+            case PAUSE_MENU:
+                g2d = (Graphics2D) windowBuffer.getGraphics();
+                _drawBackground(g2d);
+                _drawGameObjects(g2d);
+                _drawUIPanel(g2d);
+                _drawUIPause(g2d);
+                g.drawImage(windowBuffer, 0, 0, this);
                 break;
             case EXITING:
                 // Application exiting....
@@ -412,14 +421,16 @@ public class GameEngine extends JPanel implements Runnable {
     }
 
     private void _drawBackground(Graphics2D g2d) {
-        // Draw the stages background.
+        testStage.draw(g2d);
     }
 
     private void _drawGameObjects(Graphics2D g2d) {
-        // Draw the stage's objects.
+        testBall.draw(g2d);
+        testShip.draw(g2d);
+        for (PowerUp _p : powerups) _p.draw(g2d);
     }
 
-    private void drawUIPanel(Graphics2D g2d) {
+    private void _drawUIPanel(Graphics2D g2d) {
         int commonXoffset = GAME_WINDOW_WIDTH+10;
 
         // Draw branding.
@@ -444,6 +455,40 @@ public class GameEngine extends JPanel implements Runnable {
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g2d.drawString("Active Power-up", commonXoffset, 110);
             g2d.drawString(testActivePowerUp.type.name(), commonXoffset, 125);
+        }
+    }
+
+    private void _drawUIPause(Graphics2D g2d) {
+        int commonXoffset = GAME_WINDOW_WIDTH+10;
+        g2d.setColor(Color.WHITE);
+        g2d.setFont(new Font("Courier", Font.BOLD, 14));
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.drawString("GAME PAUSED", commonXoffset, MAIN_WINDOW_HEIGHT - 50);
+    }
+
+    @Override
+    public void update(Observable obj, Object e) {
+
+        // onKey event
+        if (e instanceof KeyEvent) {
+            KeyEvent ke = (KeyEvent) e;
+            int keyCode = ke.getKeyCode();
+            int keyId = ke.getID();
+            GameActions buttonPressed = gameControls.get(keyCode);
+
+            // Only react to buttons the game engine is interested in.
+            if (buttonPressed == null) {
+                return;
+            }
+
+            if (keyId == KeyEvent.KEY_PRESSED) {
+                // Pause game on P press.
+                if (buttonPressed == GameActions.PAUSE) {
+                    System.out.println("Game paused");
+                    gameState = (gameState != GameState.PAUSE_MENU) ? GameState.PAUSE_MENU : GameState.TESTING_DRAWING;
+                }
+            }
+
         }
     }
 
