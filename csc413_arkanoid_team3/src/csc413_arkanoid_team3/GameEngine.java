@@ -312,7 +312,12 @@ public class GameEngine extends JPanel implements Runnable, Observer {
             testBall.ySpeed = -testBall.ySpeed;
             testBall.xSpeed += (tempX < testBall.speed) ? tempX : testBall.speed;
 
-            System.out.printf("ball center: %d, ship center: %d\nnew ball x: %d, new ball y: %d", ballCenter, shipCenter, testBall.xSpeed, testBall.ySpeed);
+            if (DebugState.showPaddleActive) {
+                System.out.printf(
+                    "ball center: %d, ship center: %d\nnew ball x: %d, new ball y: %d",
+                    ballCenter, shipCenter, testBall.xSpeed, testBall.ySpeed
+                );
+            }
 
             this.soundManager.playBallCollision(testShip);
         }
@@ -483,11 +488,19 @@ public class GameEngine extends JPanel implements Runnable, Observer {
             if (keyId == KeyEvent.KEY_PRESSED) {
                 // Pause game on P press.
                 if (buttonPressed == GameActions.PAUSE) {
-                    gameState = (gameState != GameState.PAUSE_MENU) ? GameState.PAUSE_MENU : GameState.TESTING_DRAWING;
+                    if (gameState != GameState.PAUSE_MENU) {
+                        gameState = GameState.PAUSE_MENU;
+                        soundManager.pauseBgMusic();
+                    } else {
+                        gameState = GameState.TESTING_DRAWING;
+                        soundManager.pauseBgMusic();
+                    }
                 }
 
+                // Toggle music.
                 if (buttonPressed == GameActions.MUSIC_STOP) {
-                    soundManager.stopBgMusic();
+                    // Note: this will toggle play/pause depending on clip state.
+                    soundManager.pauseBgMusic();
                 }
 
                 // Exit game on escape press.

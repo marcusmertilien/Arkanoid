@@ -60,4 +60,8 @@ public class SoundManager {
         soundBank.get(SFXType.BG_MUSIC).stop();
     }
 
+    public void pauseBgMusic() {
+        soundBank.get(SFXType.BG_MUSIC).pause();
+    }
+
 }
