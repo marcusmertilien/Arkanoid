@@ -17,7 +17,7 @@ public class GameEngine extends JPanel implements Runnable {
     // Game world size.
     private static final int WINDOW_BORDER_WIDTH = 5;
     private static final int GAME_WINDOW_WIDTH = 448;
-    private static final int GAME_WINDOW_HEIGHT = 480;
+    private static final int GAME_WINDOW_HEIGHT = 500;
     private static final int UI_PANEL_WIDTH = 200;
     private static final int UI_PANEL_HEIGHT = 200;
     private static final int MAIN_WINDOW_WIDTH = GAME_WINDOW_WIDTH + UI_PANEL_WIDTH;
@@ -163,7 +163,7 @@ public class GameEngine extends JPanel implements Runnable {
     }
 
     private void _setupGameData() {
-        testShip = new Player(200, 420, p1Keys);
+        testShip = new Player(200, 450, p1Keys);
         this.testStage = new Stage(Stage.Rounds.ROUND_3);
         testBall = new Ball(205, 400);
         testBall.xSpeed = 2;
@@ -171,9 +171,9 @@ public class GameEngine extends JPanel implements Runnable {
 
         powerups = new ArrayList<PowerUp>();
 
-        for (int i = 0; i < PowerUp.Types.values().length; i++) {
-            powerups.add(new PowerUp(100 + (32*i), 25, PowerUp.Types.values()[i]));
-        }
+        // for (int i = 0; i < PowerUp.Types.values().length; i++) {
+        //     powerups.add(new PowerUp(100 + (32*i), 25, PowerUp.Types.values()[i]));
+        // }
 
         eventManager.addObserver(testShip);
     }
@@ -250,7 +250,7 @@ public class GameEngine extends JPanel implements Runnable {
     // Update data layer
     // =================
     private void updateData() {
-        // Update application data.
+
     }
 
     private void checkCollisions() {
@@ -266,7 +266,7 @@ public class GameEngine extends JPanel implements Runnable {
         }
 
         // Check y axis boundery collsion.
-        if (testBall.y < 16 || testBall.y > GAME_WINDOW_HEIGHT-16) {
+        if (testBall.y < 16 || testBall.y > GAME_WINDOW_HEIGHT-30) {
             testBall.resetLocation();
             testBall.ySpeed = -(testBall.ySpeed);
         }
@@ -303,14 +303,33 @@ public class GameEngine extends JPanel implements Runnable {
                     testBall.xSpeed = -testBall.xSpeed;
                 }
 
-                if(_i.x == testBall.x) {
+                if (_i.x == testBall.x) {
                     testBall.xSpeed = -testBall.xSpeed;
                 }
 
                 this.soundManager.playBallCollision(_b);
                 this.testScore += _b.registerHit();
 
+                // Test for powerups, create a random type on every brick break.
+                if (_b.isHidden()) {
+                    powerups.add(new PowerUp(
+                        _b.x, _b.y, PowerUp.Types.values()[new Random().nextInt(PowerUp.Types.values().length)]
+                    ));
+                }
+
                 break;
+            }
+        }
+
+        for (PowerUp _p: this.powerups) {
+            // Check powerup vs lower bound.
+            if (_p.y > GAME_WINDOW_HEIGHT-35) {
+                _p.hide();
+            }
+
+            // Check powerup vs ship.
+            if (Physics.doesCollideWith(_p, testShip)) {
+                _p.hide();
             }
         }
     }
@@ -319,6 +338,7 @@ public class GameEngine extends JPanel implements Runnable {
     private void cleanupObjects() {
         // Object cleanup.
         this.testStage.blocks.removeIf(_b -> _b.isHidden());
+        this.powerups.removeIf(_p -> _p.isHidden());
     }
 
 
