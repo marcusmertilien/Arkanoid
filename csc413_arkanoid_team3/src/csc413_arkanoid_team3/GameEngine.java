@@ -459,9 +459,9 @@ public class GameEngine extends JPanel implements Runnable, Observer {
     private void _drawUIPause(Graphics2D g2d) {
         int commonXoffset = GAME_WINDOW_WIDTH+10;
         g2d.setColor(Color.WHITE);
-        g2d.setFont(new Font("Courier", Font.BOLD, 18));
+        g2d.setFont(new Font("Courier", Font.BOLD, 15));
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2d.drawString("GAME PAUSED", commonXoffset + 25, MAIN_WINDOW_HEIGHT - 50);
+        g2d.drawString("GAME PAUSED", commonXoffset + 40, MAIN_WINDOW_HEIGHT - 40);
     }
 
     @Override
