@@ -67,15 +67,18 @@ public class GameEngine extends JPanel implements Runnable, Observer {
     private Player testShip;
     private Stage testStage;
     private Ball testBall;
-    private ArrayList<PowerUp> powerups;
+    
     private int testScore;
     private int testLives;
+
+    private ArrayList<PowerUp> testPowerUps;
     private PowerUp testActivePowerUp;
 
     // TODO: move this somewhere else.
     private static BufferedImage logoImage;
     static {
         try {
+            // Load Arkanoid logo.
             ClassLoader cl = GameEngine.class.getClassLoader();
             logoImage = ImageIO.read(cl.getResource(GameEngine.GENERAL_ASSET_PATH + "logo.png"));
         } catch (Exception e) {
@@ -128,6 +131,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         // Active test mode for BG.
         gameState = GameState.PLAYING;
 
+        // Application control.
         inputHandler = InputHandler.getInstance();
         soundManager = SoundManager.getInstance();
         eventManager = EventManager.getInstance();
@@ -175,7 +179,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
     }
 
     private void _setupGameData() {
-        // Listen from game engine
+        // Listen from game engine.
         eventManager.addObserver(this);
 
         // Ship
@@ -195,7 +199,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         testLives = 5;
 
         // Powerups
-        powerups = new ArrayList<PowerUp>();
+        testPowerUps = new ArrayList<PowerUp>();
     }
 
     private void _setupGameAudio() {
@@ -266,30 +270,30 @@ public class GameEngine extends JPanel implements Runnable, Observer {
     // Update data layer
     // =================
     private void updateData() {
+        for (PowerUp _p : testPowerUps) _p.update();
         testShip.update();
         testBall.update();
-        for (PowerUp _p : powerups) _p.update();
     }
 
     private void checkCollisions() {
-        // Check ship vs boundry collision.
+        // Check ship vs side walls.
         if (testShip.x < 16 || (testShip.width + testShip.x + 16) > GAME_WINDOW_WIDTH) {
             testShip.resetLocation();
         }
 
-        // Check x axis boundry collision.
+        // Check ball vs side walls.
         if (testBall.x < 16 || testBall.x > GAME_WINDOW_WIDTH -16) {
             testBall.resetLocation();
             testBall.xSpeed = -(testBall.xSpeed);
         }
 
-        // Test upper bounds collision
+        // Check ball vs ceiling.
         if (testBall.y < 16) {
             testBall.resetLocation();
             testBall.ySpeed = -(testBall.ySpeed);
         }
 
-        // Test gutter collision
+        // Check ball vs gutter.
         if (testBall.y > GAME_WINDOW_HEIGHT-32) {
             testBall.resetLocation();
             testBall.ySpeed = -(testBall.ySpeed);
@@ -297,16 +301,25 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         }
 
 
-        // Check ship vs ball collision.
+        // Check ship vs ball.
         if (Physics.doesCollideWith(testBall, testShip)) {
-            int normalizedBallPosition = testBall.x - testShip.x;
-            int ballCenter = normalizedBallPosition + (testBall.width/2);
+            // Claculate new ball speed based on contact point with padd
+            int ballCenter = (testBall.x - testShip.x) + (testBall.width/2);
             int shipCenter = (testShip.width/2);
-            int tempX = (ballCenter - shipCenter);
+            int newXspeed = (ballCenter - shipCenter);
 
+            // Reset location.
             testBall.resetLocation();
+
+            // Use new ball speed.
             testBall.ySpeed = -testBall.ySpeed;
-            testBall.xSpeed = tempX/8;
+            testBall.xSpeed = newXspeed/8;
+
+            // Allow paddle movement to contribute to reflected speed.
+            testBall.xSpeed += testShip.xSpeed/2;
+
+            // Trigger SFX.
+            soundManager.playBallCollision(testShip);
 
             if (DebugState.showPaddleActive) {
                 System.out.printf(
@@ -314,35 +327,41 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                     ballCenter, shipCenter, testBall.xSpeed, testBall.ySpeed
                 );
             }
-
-            this.soundManager.playBallCollision(testShip);
         }
 
-        // Check for ball collisions with block.
+        // Check for ball vs block.
         for (Block _b : this.testStage.blocks) {
             if (Physics.doesCollideWith(_b, testBall)) {
                 // Reset location before calculating.
                 testBall.resetLocation();
 
+                // Calculate new x,y speeds based on contact with block
                 if (testBall.y <= _b.y) {
+                    // Contact top.
                     testBall.ySpeed = -Math.abs(testBall.ySpeed);
                 }
                 else if (testBall.y >= _b.y + _b.height) {
+                    // COntact bottom.
                     testBall.ySpeed = Math.abs(testBall.ySpeed);
                 }
                 else if (testBall.x <= _b.x) {
+                    // Contact left.
                     testBall.xSpeed = -Math.abs(testBall.xSpeed);
                 }
                 else if (testBall.x >= _b.x + _b.width) {
+                    // Contact right.
                     testBall.xSpeed = Math.abs(testBall.ySpeed);
                 }
 
-                this.soundManager.playBallCollision(_b);
+                // Updare user score.
                 this.testScore += _b.registerHit();
+
+                // Play SFX.
+                this.soundManager.playBallCollision(_b);
 
                 // Test for powerups, create a random type on every brick break.
                 if (_b.isHidden()) {
-                    powerups.add(new PowerUp(
+                    testPowerUps.add(new PowerUp(
                         _b.x, _b.y, PowerUp.Types.values()[new Random().nextInt(PowerUp.Types.values().length)]
                     ));
                 }
@@ -352,11 +371,10 @@ public class GameEngine extends JPanel implements Runnable, Observer {
             }
         }
 
-        for (PowerUp _p: this.powerups) {
+        for (PowerUp _p: testPowerUps) {
             // Check powerup vs lower bound.
-            if (_p.y > GAME_WINDOW_HEIGHT-35) {
+            if (_p.y > GAME_WINDOW_HEIGHT-42)
                 _p.hide();
-            }
 
             // Check powerup vs ship.
             if (Physics.doesCollideWith(_p, testShip)) {
@@ -370,8 +388,8 @@ public class GameEngine extends JPanel implements Runnable, Observer {
 
     private void cleanupObjects() {
         // Object cleanup.
-        this.testStage.blocks.removeIf(_b -> _b.isHidden());
-        this.powerups.removeIf(_p -> _p.isHidden());
+        testStage.blocks.removeIf(_b -> _b.isHidden());
+        testPowerUps.removeIf(_p -> _p.isHidden());
     }
 
 
@@ -422,7 +440,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
     private void _drawGameObjects(Graphics2D g2d) {
         testBall.draw(g2d);
         testShip.draw(g2d);
-        for (PowerUp _p : powerups) _p.draw(g2d);
+        for (PowerUp _p : testPowerUps) _p.draw(g2d);
     }
 
     private void _drawUIPanel(Graphics2D g2d) {
@@ -455,6 +473,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
 
     private void _drawUIPause(Graphics2D g2d) {
         int commonXoffset = GAME_WINDOW_WIDTH+10;
+
         g2d.setColor(Color.WHITE);
         g2d.setFont(new Font("Courier", Font.BOLD, 15));
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -477,7 +496,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
             }
 
             if (keyId == KeyEvent.KEY_PRESSED) {
-                // Pause game on P press.
+                // Toggle game pause on P press.
                 if (buttonPressed == GameActions.PAUSE) {
                     if (gameState != GameState.PAUSE_MENU) {
                         gameState = GameState.PAUSE_MENU;
@@ -488,7 +507,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                     }
                 }
 
-                // Toggle music.
+                // Toggle music on M press.
                 if (buttonPressed == GameActions.MUSIC_STOP) {
                     // Note: this will toggle play/pause depending on clip state.
                     soundManager.pauseBgMusic();
