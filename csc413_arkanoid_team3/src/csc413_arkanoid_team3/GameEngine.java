@@ -7,7 +7,6 @@ import java.util.*;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.Random;
 
 
 public class GameEngine extends JPanel implements Runnable {
@@ -54,6 +53,9 @@ public class GameEngine extends JPanel implements Runnable {
     public static String GENERAL_ASSET_PATH = ASSET_PATH + "general/";
     public static String BALL_ASSET_PATH = ASSET_PATH + "ball/";
     public static String POWERUPS_ASSET_PATH = ASSET_PATH + "power-ups/";
+    
+    //Moving Away From Test Data
+    private Player player1;
 
     // Test data
     private Player testShip;
@@ -105,7 +107,7 @@ public class GameEngine extends JPanel implements Runnable {
         isRunning = true;
 
         // Active test mode for BG.
-        gameState = GameState.TESTING_DRAWING;
+        gameState = GameState.MAIN_MENU;
 
         inputHandler = InputHandler.getInstance();
         soundManager = SoundManager.getInstance();
@@ -138,6 +140,7 @@ public class GameEngine extends JPanel implements Runnable {
         p1Keys.put(KeyEvent.VK_LEFT, Controls.LEFT);
         p1Keys.put(KeyEvent.VK_RIGHT, Controls.RIGHT);
         p1Keys.put(KeyEvent.VK_ENTER, Controls.SHOOT);
+        p1Keys.put(KeyEvent.VK_BACK_SPACE, Controls.START);
 
         // Setup player 2 key mapping (Do we still need 2 player?)
         p2Keys = new HashMap<Integer, Controls>();
@@ -183,8 +186,15 @@ public class GameEngine extends JPanel implements Runnable {
                 case INITIALIZING:
                     // Game open
                     break;
+                    
+                case MAIN_MENU:
+                    updateData();
+                    break;
                 case PLAYING:
                     // Main game update
+                    updateData();
+                    checkCollisions();
+                    cleanupObjects();
                     break;
                 case TESTING_DRAWING:
                     // Test area
@@ -194,9 +204,11 @@ public class GameEngine extends JPanel implements Runnable {
                     checkCollisions();
                     cleanupObjects();
                     break;
-                case EXITING:
+                case GAME_OVER:
                     // Game closing
                     isRunning = false;
+                    updateData();
+                    cleanupObjects();
                     break;
                 default:
                     // Somehow, we have a bad enum...
@@ -314,14 +326,21 @@ public class GameEngine extends JPanel implements Runnable {
 
         // Draw based on current GameState.
         switch (gameState) {
-            case INITIALIZING:
+            case MAIN_MENU:
+            {
                 // Game open
-                // TODO: draw splash screen.
+                Graphics2D g2d = (Graphics2D) windowBuffer.getGraphics();
+                drawSplash(g2d);
+                g2d.dispose();
+                
+                g.drawImage(windowBuffer, 0, 0, this);
                 break;
+            }
             case PLAYING:
                 // Main application loop here
                 break;
             case TESTING_DRAWING:
+            {
                 // Test stage draw.
                 Graphics2D g2d = (Graphics2D) gameAreaBuffer.getGraphics();
 
@@ -336,6 +355,7 @@ public class GameEngine extends JPanel implements Runnable {
                 // Draw window.
                 g.drawImage(gameAreaBuffer, 0, 0, this);
                 break;
+            }
             case EXITING:
                 // Application exiting....
                 break;
@@ -357,6 +377,45 @@ public class GameEngine extends JPanel implements Runnable {
 
     private void _drawGameObjects(Graphics2D g2d) {
         // Draw the stage's objects.
+    }
+    
+     private void drawSplash(Graphics2D g){
+        String msg = "Press <Enter> To Start";
+        String msg2 = "Press <P> To Toggle Music";
+        int x;
+        int y;
+//        try {
+//            ClassLoader cl = GameEngine.class.getClassLoader();
+//            Image splash = ImageIO.read(cl.getResource(GameEngine.GENERAL_ASSET_PATH + "Splash.png"));
+//              x = getWidth()/5;
+//              g.drawImage(splash,x,0,splash.getWidth(this),splash.getHeight(this),this);
+//        } catch (IOException ex) {
+//            Logger.getLogger(GameEngine.class.getName()).log(Level.SEVERE, null, ex);
+//        }        
+        
+         g.setFont(new Font("Courier", Font.BOLD, 16));
+        
+        FontMetrics fm = g.getFontMetrics();
+        int stringWidth = fm.stringWidth(msg);
+        int stringWidth2 = fm.stringWidth(msg2);
+        int string2Ascent = fm.getAscent();
+        
+
+        int stringX = getWidth() /2 - stringWidth /2;
+        int stringY = (int)(getHeight() *.8);
+        int stringX2 = getWidth() /2 - stringWidth2 /2;
+        int stringY2 = stringY+string2Ascent;
+        
+        
+        //On Enter Change GameState
+        HashMap<Controls, Boolean> buttonStates = player1.getButtonStates();
+        if(buttonStates.get(Controls.START)){
+            gameState = GameState.PLAYING;
+        }
+        
+        g.drawString(msg,stringX,stringY);
+        g.drawString(msg2,stringX2,stringY2);
+        
     }
 
     private void drawUIPanel(Graphics2D g2d) {
