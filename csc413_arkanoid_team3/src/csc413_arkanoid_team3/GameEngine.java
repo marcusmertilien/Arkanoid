@@ -163,19 +163,20 @@ public class GameEngine extends JPanel implements Runnable {
     }
 
     private void _setupGameData() {
+        // Ship
         testShip = new Player(200, 450, p1Keys);
+        eventManager.addObserver(testShip);
+
+        // Stage
         this.testStage = new Stage(Stage.Rounds.ROUND_3);
-        testBall = new Ball(205, 400);
+
+        // Ball
+        testBall = new Ball(205, 450);
         testBall.xSpeed = 2;
         testBall.ySpeed = -2;
 
+        // Powerups
         powerups = new ArrayList<PowerUp>();
-
-        // for (int i = 0; i < PowerUp.Types.values().length; i++) {
-        //     powerups.add(new PowerUp(100 + (32*i), 25, PowerUp.Types.values()[i]));
-        // }
-
-        eventManager.addObserver(testShip);
     }
 
     private void _setupGameAudio() {
