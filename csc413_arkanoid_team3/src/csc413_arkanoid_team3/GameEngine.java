@@ -9,13 +9,19 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Random;
 
+import javax.imageio.ImageIO;
+
 
 public class GameEngine extends JPanel implements Runnable {
 
     // Game world size.
     private static final int WINDOW_BORDER_WIDTH = 5;
-    private static final int WINDOW_WIDTH        = 448;
-    private static final int WINDOW_HEIGHT       = 480;
+    private static final int GAME_WINDOW_WIDTH = 448;
+    private static final int GAME_WINDOW_HEIGHT = 480;
+    private static final int UI_PANEL_WIDTH = 200;
+    private static final int UI_PANEL_HEIGHT = 200;
+    private static final int MAIN_WINDOW_WIDTH = GAME_WINDOW_WIDTH + UI_PANEL_WIDTH;
+    private static final int MAIN_WINDOW_HEIGHT = GAME_WINDOW_HEIGHT;
 
     // Game loop constants.
     private static final int TARGET_FPS     = 60;
@@ -62,6 +68,17 @@ public class GameEngine extends JPanel implements Runnable {
     private ArrayList<PowerUp> powerups;
     private int testScore;
 
+    // TODO: move this somewhere else.
+    private static BufferedImage logoImage;
+    static {
+        try {
+            ClassLoader cl = GameEngine.class.getClassLoader();
+            logoImage = ImageIO.read(cl.getResource(GameEngine.GENERAL_ASSET_PATH + "logo.png"));
+        } catch (Exception e) {
+            System.out.println(e.toString());
+        }
+    }
+
     // Entry point
     // ===========
     public static void main(String[] args) {
@@ -74,7 +91,7 @@ public class GameEngine extends JPanel implements Runnable {
 
                 // Setup parent frame.
                 JFrame frame = new JFrame();
-                frame.setPreferredSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
+                frame.setPreferredSize(new Dimension(MAIN_WINDOW_WIDTH, GAME_WINDOW_HEIGHT));
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 frame.pack();
                 frame.setLocationRelativeTo(null);
@@ -111,7 +128,7 @@ public class GameEngine extends JPanel implements Runnable {
         eventManager = EventManager.getInstance();
 
         // Setup game panel.
-        this.setPreferredSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
+        this.setPreferredSize(new Dimension(MAIN_WINDOW_WIDTH, GAME_WINDOW_HEIGHT));
         this.setVisible(true);
         this.setFocusable(true);
         this.requestFocus();
@@ -146,7 +163,6 @@ public class GameEngine extends JPanel implements Runnable {
     }
 
     private void _setupGameData() {
-        // TODO: we'll likely need to so _something_ here.
         testShip = new Player(200, 420, p1Keys);
         this.testStage = new Stage(Stage.Rounds.ROUND_3);
         testBall = new Ball(205, 400);
@@ -239,18 +255,18 @@ public class GameEngine extends JPanel implements Runnable {
 
     private void checkCollisions() {
         // Check ship vs boundry collision.
-        if (testShip.x < 16 || (testShip.width + testShip.x + 16) > WINDOW_WIDTH) {
+        if (testShip.x < 16 || (testShip.width + testShip.x + 16) > GAME_WINDOW_WIDTH) {
             testShip.resetLocation();
         }
 
         // Check x axis boundry collision.
-        if (testBall.x < 16 || testBall.x > WINDOW_WIDTH -16) {
+        if (testBall.x < 16 || testBall.x > GAME_WINDOW_WIDTH -16) {
             testBall.resetLocation();
             testBall.xSpeed = -(testBall.xSpeed);
         }
 
         // Check y axis boundery collsion.
-        if (testBall.y < 16 || testBall.y > WINDOW_HEIGHT-16) {
+        if (testBall.y < 16 || testBall.y > GAME_WINDOW_HEIGHT-16) {
             testBall.resetLocation();
             testBall.ySpeed = -(testBall.ySpeed);
         }
@@ -312,12 +328,12 @@ public class GameEngine extends JPanel implements Runnable {
 
         // The window's double buffer.
         BufferedImage windowBuffer = new BufferedImage(
-            WINDOW_WIDTH, WINDOW_HEIGHT, BufferedImage.TYPE_INT_RGB
+            GAME_WINDOW_WIDTH, GAME_WINDOW_HEIGHT, BufferedImage.TYPE_INT_RGB
         );
 
         // The game area's buffer.
         BufferedImage gameAreaBuffer = new BufferedImage(
-            WINDOW_WIDTH, WINDOW_HEIGHT, BufferedImage.TYPE_INT_RGB
+            GAME_WINDOW_WIDTH + UI_PANEL_WIDTH, GAME_WINDOW_HEIGHT, BufferedImage.TYPE_INT_RGB
         );
 
         // Draw based on current GameState.
@@ -368,14 +384,18 @@ public class GameEngine extends JPanel implements Runnable {
     }
 
     private void drawUIPanel(Graphics2D g2d) {
+        g2d.drawImage(logoImage, GAME_WINDOW_WIDTH+10, 15, 180, 40, null);
+
+        g2d.setColor(Color.RED);
+        g2d.setFont(new Font("Courier", Font.BOLD, 15));
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.drawString("1UP", GAME_WINDOW_WIDTH+10, 75);
 
         // Set font for rendering stats.
         g2d.setColor(Color.WHITE);
-        g2d.setFont(new Font("Courier", Font.BOLD, 18));
+        g2d.setFont(new Font("Courier", Font.BOLD, 15));
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-        // Draw player 1's stats.
-        g2d.drawString("" + this.testScore, 25, 35);
+        g2d.drawString("" + this.testScore, GAME_WINDOW_WIDTH+10, 90);
     }
 
 }
