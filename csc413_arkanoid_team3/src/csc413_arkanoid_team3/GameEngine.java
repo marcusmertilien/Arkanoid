@@ -67,6 +67,8 @@ public class GameEngine extends JPanel implements Runnable {
     private Ball testBall;
     private ArrayList<PowerUp> powerups;
     private int testScore;
+    private int testLives;
+    private PowerUp testActivePowerUp;
 
     // TODO: move this somewhere else.
     private static BufferedImage logoImage;
@@ -171,9 +173,13 @@ public class GameEngine extends JPanel implements Runnable {
         this.testStage = new Stage(Stage.Rounds.ROUND_3);
 
         // Ball
-        testBall = new Ball(205, 450);
+        testBall = new Ball(205, 440);
         testBall.xSpeed = 2;
         testBall.ySpeed = -2;
+
+        // Score and lives
+        testScore = 0;
+        testLives = 5;
 
         // Powerups
         powerups = new ArrayList<PowerUp>();
@@ -266,11 +272,19 @@ public class GameEngine extends JPanel implements Runnable {
             testBall.xSpeed = -(testBall.xSpeed);
         }
 
-        // Check y axis boundery collsion.
-        if (testBall.y < 16 || testBall.y > GAME_WINDOW_HEIGHT-30) {
+        // Test upper bounds collision
+        if (testBall.y < 16) {
             testBall.resetLocation();
             testBall.ySpeed = -(testBall.ySpeed);
         }
+
+        // Test gutter collision
+        if (testBall.y > GAME_WINDOW_HEIGHT-32) {
+            testBall.resetLocation();
+            testBall.ySpeed = -(testBall.ySpeed);
+            testLives--;
+        }
+
 
         // Check ship vs ball collision.
         if (Physics.doesCollideWith(testBall, testShip)) {
@@ -331,6 +345,7 @@ public class GameEngine extends JPanel implements Runnable {
             // Check powerup vs ship.
             if (Physics.doesCollideWith(_p, testShip)) {
                 _p.hide();
+                testActivePowerUp = _p;
             }
         }
     }
@@ -405,18 +420,31 @@ public class GameEngine extends JPanel implements Runnable {
     }
 
     private void drawUIPanel(Graphics2D g2d) {
-        g2d.drawImage(logoImage, GAME_WINDOW_WIDTH+10, 15, 180, 40, null);
+        int commonXoffset = GAME_WINDOW_WIDTH+10;
 
+        // Draw branding.
+        g2d.drawImage(logoImage, commonXoffset, 15, 180, 40, null);
+
+        // Draw lives count.
         g2d.setColor(Color.RED);
         g2d.setFont(new Font("Courier", Font.BOLD, 15));
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2d.drawString("1UP", GAME_WINDOW_WIDTH+10, 75);
+        g2d.drawString("1UP x" + testLives, commonXoffset, 75);
 
-        // Set font for rendering stats.
+        // Draw Score.
         g2d.setColor(Color.WHITE);
         g2d.setFont(new Font("Courier", Font.BOLD, 15));
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2d.drawString("" + this.testScore, GAME_WINDOW_WIDTH+10, 90);
+        g2d.drawString("" + this.testScore, commonXoffset, 90);
+
+        // Draw powerup type if active.
+        if (testActivePowerUp != null) {
+            g2d.setColor(Color.GREEN);
+            g2d.setFont(new Font("Courier", Font.BOLD, 14));
+            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2d.drawString("Active Power-up", commonXoffset, 110);
+            g2d.drawString(testActivePowerUp.type.name(), commonXoffset, 125);
+        }
     }
 
 }
