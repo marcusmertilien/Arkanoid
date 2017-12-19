@@ -148,7 +148,7 @@ public class GameEngine extends JPanel implements Runnable {
     private void _setupGameData() {
         // TODO: we'll likely need to so _something_ here.
         testShip = new Player(200, 420, p1Keys);
-        this.testStage = new Stage(Stage.Rounds.ROUND_1);
+        this.testStage = new Stage(Stage.Rounds.ROUND_3);
         testBall = new Ball(205, 400);
         testBall.xSpeed = 2;
         testBall.ySpeed = -2;
@@ -156,7 +156,7 @@ public class GameEngine extends JPanel implements Runnable {
         powerups = new ArrayList<PowerUp>();
 
         for (int i = 0; i < PowerUp.Types.values().length; i++) {
-            powerups.add(new PowerUp(100+ (32*i), 25, PowerUp.Types.values()[i]));
+            powerups.add(new PowerUp(100 + (32*i), 25, PowerUp.Types.values()[i]));
         }
 
         eventManager.addObserver(testShip);
@@ -239,18 +239,18 @@ public class GameEngine extends JPanel implements Runnable {
 
     private void checkCollisions() {
         // Check ship vs boundry collision.
-        if (testShip.x < 24 || (testShip.width + testShip.x + 24) > WINDOW_WIDTH) {
+        if (testShip.x < 16 || (testShip.width + testShip.x + 16) > WINDOW_WIDTH) {
             testShip.resetLocation();
         }
 
         // Check x axis boundry collision.
-        if (testBall.x < 24 || testBall.x > WINDOW_WIDTH -24) {
+        if (testBall.x < 16 || testBall.x > WINDOW_WIDTH -16) {
             testBall.resetLocation();
             testBall.xSpeed = -(testBall.xSpeed);
         }
 
         // Check y axis boundery collsion.
-        if (testBall.y < 24 || testBall.y > WINDOW_HEIGHT-24) {
+        if (testBall.y < 16 || testBall.y > WINDOW_HEIGHT-16) {
             testBall.resetLocation();
             testBall.ySpeed = -(testBall.ySpeed);
         }
