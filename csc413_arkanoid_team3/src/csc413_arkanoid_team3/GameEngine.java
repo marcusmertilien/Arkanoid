@@ -96,7 +96,6 @@ public class GameEngine extends JPanel implements Runnable {
                 gameLoop();
             }
         }.start();
-
     }
 
     // Init
@@ -148,11 +147,11 @@ public class GameEngine extends JPanel implements Runnable {
 
     private void _setupGameData() {
         // TODO: we'll likely need to so _something_ here.
-        this.testShip = new Player(200, 420, p1Keys);
+        testShip = new Player(200, 420, p1Keys);
         this.testStage = new Stage(Stage.Rounds.ROUND_1);
-        this.testBall = new Ball(205, 400);
-        this.testBall.xSpeed = 3;
-        this.testBall.ySpeed = -3;
+        testBall = new Ball(205, 400);
+        testBall.xSpeed = 2;
+        testBall.ySpeed = -2;
 
         powerups = new ArrayList<PowerUp>();
 
@@ -160,7 +159,7 @@ public class GameEngine extends JPanel implements Runnable {
             powerups.add(new PowerUp(100+ (32*i), 25, PowerUp.Types.values()[i]));
         }
 
-        eventManager.addObserver(this.testShip);
+        eventManager.addObserver(testShip);
     }
 
     private void _setupGameAudio() {
@@ -188,8 +187,8 @@ public class GameEngine extends JPanel implements Runnable {
                     break;
                 case TESTING_DRAWING:
                     // Test area
-                    this.testShip.update();
-                    this.testBall.update();
+                    testShip.update();
+                    testBall.update();
                     for (PowerUp _p : powerups) { _p.update(); }
                     checkCollisions();
                     cleanupObjects();
@@ -240,53 +239,62 @@ public class GameEngine extends JPanel implements Runnable {
 
     private void checkCollisions() {
         // Check ship vs boundry collision.
-        if (this.testShip.x < 24 || (testShip.width + testShip.x + 24) > WINDOW_WIDTH) {
-            this.testShip.resetLocation();
+        if (testShip.x < 24 || (testShip.width + testShip.x + 24) > WINDOW_WIDTH) {
+            testShip.resetLocation();
         }
 
         // Check x axis boundry collision.
-        if (this.testBall.x < 24 || this.testBall.x > WINDOW_WIDTH -24) {
-            this.testBall.resetLocation();
-            this.testBall.xSpeed = -(this.testBall.xSpeed);
+        if (testBall.x < 24 || testBall.x > WINDOW_WIDTH -24) {
+            testBall.resetLocation();
+            testBall.xSpeed = -(testBall.xSpeed);
         }
 
         // Check y axis boundery collsion.
-        if (this.testBall.y < 24 || this.testBall.y > WINDOW_HEIGHT-24) {
-            this.testBall.resetLocation();
-            this.testBall.ySpeed = -(this.testBall.ySpeed);
+        if (testBall.y < 24 || testBall.y > WINDOW_HEIGHT-24) {
+            testBall.resetLocation();
+            testBall.ySpeed = -(testBall.ySpeed);
         }
 
         // Check ship vs ball collision.
-        if (Physics.doesCollideWith(this.testBall, this.testShip)) {
-            this.testBall.resetLocation();
-            this.testBall.ySpeed = -(this.testBall.ySpeed);
-            this.soundManager.playBallCollision(this.testShip);
+        if (Physics.doesCollideWith(testBall, testShip)) {
+            int normalizedBallPosition = testBall.x - testShip.x;
+            int ballCenter = normalizedBallPosition + testBall.width;
+            int shipCenter = testShip.width/2;
+            int tempX = (ballCenter - shipCenter)/4;
+
+            testBall.resetLocation();
+            testBall.ySpeed = -testBall.ySpeed;
+            testBall.xSpeed += (tempX < testBall.speed) ? tempX : testBall.speed;
+
+            this.soundManager.playBallCollision(testShip);
         }
 
         // Check for ball collisions with block.
         for (Block _b : this.testStage.blocks) {
-            if (Physics.doesCollideWith(_b, this.testBall)) {
+            if (Physics.doesCollideWith(_b, testBall)) {
                 // Find intersection
-                Rectangle _i = Physics.getIntersection(this.testBall, _b);
+                Rectangle _i = Physics.getIntersection(testBall, _b);
 
                 if (_i.y == _b.y) {
-                    this.testBall.ySpeed = -this.testBall.ySpeed;
+                    testBall.ySpeed = -testBall.ySpeed;
                 }
 
-                if (_i.y == this.testBall.y) {
-                    this.testBall.ySpeed = -this.testBall.ySpeed;
+                if (_i.y == testBall.y) {
+                    testBall.ySpeed = -testBall.ySpeed;
                 }
 
                 if (_i.x == _b.x) {
-                    this.testBall.xSpeed = -this.testBall.xSpeed;
+                    testBall.xSpeed = -testBall.xSpeed;
                 }
 
-                if(_i.x == this.testBall.x) {
-                    this.testBall.xSpeed = -this.testBall.xSpeed;
+                if(_i.x == testBall.x) {
+                    testBall.xSpeed = -testBall.xSpeed;
                 }
 
                 this.soundManager.playBallCollision(_b);
                 this.testScore += _b.registerHit();
+
+                break;
             }
         }
     }
@@ -326,11 +334,11 @@ public class GameEngine extends JPanel implements Runnable {
                 Graphics2D g2d = (Graphics2D) gameAreaBuffer.getGraphics();
 
                 this.testStage.draw(g2d);
-                this.testBall.draw(g2d);
+                testBall.draw(g2d);
                 for (PowerUp _p : powerups) {
                     _p.draw(g2d);
                 }
-                this.testShip.draw(g2d);
+                testShip.draw(g2d);
                 drawUIPanel(g2d);
 
                 // Draw window.
