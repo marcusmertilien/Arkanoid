@@ -233,8 +233,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                 case PAUSE_MENU:
                     break;
                 case EXITING:
-                    // Game closing
-                    isRunning = false;
+                    System.exit(0);
                     break;
                 default:
                     // Somehow, we have a bad enum...
@@ -406,7 +405,6 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                 g.drawImage(windowBuffer, 0, 0, this);
                 break;
             case EXITING:
-                // Application exiting....
                 break;
             default:
                 // Somehow, we have a bad enum...
@@ -461,9 +459,9 @@ public class GameEngine extends JPanel implements Runnable, Observer {
     private void _drawUIPause(Graphics2D g2d) {
         int commonXoffset = GAME_WINDOW_WIDTH+10;
         g2d.setColor(Color.WHITE);
-        g2d.setFont(new Font("Courier", Font.BOLD, 14));
+        g2d.setFont(new Font("Courier", Font.BOLD, 18));
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2d.drawString("GAME PAUSED", commonXoffset, MAIN_WINDOW_HEIGHT - 50);
+        g2d.drawString("GAME PAUSED", commonXoffset + 25, MAIN_WINDOW_HEIGHT - 50);
     }
 
     @Override
@@ -484,8 +482,12 @@ public class GameEngine extends JPanel implements Runnable, Observer {
             if (keyId == KeyEvent.KEY_PRESSED) {
                 // Pause game on P press.
                 if (buttonPressed == GameActions.PAUSE) {
-                    System.out.println("Game paused");
                     gameState = (gameState != GameState.PAUSE_MENU) ? GameState.PAUSE_MENU : GameState.TESTING_DRAWING;
+                }
+
+                // Exit game on escape press.
+                if (buttonPressed == GameActions.EXIT) {
+                    gameState = GameState.EXITING;
                 }
             }
 
