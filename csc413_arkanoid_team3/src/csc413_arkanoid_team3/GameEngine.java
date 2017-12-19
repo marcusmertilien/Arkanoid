@@ -111,7 +111,7 @@ public class GameEngine extends JPanel implements Runnable {
         isRunning = true;
 
         // Active test mode for BG.
-        gameState = GameState.MAIN_MENU;
+        gameState = GameState.GAME_OVER;
 
         inputHandler = InputHandler.getInstance();
         soundManager = SoundManager.getInstance();
@@ -361,9 +361,17 @@ public class GameEngine extends JPanel implements Runnable {
                 g.drawImage(gameAreaBuffer, 0, 0, this);
                 break;
             }
-            case EXITING:
-                // Application exiting....
+            case GAME_OVER:
+            {
+              Graphics2D g2d = (Graphics2D) windowBuffer.getGraphics();
+                drawKillScreen(g2d);
+                g2d.dispose();
+                
+                // Draw contents of buffer.
+                g.drawImage(windowBuffer, 0, 0, this);
+                
                 break;
+            }
             default:
                 // Somehow, we have a bad enum...
                 System.out.println("GameEngine::gameLoop Error: bad enum");
@@ -384,7 +392,7 @@ public class GameEngine extends JPanel implements Runnable {
         // Draw the stage's objects.
     }
     
-     private void drawSplash(Graphics2D g){
+    private void drawSplash(Graphics2D g){
         String msg = "Press <Backspace> To Start";
         String msg2 = "Press <P> To Toggle Music";
         int x;
@@ -398,7 +406,7 @@ public class GameEngine extends JPanel implements Runnable {
             Logger.getLogger(GameEngine.class.getName()).log(Level.SEVERE, null, ex);
         }        
         
-         g.setFont(new Font("Courier", Font.BOLD, 16));
+        g.setFont(new Font("Courier", Font.BOLD, 16));
         
         FontMetrics fm = g.getFontMetrics();
         int stringWidth = fm.stringWidth(msg);
@@ -419,7 +427,29 @@ public class GameEngine extends JPanel implements Runnable {
         }
         
         g.drawString(msg,stringX,stringY);
-        g.drawString(msg2,stringX2,stringY2);
+        //g.drawString(msg2,stringX2,stringY2);
+        
+    }
+     
+    private void drawKillScreen(Graphics2D g){
+        String msg = "GAME OVER!";
+        g.setColor(Color.BLACK);
+        g.fillRect(0,0,WINDOW_WIDTH , WINDOW_HEIGHT);
+        
+
+//         Set font for rendering stats.
+        g.setColor(Color.RED);
+        g.setFont(new Font("Courier", Font.BOLD, 36));
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        
+        FontMetrics fm = g.getFontMetrics();
+        int stringWidth = fm.stringWidth(msg);
+        int stringHeight = fm.getAscent();
+
+        int x = getWidth() /2 - stringWidth /2;
+        int y = getHeight() /2 + stringHeight/2;
+                
+        g.drawString(msg,x,y);
         
     }
 
