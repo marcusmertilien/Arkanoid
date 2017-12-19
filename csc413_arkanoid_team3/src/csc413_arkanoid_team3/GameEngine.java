@@ -101,6 +101,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                 frame.pack();
                 frame.setLocationRelativeTo(null);
                 frame.setVisible(true);
+                frame.setIgnoreRepaint(true);
 
                 // Setup and run engine.
                 engine.init(frame);
@@ -171,6 +172,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         gameControls.put(KeyEvent.VK_P, GameActions.PAUSE);
         gameControls.put(KeyEvent.VK_ESCAPE, GameActions.EXIT);
         gameControls.put(KeyEvent.VK_1, GameActions.START);
+        gameControls.put(KeyEvent.VK_M, GameActions.MUSIC_STOP);
     }
 
     private void _setupGameData() {
@@ -198,7 +200,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
     }
 
     private void _setupGameAudio() {
-        // TODO: maybe implment soundtrack;
+        soundManager.playBgMusic();
     }
 
     // Game loop
@@ -302,13 +304,15 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         // Check ship vs ball collision.
         if (Physics.doesCollideWith(testBall, testShip)) {
             int normalizedBallPosition = testBall.x - testShip.x;
-            int ballCenter = normalizedBallPosition + testBall.width;
-            int shipCenter = testShip.width/2;
+            int ballCenter = normalizedBallPosition + (testBall.width/2);
+            int shipCenter = (testShip.width/2);
             int tempX = (ballCenter - shipCenter)/4;
 
             testBall.resetLocation();
             testBall.ySpeed = -testBall.ySpeed;
             testBall.xSpeed += (tempX < testBall.speed) ? tempX : testBall.speed;
+
+            System.out.printf("ball center: %d, ship center: %d\nnew ball x: %d, new ball y: %d", ballCenter, shipCenter, testBall.xSpeed, testBall.ySpeed);
 
             this.soundManager.playBallCollision(testShip);
         }
@@ -482,11 +486,16 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                     gameState = (gameState != GameState.PAUSE_MENU) ? GameState.PAUSE_MENU : GameState.TESTING_DRAWING;
                 }
 
+                if (buttonPressed == GameActions.MUSIC_STOP) {
+                    soundManager.stopBgMusic();
+                }
+
                 // Exit game on escape press.
                 if (buttonPressed == GameActions.EXIT) {
                     gameState = GameState.EXITING;
                 }
             }
+
 
         }
     }
