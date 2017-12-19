@@ -6,7 +6,11 @@ import java.util.*;
 
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 
 
 public class GameEngine extends JPanel implements Runnable {
@@ -177,7 +181,7 @@ public class GameEngine extends JPanel implements Runnable {
         long lastFrameTime = System.nanoTime(); // previous frame time
         long lastFps = 0;                       // previous frame fps
         long fps = 0;                           // frames per second
-
+        
         // Main application loop...
         while (isRunning) {
 
@@ -330,6 +334,7 @@ public class GameEngine extends JPanel implements Runnable {
             {
                 // Game open
                 Graphics2D g2d = (Graphics2D) windowBuffer.getGraphics();
+                
                 drawSplash(g2d);
                 g2d.dispose();
                 
@@ -380,18 +385,18 @@ public class GameEngine extends JPanel implements Runnable {
     }
     
      private void drawSplash(Graphics2D g){
-        String msg = "Press <Enter> To Start";
+        String msg = "Press <Backspace> To Start";
         String msg2 = "Press <P> To Toggle Music";
         int x;
         int y;
-//        try {
-//            ClassLoader cl = GameEngine.class.getClassLoader();
-//            Image splash = ImageIO.read(cl.getResource(GameEngine.GENERAL_ASSET_PATH + "Splash.png"));
-//              x = getWidth()/5;
-//              g.drawImage(splash,x,0,splash.getWidth(this),splash.getHeight(this),this);
-//        } catch (IOException ex) {
-//            Logger.getLogger(GameEngine.class.getName()).log(Level.SEVERE, null, ex);
-//        }        
+        try {
+            ClassLoader cl = GameEngine.class.getClassLoader();
+            Image splash = ImageIO.read(cl.getResource(GameEngine.GENERAL_ASSET_PATH + "Splash.png"));
+            x = getWidth()/5;
+            g.drawImage(splash,x,0,splash.getWidth(this),splash.getHeight(this),this);
+        } catch (IOException ex) {
+            Logger.getLogger(GameEngine.class.getName()).log(Level.SEVERE, null, ex);
+        }        
         
          g.setFont(new Font("Courier", Font.BOLD, 16));
         
@@ -408,7 +413,7 @@ public class GameEngine extends JPanel implements Runnable {
         
         
         //On Enter Change GameState
-        HashMap<Controls, Boolean> buttonStates = player1.getButtonStates();
+        HashMap<Controls, Boolean> buttonStates = testShip.getButtonStates();
         if(buttonStates.get(Controls.START)){
             gameState = GameState.PLAYING;
         }
