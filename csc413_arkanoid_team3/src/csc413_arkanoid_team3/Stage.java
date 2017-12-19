@@ -152,7 +152,7 @@ public class Stage {
         for (int i = 0; i < stage.length; i++) {
             for (int j = 0; j < stage[i].length; j++) {
                 int x = 16 + (j*Block.BLOCK_WIDTH);
-                int y = 75 + (i*Block.BLOCK_HEIGHT);
+                int y = 60 + (i*Block.BLOCK_HEIGHT);
                 blocks.add(new Block(x, y, map.get(stage[i][j])));
             }
         }

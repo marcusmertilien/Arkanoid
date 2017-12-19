@@ -74,6 +74,7 @@ public class PowerUp extends Prop {
             this.sprite = this.assetRow.getSubimage(spriteX, 0, POWERUP_WIDTH, POWERUP_HEIGHT);
         }
 
-
+        // Powerups move to the bottom of the screen.
+        this.y++;
     }
 }
