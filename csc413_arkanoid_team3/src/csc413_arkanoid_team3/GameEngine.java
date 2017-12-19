@@ -84,8 +84,6 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         }
     }
 
-    BufferedImage windowBuffer = new BufferedImage(MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT, BufferedImage.TYPE_INT_RGB);
-
     // Entry point
     // ===========
     public static void main(String[] args) {
@@ -361,6 +359,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
             if (Physics.doesCollideWith(_p, testShip)) {
                 _p.hide();
                 testActivePowerUp = _p;
+                soundManager.playPowerUpCollision();
             }
         }
     }
@@ -377,8 +376,8 @@ public class GameEngine extends JPanel implements Runnable, Observer {
     @Override
     protected void paintComponent(Graphics g) {
 
-        windowBuffer = new BufferedImage(MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT, BufferedImage.TYPE_INT_RGB);
-        Graphics2D g2d;
+        BufferedImage windowBuffer = new BufferedImage(MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2d = (Graphics2D) windowBuffer.getGraphics();
 
         // Draw based on current GameState.
         switch (gameState) {
@@ -390,19 +389,15 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                 // Main application loop here
                 break;
             case TESTING_DRAWING:
-                g2d = (Graphics2D) windowBuffer.getGraphics();
                 _drawBackground(g2d);
                 _drawGameObjects(g2d);
                 _drawUIPanel(g2d);
-                g.drawImage(windowBuffer, 0, 0, this);
                 break;
             case PAUSE_MENU:
-                g2d = (Graphics2D) windowBuffer.getGraphics();
                 _drawBackground(g2d);
                 _drawGameObjects(g2d);
                 _drawUIPanel(g2d);
                 _drawUIPause(g2d);
-                g.drawImage(windowBuffer, 0, 0, this);
                 break;
             case EXITING:
                 break;
@@ -410,8 +405,10 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                 // Somehow, we have a bad enum...
                 System.out.println("GameEngine::gameLoop Error: bad enum");
                 break;
-
         }
+
+        // Drw current frame.
+        g.drawImage(windowBuffer, 0, 0, this);
     }
 
     private void _drawViews(Graphics2D g2d, BufferedImage gameWorldBuffer) {

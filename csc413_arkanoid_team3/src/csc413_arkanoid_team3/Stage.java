@@ -93,6 +93,7 @@ public class Stage {
         put(Rounds.ROUND_1, round1map);
         put(Rounds.ROUND_2, round2map);
         put(Rounds.ROUND_3, round3map);
+        put(Rounds.ROUND_4, round4map);
     }};
 
     private static HashMap<Rounds, BufferedImage> backgroundCollection;
