@@ -302,15 +302,15 @@ public class GameEngine extends JPanel implements Runnable, Observer {
             int normalizedBallPosition = testBall.x - testShip.x;
             int ballCenter = normalizedBallPosition + (testBall.width/2);
             int shipCenter = (testShip.width/2);
-            int tempX = (ballCenter - shipCenter)/4;
+            int tempX = (ballCenter - shipCenter);
 
             testBall.resetLocation();
             testBall.ySpeed = -testBall.ySpeed;
-            testBall.xSpeed += (tempX < testBall.speed) ? tempX : testBall.speed;
+            testBall.xSpeed = tempX/8;
 
             if (DebugState.showPaddleActive) {
                 System.out.printf(
-                    "ball center: %d, ship center: %d\nnew ball x: %d, new ball y: %d",
+                    "ball center: %d, ship center: %d\nnew ball x: %d, new ball y: %d\n",
                     ballCenter, shipCenter, testBall.xSpeed, testBall.ySpeed
                 );
             }
