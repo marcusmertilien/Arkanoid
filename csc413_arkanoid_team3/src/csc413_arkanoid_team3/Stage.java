@@ -11,7 +11,7 @@ import javax.imageio.ImageIO;
 
 public class Stage {
 
-    private static String SPRITE_PATH = "background-sprite-sheet.png";
+    private static String SPRITE_PATH = GameEngine.STAGE_BG_PATH + "background-sprite-sheet.png";
 
     private static int BG_SPRITE_WIDTH = 224;      // width of stage area
     private static int BG_SPRITE_HEIGHT = 240;     // height of stage area
@@ -96,37 +96,28 @@ public class Stage {
         put(Rounds.ROUND_4, round4map);
     }};
 
-    private static HashMap<Rounds, BufferedImage> backgroundCollection;
+    private static HashMap<Rounds, BufferedImage> assetMap;
     static {
-        try {
-            ClassLoader cl = GameEngine.class.getClassLoader();
-            BufferedImage spriteMap = ImageIO.read(cl.getResource(GameEngine.STAGE_BG_PATH + SPRITE_PATH));
-            BufferedImage rawAsset, bgMap;
-            Image tempScaledImage;
-            Graphics2D g2d;
-            
-            backgroundCollection = new HashMap<Rounds, BufferedImage>();
 
-            for (int i = 0; i < Rounds.values().length; i++) {
-                int x = i * BG_SPRITE_WIDTH;
-                int y = 0;
+        // Init images assets
+        // ==================
+        BufferedImage spriteSheet = AssetLoader.load(SPRITE_PATH, 1);
+        assetMap = new HashMap<Rounds, BufferedImage>();
 
-                // Account for spacers in sprite sheet.
-                if (i > 0) x += i*SPACER_WIDTH;
+        // For each round, crop one sprite from the sheet and store it.
+        for (int i = 0; i < Rounds.values().length; i++) {
+            int x = i * BG_SPRITE_WIDTH;
+            int y = 0;
 
-                // Provide an image asset per enum type.
-                rawAsset = spriteMap.getSubimage(x, y, BG_SPRITE_WIDTH, BG_SPRITE_HEIGHT);
-                tempScaledImage = rawAsset.getScaledInstance(STAGE_WIDTH, STAGE_HEIGHT, Image.SCALE_SMOOTH);
-                bgMap = new BufferedImage(STAGE_WIDTH, STAGE_HEIGHT, BufferedImage.TYPE_INT_ARGB);
-                g2d = bgMap.createGraphics();
-                g2d.drawImage(tempScaledImage, 0, 0, null);
+            // Account for spacers in sprite sheet.
+            if (i > 0) x += i*SPACER_WIDTH;
 
-                backgroundCollection.put(Rounds.values()[i], bgMap);
-            }
-
-        } catch (Exception e) {
-            System.out.print("No resources found\n");
+            // Provide an image asset per enum type.
+            BufferedImage rawAsset = spriteSheet.getSubimage(x, y, BG_SPRITE_WIDTH, BG_SPRITE_HEIGHT);
+            BufferedImage stageAsset = AssetLoader.getScaledInstance(rawAsset, STAGE_WIDTH, STAGE_HEIGHT);
+            assetMap.put(Rounds.values()[i], stageAsset);
         }
+
     }
 
 
@@ -134,7 +125,6 @@ public class Stage {
     // ============
 
     private BufferedImage bgSprite;
-
     public Rounds round;
     public ArrayList<Block> blocks;
 
@@ -144,7 +134,7 @@ public class Stage {
 
     public Stage(Rounds round) {
         this.round = round;
-        this.bgSprite = backgroundCollection.get(this.round);
+        this.bgSprite = assetMap.get(this.round);
 
         // Test data will use a data collection for the setup.
         this.blocks = new ArrayList<Block>();

@@ -18,32 +18,17 @@ public class PowerUp extends Prop {
     public static int POWERUP_WIDTH = 2*POWERUP_SPRITE_WIDTH;
     public static int POWERUP_HEIGHT = 2*POWERUP_SPRITE_HEIGHT;
 
-    private static String FILE_NAME = "powerups-sprite-sheet.png";
+    private static String SPRITE_PATH = GameEngine.POWERUPS_ASSET_PATH + "powerups-sprite-sheet.png";
     private static HashMap<Types, BufferedImage> assetMap;
     static {
-        try {
-            // Init images assets
-            // ==================
-            ClassLoader cl = GameEngine.class.getClassLoader();
-            BufferedImage spriteSheet, rawAsset;
-            Image tempScaledImage;
-            Graphics2D g2d;
+        // Init images assets
+        // ==================
+        BufferedImage spriteSheet = AssetLoader.load(SPRITE_PATH, 2);
+        assetMap = new HashMap<Types, BufferedImage>();
 
-            rawAsset = ImageIO.read(cl.getResource(GameEngine.POWERUPS_ASSET_PATH + FILE_NAME));
-            tempScaledImage = rawAsset.getScaledInstance(2*rawAsset.getWidth(), 2*rawAsset.getHeight(), BufferedImage.TYPE_INT_ARGB);
-            spriteSheet =  new BufferedImage(2*rawAsset.getWidth(), 2*rawAsset.getHeight(), BufferedImage.TYPE_INT_ARGB);
-            g2d = spriteSheet.createGraphics();
-            g2d.drawImage(tempScaledImage, 0, 0, null);
-
-            assetMap = new HashMap<Types, BufferedImage>();
-
-            for (int i = 0; i < Types.values().length; i++) {
-                BufferedImage powerUp = spriteSheet.getSubimage(0, i*POWERUP_HEIGHT, spriteSheet.getWidth(), POWERUP_HEIGHT);
-                assetMap.put(Types.values()[i], powerUp);
-            }
-
-        } catch (Exception e) {
-            System.out.print("No resources found\n");
+        for (int i = 0; i < Types.values().length; i++) {
+            BufferedImage powerUp = spriteSheet.getSubimage(0, i*POWERUP_HEIGHT, spriteSheet.getWidth(), POWERUP_HEIGHT);
+            assetMap.put(Types.values()[i], powerUp);
         }
     }
 
