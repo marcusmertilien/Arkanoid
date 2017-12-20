@@ -213,6 +213,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                     _updateData();
                     _checkCollisions();
                     _cleanupObjects();
+                    _checkState();
                     break;
                 case PAUSE_MENU:
                     break;
@@ -368,19 +369,21 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                 soundManager.playPowerUpCollision();
             }
         }
-
-        // Transition to game over if all lives are lost
-        if (testLives == 0) {
-            gameState = GameState.GAME_OVER;
-            soundManager.stopBgMusic();
-            soundManager.playGameOverMusic();
-        }
     }
 
 
     private void _cleanupObjects() {
         testStage.blocks.removeIf(_b -> _b.isHidden());
         testPowerUps.removeIf(_p -> _p.isHidden());
+    }
+
+    private void _checkState() {
+        // Transition to game over if all lives are lost
+        if (testLives == 0) {
+            gameState = GameState.GAME_OVER;
+            soundManager.stopBgMusic();
+            soundManager.playGameOverMusic();
+        }
     }
 
 
