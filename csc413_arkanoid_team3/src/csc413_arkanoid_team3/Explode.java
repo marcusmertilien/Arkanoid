@@ -92,12 +92,12 @@ public class Explode extends GameObject {
                 break;
             case SHIP:
             
-                if (animationTimerS == 0) {
-                    this.hide();
-                } else {
-                    this.sprite = enemy.get(--animationTimerS/2);
-                }
-                break;
+            if (animationTimerS == 0) {
+                this.hide();
+            } else {
+                this.sprite = enemy.get(--animationTimerS/2);
+            }
+            break;
         }
     }
 }

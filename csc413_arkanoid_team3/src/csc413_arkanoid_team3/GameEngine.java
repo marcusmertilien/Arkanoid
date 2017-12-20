@@ -54,7 +54,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
     private HashMap<Integer, Controls> p1Keys;
     private HashMap<Integer, Controls> p2Keys;
     
-    private ArrayList<Explode> explosions;
+    
 
     // Game interface controls.
     private HashMap<Integer, GameActions> gameControls;
@@ -77,10 +77,12 @@ public class GameEngine extends JPanel implements Runnable, Observer {
     private Stage testStage;
     private Ball testBall;
     private int testScore;
-    private int testLives;
+    
     private ArrayList<PowerUp> testPowerUps;
     private ArrayList<Enemy> testEnemies;
     private PowerUp testActivePowerUp;
+    private ArrayList<Explode> explosions;
+    private ArrayList<Projectile> projectiles;
 
 
     // Load static assets
@@ -150,14 +152,14 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         p1Keys = new HashMap<Integer, Controls>();
         p1Keys.put(KeyEvent.VK_LEFT, Controls.LEFT);
         p1Keys.put(KeyEvent.VK_RIGHT, Controls.RIGHT);
-        p1Keys.put(KeyEvent.VK_ENTER, Controls.SHOOT);
+        p1Keys.put(KeyEvent.VK_SPACE, Controls.SHOOT);
         p1Keys.put(KeyEvent.VK_BACK_SPACE, Controls.START);
 
         // Setup player 2 key mapping (Do we still need 2 player?)
         p2Keys = new HashMap<Integer, Controls>();
         p2Keys.put(KeyEvent.VK_F, Controls.LEFT);
         p2Keys.put(KeyEvent.VK_H, Controls.RIGHT);
-        p2Keys.put(KeyEvent.VK_SPACE, Controls.SHOOT);
+        p2Keys.put(KeyEvent.VK_ENTER, Controls.SHOOT);
 
         // Setup game action controls.
         gameControls = new HashMap<Integer, GameActions>();
@@ -193,11 +195,13 @@ public class GameEngine extends JPanel implements Runnable, Observer {
 
         // Score and lives
         testScore = 0;
-        testLives = 3;
+        //testLives = 3;
 
         testPowerUps = new ArrayList<PowerUp>();
         testEnemies = new ArrayList<Enemy>();
         explosions = new ArrayList<Explode>();
+        projectiles = new ArrayList<Projectile>();
+        
 
         testEnemies.add(new Enemy(220, 300, Enemy.Types.GREEN));
         testEnemies.add(new Enemy(120, 300, Enemy.Types.BLUE));
@@ -275,11 +279,14 @@ public class GameEngine extends JPanel implements Runnable, Observer {
     }
 
     private void _updateData() {
+        
+        testShip.update(projectiles);
+        testBall.update();
+        
         for (Explode _e : explosions) _e.update();
         for (PowerUp _p : testPowerUps) _p.update();
         for (Enemy _e: testEnemies) _e.update();
-        testShip.update();
-        testBall.update();
+        for (Projectile _p : projectiles) _p.update();       
     }
 
     private void _checkCollisions() {
@@ -305,7 +312,8 @@ public class GameEngine extends JPanel implements Runnable, Observer {
             testBall.resetLocation();
             testBall.ySpeed = -(testBall.ySpeed);
             explosions.add(new Explode(testShip.x,testShip.y,Explode.Type.SHIP));
-            testLives--;
+            //Take a life away
+            testShip.setLives(testShip.getLives()-1);
         }
 
 
@@ -336,6 +344,20 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                     "ball center: %d, ship center: %d\nnew ball x: %d, new ball y: %d\n",
                     ballCenter, shipCenter, testBall.xSpeed, testBall.ySpeed
                 );
+            }
+        }
+        
+        //Check Block vs Projectile
+        for (Block _b : this.testStage.blocks){
+            for(Projectile _p :this.projectiles){
+                if(Physics.doesCollideWith(_b, _p)){
+                    _b.hide();
+                    _p.hide();
+                    
+                    this.testScore += _b.registerHit();
+                    this.soundManager.playBallCollision(_b);
+
+                }
             }
         }
 
@@ -381,7 +403,8 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                 break;
             }
         }
-
+        
+        //Enemy vs. Ball
         for (Enemy _e : testEnemies) {
             if (Physics.doesCollideWith(_e, testBall)) {
                 testBall.resetLocation();
@@ -422,6 +445,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
             // Check powerup vs ship.
             if (Physics.doesCollideWith(_p, testShip)) {
                 _p.hide();
+                testShip.powerUp(_p);
                 testActivePowerUp = _p;
                 soundManager.playPowerUpCollision();
             }
@@ -433,11 +457,12 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         testPowerUps.removeIf(_p -> _p.isHidden());
         explosions.removeIf(e -> e.isHidden());
         testEnemies.removeIf(_e -> _e.isHidden());
+        projectiles.removeIf(_p -> _p.isHidden());
     }
 
     private void _checkState() {
         // Transition to game over if all lives are lost
-        if (testLives == 0) {
+        if (testShip.getLives() == 0) {
             gameState = GameState.GAME_OVER;
             soundManager.stopBgMusic();
             soundManager.playGameOverMusic();
@@ -497,6 +522,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         for (Enemy _e: testEnemies) _e.draw(g2d);
         for (PowerUp _p : testPowerUps) _p.draw(g2d);
         for (Explode _e : explosions) _e.draw(g2d);
+        for(Projectile _p : projectiles) _p.draw(g2d);
     }
 
     private void _drawUIPanel(Graphics2D g2d) {
@@ -509,7 +535,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         g2d.setColor(Color.RED);
         g2d.setFont(new Font("Courier", Font.BOLD, 15));
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2d.drawString("1UP x" + testLives, commonXoffset, 75);
+        g2d.drawString("1UP x" + testShip.getLives(), commonXoffset, 75);
 
         // Draw Score.
         g2d.setColor(Color.WHITE);
@@ -542,7 +568,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
      
     private void _drawSplash(Graphics2D g){
 
-        // Draw logo.
+        // Draw logo.f
         int xPos = (MAIN_WINDOW_WIDTH/2) - (splashLogo.getWidth()/2);
         g.drawImage(splashLogo, xPos, 40, splashLogo.getWidth(), splashLogo.getHeight(), this);
 
