@@ -53,12 +53,15 @@ public class GameEngine extends JPanel implements Runnable, Observer {
     // Players
     private HashMap<Integer, Controls> p1Keys;
     private HashMap<Integer, Controls> p2Keys;
+    
+    private ArrayList<Explode> explosions;
 
     // Game interface controls.
     private HashMap<Integer, GameActions> gameControls;
 
     // Assets
     public static String ASSET_PATH = "resources/";
+    public static String ENEMIES_ASSET_PATH = ASSET_PATH + "enemies/";
     public static String SHIP_PATH = ASSET_PATH + "ship/";
     public static String STAGE_BG_PATH = ASSET_PATH + "stage-background/";
     public static String SOUND_ASSET_PATH = ASSET_PATH + "sounds/";
@@ -127,6 +130,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         this.setOpaque(false);
         this.addKeyListener(inputHandler); // attach input handler to panel
 
+        
         // Setup player keys.
         _setupControls();
 
@@ -162,6 +166,17 @@ public class GameEngine extends JPanel implements Runnable, Observer {
     }
 
     private void _setupGameData() {
+
+        explosions = new ArrayList<Explode>();
+        
+        
+        // TODO: we'll likely need to so _something_ here.
+        this.testShip = new Player(200, 420, p1Keys);
+        this.testStage = new Stage(Stage.Rounds.ROUND_1);
+        this.testBall = new Ball(205, 400);
+        this.testBall.xSpeed = 3;
+        this.testBall.ySpeed = -3;
+
         // Listen from game engine.
         eventManager.addObserver(this);
 
@@ -214,6 +229,15 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                     _cleanupObjects();
                     _checkState();
                     break;
+                case TESTING_DRAWING:
+                    // Test area
+                    updateData();
+                    this.testShip.update();
+                    this.testBall.update();
+                    for (PowerUp _p : powerups) { _p.update(); }
+                    checkCollisions();
+                    cleanupObjects();
+
                 case PAUSE_MENU:
                     break;
                 case GAME_OVER:
@@ -254,7 +278,9 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         }
     }
 
+
     private void _updateData() {
+        for (Explode _e : explosions){ _e.update();
         for (PowerUp _p : testPowerUps) _p.update();
         testShip.update();
         testBall.update();
@@ -286,12 +312,14 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         }
 
 
+
         // Check ship vs ball.
         if (Physics.doesCollideWith(testBall, testShip)) {
             // Calculate new ball speed based on contact point with ship.
             int ballCenter = (testBall.x - testShip.x) + (testBall.width/2);
             int shipCenter = (testShip.width/2);
             int newXspeed = (ballCenter - shipCenter);
+
 
             // Reset location.
             testBall.resetLocation();
@@ -370,10 +398,10 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         }
     }
 
-
     private void _cleanupObjects() {
         testStage.blocks.removeIf(_b -> _b.isHidden());
         testPowerUps.removeIf(_p -> _p.isHidden());
+        explosions.removeIf(e -> e.isHidden());
     }
 
     private void _checkState() {
@@ -408,11 +436,33 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                 _drawGameWorld(g2d);
                 _drawUIPanel(g2d);
                 break;
+
+            case TESTING_DRAWING:
+            {
+                // Test stage draw.
+                Graphics2D g2d = (Graphics2D) gameAreaBuffer.getGraphics();
+
+                this.testStage.draw(g2d);
+                this.testBall.draw(g2d);
+                for (PowerUp _p : powerups) {
+                    _p.draw(g2d);
+                }
+                this.testShip.draw(g2d);
+                drawUIPanel(g2d);
+                
+                g2d = (Graphics2D) gameAreaBuffer.getGraphics();
+                drawFXObjects(g2d);
+                g2d.dispose();
+
+                // Draw window.
+                g.drawImage(gameAreaBuffer, 0, 0, this);
+
             case PAUSE_MENU:
                 _drawGameWorld(g2d);
                 _drawUIPanel(g2d);
                 _drawUIPause(g2d);
                 break;
+              
             case GAME_OVER:
                 _drawGameOverScreen(g2d);
                 break;
@@ -472,6 +522,11 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         g2d.drawString("GAME PAUSED", commonXoffset + 40, MAIN_WINDOW_HEIGHT - 40);
     }
     
+
+    private void drawFXObjects(Graphics2D g2d) {
+        for (Explode _e : explosions) _e.draw(g2d);
+    }
+      
     private void _drawSplash(Graphics2D g){
 
         // Draw logo.
@@ -479,6 +534,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         g.drawImage(splashLogo, xPos, 40, splashLogo.getWidth(), splashLogo.getHeight(), this);
 
         // Draw start messaging.
+
         String msg = "Press <Backspace> To Start";
         String msg2 = "Press <P> To Toggle Music";
 
@@ -489,14 +545,26 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         int stringWidth2 = fm.stringWidth(msg2);
         int string2Ascent = fm.getAscent();
 
-        int stringX = (MAIN_WINDOW_WIDTH/2) - (stringWidth/2);
-        int stringY = (int)(getHeight() *.8);
+        int stringX2 = getWidth() /2 - stringWidth2 /2;
+        int stringY2 = stringY+string2Ascent;
+        
+        //On Enter Change GameState
+        HashMap<Controls, Boolean> buttonStates = testShip.getButtonStates();
+        if(buttonStates.get(Controls.START)){
+            gameState = GameState.TESTING_DRAWING;
+        }
+        
+        g.drawString(msg,stringX,stringY);
+        //g.drawString(msg2,stringX2,stringY2);
+        
+
         int stringX2 = (MAIN_WINDOW_WIDTH/2) - (stringWidth2/2);
         int stringY2 = stringY+string2Ascent+10;
 
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.drawString(msg, stringX, stringY);
         g.drawString(msg2, stringX2, stringY2);
+
     }
      
     private void _drawGameOverScreen(Graphics2D g){
