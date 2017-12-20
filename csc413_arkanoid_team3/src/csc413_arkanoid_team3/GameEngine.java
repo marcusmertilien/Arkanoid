@@ -89,7 +89,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
 
     static {
         try {
-            // Load Arkanoid logo.
+            // Load Arkanoid logo assets.
             ClassLoader cl = GameEngine.class.getClassLoader();
             logoImage = ImageIO.read(cl.getResource(GameEngine.GENERAL_ASSET_PATH + "logo.png"));
             splashLogo = ImageIO.read(cl.getResource(GameEngine.GENERAL_ASSET_PATH + "Splash.png"));
@@ -197,7 +197,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         testScore = 0;
         testLives = 1;
 
-        // Powerups
+        // Power ups
         testPowerUps = new ArrayList<PowerUp>();
     }
 
@@ -358,13 +358,13 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                     testBall.xSpeed = Math.abs(testBall.ySpeed);
                 }
 
-                // Updare user score.
+                // Update user score.
                 this.testScore += _b.registerHit();
 
                 // Play SFX.
                 this.soundManager.playBallCollision(_b);
 
-                // Test for powerups, create a random type on every brick break.
+                // Test for power ups, create a random type on every brick break.
                 if (_b.isHidden()) {
                     testPowerUps.add(new PowerUp(
                         _b.x, _b.y, PowerUp.Types.values()[new Random().nextInt(PowerUp.Types.values().length)]
@@ -445,7 +445,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                 break;
         }
 
-        // Drw current frame.
+        // Draw current frame.
         g.drawImage(windowBuffer, 0, 0, this);
     }
 
@@ -474,7 +474,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.drawString("" + this.testScore, commonXoffset, 90);
 
-        // Draw powerup type if active.
+        // Draw power up type if active.
         if (testActivePowerUp != null) {
             g2d.setColor(Color.GREEN);
             g2d.setFont(new Font("Courier", Font.BOLD, 14));
