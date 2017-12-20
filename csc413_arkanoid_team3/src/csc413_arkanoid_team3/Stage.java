@@ -25,6 +25,77 @@ public class Stage {
         ROUND_1, ROUND_2, ROUND_3, ROUND_4, ROUND_5
     }
 
+    private static HashMap<String, Block.Types> map = new HashMap<String, Block.Types>(){{
+        put("w", Block.Types.WHITE);
+        put("y", Block.Types.YELLOW);
+        put("p", Block.Types.PINK);
+        put("b", Block.Types.BLUE);
+        put("r", Block.Types.RED);
+        put("g", Block.Types.GREEN);
+        put("c", Block.Types.CYAN);
+        put("o", Block.Types.ORANGE);
+        put("+", Block.Types.SILVER);
+        put("^", Block.Types.GOLD);
+    }};
+
+    private static String[][] round1map = {
+        {"+", "+", "+", "+", "+", "+", "+", "+", "+", "+", "+", "+", "+"},
+        {"r", "r", "r", "r", "r", "r", "r", "r", "r", "r", "r", "r", "r"},
+        {"b", "b", "b", "b", "b", "b", "b", "b", "b", "b", "b", "b", "b"},
+        {"o", "o", "o", "o", "o", "o", "o", "o", "o", "o", "o", "o", "o"},
+        {"p", "p", "p", "p", "p", "p", "p", "p", "p", "p", "p", "p", "p"},
+        {"g", "g", "g", "g", "g", "g", "g", "g", "g", "g", "g", "g", "g"}
+    };
+
+    private static String[][] round2map = {
+        {"p"},
+        {"p", "c"},
+        {"p", "c", "b"},
+        {"p", "c", "b", "g"},
+        {"p", "c", "b", "g", "r"},
+        {"p", "c", "b", "g", "r", "p"},
+        {"p", "c", "b", "g", "r", "p", "c"},
+        {"p", "c", "b", "g", "r", "p", "c", "g"},
+        {"p", "c", "b", "g", "r", "p", "c", "g", "b"},
+        {"p", "c", "b", "g", "r", "p", "c", "g", "b", "r"},
+        {"p", "c", "b", "g", "r", "p", "c", "g", "b", "r", "p"},
+        {"p", "c", "b", "g", "r", "p", "c", "g", "b", "r", "p", "y"},
+        {"p", "c", "b", "g", "r", "p", "c", "g", "b", "r", "p", "y", "p"},
+        {"+", "+", "+", "+", "+", "+", "+", "+", "+", "+", "+", "+", "p"}
+    };
+
+    private static String[][] round3map = {
+        {"w", "y", "p", "b", "r", "g", "c", "o", "+", "^", "w", "y", "p"},
+        {"w", "y", "p", "b", "r", "g", "c", "o", "+", "^", "w", "y", "p"},
+        {"w", "y", "p", "b", "r", "g", "c", "o", "+", "^", "w", "y", "p"},
+        {"w", "y", "p", "b", "r", "g", "c", "o", "+", "^", "w", "y", "p"},
+        {"w", "y", "p", "b", "r", "g", "c", "o", "+", "^", "w", "y", "p"},
+        {"w", "y", "p", "b", "r", "g", "c", "o", "+", "^", "w", "y", "p"},
+        {"w", "y", "p", "b", "r", "g", "c", "o", "+", "^", "w", "y", "p"},
+        {"w", "y", "p", "b", "r", "g", "c", "o", "+", "^", "w", "y", "p"},
+        {"w", "y", "p", "b", "r", "g", "c", "o", "+", "^", "w", "y", "p"},
+        {"w", "y", "p", "b", "r", "g", "c", "o", "+", "^", "w", "y", "p"},
+        {"w", "y", "p", "b", "r", "g", "c", "o", "+", "^", "w", "y", "p"}
+    };
+
+    private static String[][] round4map = {
+        {"g", "g", "g", "g", "g", "g", "g", "g", "g", "g", "g", "g", "g"}, {},
+        {"w", "w", "w", "^", "^", "^", "^", "^", "^", "^", "^", "^", "^"}, {},
+        {"r", "r", "r", "r", "r", "r", "r", "r", "r", "r", "r", "r", "r"}, {},
+        {"^", "^", "^", "^", "^", "^", "^", "^", "^", "^", "w", "w", "w"}, {},
+        {"p", "p", "p", "p", "p", "p", "p", "p", "p", "p", "p", "p", "p"}, {},
+        {"b", "b", "b", "^", "^", "^", "^", "^", "^", "^", "^", "^", "^"}, {},
+        {"b", "b", "b", "b", "b", "b", "b", "b", "b", "b", "b", "b", "b"}, {},
+        {"^", "^", "^", "^", "^", "^", "^", "^", "^", "^", "b", "b", "b"},
+    };
+
+    private static HashMap<Rounds, String[][]> stageMap = new HashMap<Rounds, String[][]>(){{
+        put(Rounds.ROUND_1, round1map);
+        put(Rounds.ROUND_2, round2map);
+        put(Rounds.ROUND_3, round3map);
+        put(Rounds.ROUND_4, round4map);
+    }};
+
     private static HashMap<Rounds, BufferedImage> backgroundCollection;
     static {
         try {
@@ -77,13 +148,15 @@ public class Stage {
 
         // Test data will use a data collection for the setup.
         this.blocks = new ArrayList<Block>();
-        for (int j = 0; j < 10; j++) {
-        for (int i = 0; i < 13; i++) {
-            int x = 16 + (i*Block.BLOCK_WIDTH);
-            int y = 50 + (j*Block.BLOCK_HEIGHT);
-            Block testBlock = new Block(x, y, Block.Types.values()[i %Block.Types.values().length]);
-            blocks.add(testBlock);
-        }}
+        String[][] stage = stageMap.get(this.round);
+
+        for (int i = 0; i < stage.length; i++) {
+            for (int j = 0; j < stage[i].length; j++) {
+                int x = 16 + (j*Block.BLOCK_WIDTH);
+                int y = 60 + (i*Block.BLOCK_HEIGHT);
+                blocks.add(new Block(x, y, map.get(stage[i][j])));
+            }
+        }
     }
 
     public void draw(Graphics2D g2d) {

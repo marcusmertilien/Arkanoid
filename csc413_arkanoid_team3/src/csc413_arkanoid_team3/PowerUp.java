@@ -10,7 +10,7 @@ public class PowerUp extends Prop {
 
     public Types type;
     public enum Types {
-        LAZER, EXTEND, SLOW, CATCH, BREAK, DISRUPT, T, N, P, R
+        LAZER, EXTEND, SLOW, CATCH, BREAK, DISRUPT, TWIN, NEWDISRUPT, PLAYER, REDUCE
     }
 
     private static int POWERUP_SPRITE_WIDTH = 16;             // width of stage area
@@ -74,6 +74,7 @@ public class PowerUp extends Prop {
             this.sprite = this.assetRow.getSubimage(spriteX, 0, POWERUP_WIDTH, POWERUP_HEIGHT);
         }
 
-
+        // Powerups move to the bottom of the screen.
+        this.y++;
     }
 }

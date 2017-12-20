@@ -12,13 +12,19 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 
+import javax.imageio.ImageIO;
 
-public class GameEngine extends JPanel implements Runnable {
+
+public class GameEngine extends JPanel implements Runnable, Observer {
 
     // Game world size.
-    private static final int WINDOW_BORDER_WIDTH = 5;
-    private static final int WINDOW_WIDTH        = 448;
-    private static final int WINDOW_HEIGHT       = 480;
+    public static final int WINDOW_BORDER_WIDTH = 5;
+    public static final int GAME_WINDOW_WIDTH = 448;
+    public static final int GAME_WINDOW_HEIGHT = 500;
+    public static final int UI_PANEL_WIDTH = 200;
+    public static final int UI_PANEL_HEIGHT = 200;
+    public static final int MAIN_WINDOW_WIDTH = GAME_WINDOW_WIDTH + UI_PANEL_WIDTH;
+    public static final int MAIN_WINDOW_HEIGHT = GAME_WINDOW_HEIGHT;
 
     // Game loop constants.
     private static final int TARGET_FPS     = 60;
@@ -34,7 +40,6 @@ public class GameEngine extends JPanel implements Runnable {
         PAUSE_MENU,
         PLAYING,
         GAME_OVER,
-        TESTING_DRAWING,
         EXITING
     };
     private Boolean isRunning;
@@ -48,6 +53,9 @@ public class GameEngine extends JPanel implements Runnable {
     // Players
     private HashMap<Integer, Controls> p1Keys;
     private HashMap<Integer, Controls> p2Keys;
+
+    // Game interface controls.
+    private HashMap<Integer, GameActions> gameControls;
 
     // Assets
     public static String ASSET_PATH = "resources/";
@@ -65,32 +73,23 @@ public class GameEngine extends JPanel implements Runnable {
     private Player testShip;
     private Stage testStage;
     private Ball testBall;
-    private ArrayList<PowerUp> powerups;
     private int testScore;
+    private int testLives;
+    private ArrayList<PowerUp> testPowerUps;
+    private PowerUp testActivePowerUp;
 
-    // Entry point
-    // ===========
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            
-            @Override
-            public void run() {
-                // Initialize and start the app.
-                GameEngine engine = new GameEngine();
 
-                // Setup parent frame.
-                JFrame frame = new JFrame();
-                frame.setPreferredSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
-                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                frame.pack();
-                frame.setLocationRelativeTo(null);
-                frame.setVisible(true);
-
-                // Setup and run engine.
-                engine.init(frame);
-                engine.run();
-            }
-        });
+    // Load static assets
+    // TODO: move this somewhere else.
+    private static BufferedImage logoImage;
+    static {
+        try {
+            // Load Arkanoid logo.
+            ClassLoader cl = GameEngine.class.getClassLoader();
+            logoImage = ImageIO.read(cl.getResource(GameEngine.GENERAL_ASSET_PATH + "logo.png"));
+        } catch (Exception e) {
+            System.out.println(e.toString());
+        }
     }
 
     // *** Runnable.run
@@ -102,7 +101,6 @@ public class GameEngine extends JPanel implements Runnable {
                 gameLoop();
             }
         }.start();
-
     }
 
     // Init
@@ -113,12 +111,13 @@ public class GameEngine extends JPanel implements Runnable {
         // Active test mode for BG.
         gameState = GameState.MAIN_MENU;
 
+        // Application control.
         inputHandler = InputHandler.getInstance();
         soundManager = SoundManager.getInstance();
         eventManager = EventManager.getInstance();
 
         // Setup game panel.
-        this.setPreferredSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
+        this.setPreferredSize(new Dimension(MAIN_WINDOW_WIDTH, GAME_WINDOW_HEIGHT));
         this.setVisible(true);
         this.setFocusable(true);
         this.requestFocus();
@@ -151,31 +150,47 @@ public class GameEngine extends JPanel implements Runnable {
         p2Keys.put(KeyEvent.VK_F, Controls.LEFT);
         p2Keys.put(KeyEvent.VK_H, Controls.RIGHT);
         p2Keys.put(KeyEvent.VK_SPACE, Controls.SHOOT);
+
+        // Setup game action controls.
+        gameControls = new HashMap<Integer, GameActions>();
+        gameControls.put(KeyEvent.VK_P, GameActions.PAUSE);
+        gameControls.put(KeyEvent.VK_ESCAPE, GameActions.EXIT);
+        gameControls.put(KeyEvent.VK_1, GameActions.START);
+        gameControls.put(KeyEvent.VK_M, GameActions.MUSIC_STOP);
     }
 
     private void _setupGameData() {
-        // TODO: we'll likely need to so _something_ here.
-        this.testShip = new Player(200, 420, p1Keys);
-        this.testStage = new Stage(Stage.Rounds.ROUND_1);
-        this.testBall = new Ball(205, 400);
-        this.testBall.xSpeed = 3;
-        this.testBall.ySpeed = -3;
+        // Listen from game engine.
+        eventManager.addObserver(this);
 
-        powerups = new ArrayList<PowerUp>();
+        // Ship
+        testShip = new Player(200, 450, p1Keys);
+        eventManager.addObserver(testShip);
 
-        for (int i = 0; i < PowerUp.Types.values().length; i++) {
-            powerups.add(new PowerUp(100+ (32*i), 25, PowerUp.Types.values()[i]));
-        }
+        // Stage
+        testStage = new Stage(Stage.Rounds.ROUND_3);
 
-        eventManager.addObserver(this.testShip);
+        // Ball
+        testBall = new Ball(205, 440);
+        testBall.xSpeed = 2;
+        testBall.ySpeed = -2;
+
+        // Score and lives
+        testScore = 0;
+        testLives = 5;
+
+        // Powerups
+        testPowerUps = new ArrayList<PowerUp>();
     }
 
     private void _setupGameAudio() {
-        // TODO: maybe implment soundtrack;
+        soundManager.playBgMusic();
     }
 
-    // Game loop
-    // =========
+    // ==========
+    // Update API
+    // ==========
+
     private void gameLoop() {
 
         long lastFrameTime = System.nanoTime(); // previous frame time
@@ -188,34 +203,22 @@ public class GameEngine extends JPanel implements Runnable {
             // Switch on current GameState.
             switch (gameState) {
                 case INITIALIZING:
-                    // Game open
                     break;
-                    
                 case MAIN_MENU:
-                    updateData();
                     break;
                 case PLAYING:
-                    // Main game update
-                    updateData();
-                    checkCollisions();
-                    cleanupObjects();
+                    _updateData();
+                    _checkCollisions();
+                    _cleanupObjects();
                     break;
-                case TESTING_DRAWING:
-                    // Test area
-                    this.testShip.update();
-                    this.testBall.update();
-                    for (PowerUp _p : powerups) { _p.update(); }
-                    checkCollisions();
-                    cleanupObjects();
+                case PAUSE_MENU:
                     break;
                 case GAME_OVER:
-                    // Game closing
                     isRunning = false;
-                    updateData();
-                    cleanupObjects();
+                case EXITING:
+                    System.exit(0);
                     break;
                 default:
-                    // Somehow, we have a bad enum...
                     System.out.println("GameEngine::gameLoop Error: bad enum");
                     break;
             }
@@ -247,137 +250,171 @@ public class GameEngine extends JPanel implements Runnable {
         }
     }
 
-
-    // Update data layer
-    // =================
-    private void updateData() {
-        // Update application data.
+    private void _updateData() {
+        for (PowerUp _p : testPowerUps) _p.update();
+        testShip.update();
+        testBall.update();
     }
 
-    private void checkCollisions() {
-        // Check ship vs boundry collision.
-        if (this.testShip.x < 24 || (testShip.width + testShip.x + 24) > WINDOW_WIDTH) {
-            this.testShip.resetLocation();
+    private void _checkCollisions() {
+        // Check ship vs side walls.
+        if (testShip.x < 16 || (testShip.width + testShip.x + 16) > GAME_WINDOW_WIDTH) {
+            testShip.resetLocation();
         }
 
-        // Check x axis boundry collision.
-        if (this.testBall.x < 24 || this.testBall.x > WINDOW_WIDTH -24) {
-            this.testBall.resetLocation();
-            this.testBall.xSpeed = -(this.testBall.xSpeed);
+        // Check ball vs side walls.
+        if (testBall.x < 16 || testBall.x > GAME_WINDOW_WIDTH -16) {
+            testBall.resetLocation();
+            testBall.xSpeed = -(testBall.xSpeed);
         }
 
-        // Check y axis boundery collsion.
-        if (this.testBall.y < 24 || this.testBall.y > WINDOW_HEIGHT-24) {
-            this.testBall.resetLocation();
-            this.testBall.ySpeed = -(this.testBall.ySpeed);
+        // Check ball vs ceiling.
+        if (testBall.y < 16) {
+            testBall.resetLocation();
+            testBall.ySpeed = -(testBall.ySpeed);
         }
 
-        // Check ship vs ball collision.
-        if (Physics.doesCollideWith(this.testBall, this.testShip)) {
-            this.testBall.resetLocation();
-            this.testBall.ySpeed = -(this.testBall.ySpeed);
-            this.soundManager.playBallCollision(this.testShip);
+        // Check ball vs gutter.
+        if (testBall.y > GAME_WINDOW_HEIGHT-32) {
+            testBall.resetLocation();
+            testBall.ySpeed = -(testBall.ySpeed);
+            testLives--;
         }
 
-        // Check for ball collisions with block.
+
+        // Check ship vs ball.
+        if (Physics.doesCollideWith(testBall, testShip)) {
+            // Claculate new ball speed based on contact point with padd
+            int ballCenter = (testBall.x - testShip.x) + (testBall.width/2);
+            int shipCenter = (testShip.width/2);
+            int newXspeed = (ballCenter - shipCenter);
+
+            // Reset location.
+            testBall.resetLocation();
+
+            // Use new ball speed.
+            testBall.ySpeed = -testBall.ySpeed;
+            testBall.xSpeed = newXspeed/8;
+
+            // Allow paddle movement to contribute to reflected speed.
+            testBall.xSpeed += testShip.xSpeed/2;
+
+            // Trigger SFX.
+            soundManager.playBallCollision(testShip);
+
+            if (DebugState.showPaddleActive) {
+                System.out.printf(
+                    "ball center: %d, ship center: %d\nnew ball x: %d, new ball y: %d\n",
+                    ballCenter, shipCenter, testBall.xSpeed, testBall.ySpeed
+                );
+            }
+        }
+
+        // Check for ball vs block.
         for (Block _b : this.testStage.blocks) {
-            if (Physics.doesCollideWith(_b, this.testBall)) {
-                // Find intersection
-                Rectangle _i = Physics.getIntersection(this.testBall, _b);
+            if (Physics.doesCollideWith(_b, testBall)) {
+                // Reset location before calculating.
+                testBall.resetLocation();
 
-                if (_i.y == _b.y) {
-                    this.testBall.ySpeed = -this.testBall.ySpeed;
+                // Calculate new x,y speeds based on contact with block
+                if (testBall.y <= _b.y) {
+                    // Contact top.
+                    testBall.ySpeed = -Math.abs(testBall.ySpeed);
+                }
+                else if (testBall.y >= _b.y + _b.height) {
+                    // COntact bottom.
+                    testBall.ySpeed = Math.abs(testBall.ySpeed);
+                }
+                else if (testBall.x <= _b.x) {
+                    // Contact left.
+                    testBall.xSpeed = -Math.abs(testBall.xSpeed);
+                }
+                else if (testBall.x >= _b.x + _b.width) {
+                    // Contact right.
+                    testBall.xSpeed = Math.abs(testBall.ySpeed);
                 }
 
-                if (_i.y == this.testBall.y) {
-                    this.testBall.ySpeed = -this.testBall.ySpeed;
-                }
-
-                if (_i.x == _b.x) {
-                    this.testBall.xSpeed = -this.testBall.xSpeed;
-                }
-
-                if(_i.x == this.testBall.x) {
-                    this.testBall.xSpeed = -this.testBall.xSpeed;
-                }
-
-                this.soundManager.playBallCollision(_b);
+                // Updare user score.
                 this.testScore += _b.registerHit();
+
+                // Play SFX.
+                this.soundManager.playBallCollision(_b);
+
+                // Test for powerups, create a random type on every brick break.
+                if (_b.isHidden()) {
+                    testPowerUps.add(new PowerUp(
+                        _b.x, _b.y, PowerUp.Types.values()[new Random().nextInt(PowerUp.Types.values().length)]
+                    ));
+                }
+
+                // Only register one collision per cycle.
+                break;
+            }
+        }
+
+        for (PowerUp _p: testPowerUps) {
+            // Check powerup vs lower bound.
+            if (_p.y > GAME_WINDOW_HEIGHT-42)
+                _p.hide();
+
+            // Check powerup vs ship.
+            if (Physics.doesCollideWith(_p, testShip)) {
+                _p.hide();
+                testActivePowerUp = _p;
+                soundManager.playPowerUpCollision();
             }
         }
     }
 
 
-    private void cleanupObjects() {
-        // Object cleanup.
-        this.testStage.blocks.removeIf(_b -> _b.isHidden());
+    private void _cleanupObjects() {
+        testStage.blocks.removeIf(_b -> _b.isHidden());
+        testPowerUps.removeIf(_p -> _p.isHidden());
     }
+
+
+    // ========
+    // Draw API
+    // ========
 
 
     // *** JPanel.paintComponent
     @Override
     protected void paintComponent(Graphics g) {
 
-        // The window's double buffer.
-        BufferedImage windowBuffer = new BufferedImage(
-            WINDOW_WIDTH, WINDOW_HEIGHT, BufferedImage.TYPE_INT_RGB
-        );
-
-        // The game area's buffer.
-        BufferedImage gameAreaBuffer = new BufferedImage(
-            WINDOW_WIDTH, WINDOW_HEIGHT, BufferedImage.TYPE_INT_RGB
-        );
+        BufferedImage windowBuffer = new BufferedImage(MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2d = (Graphics2D) windowBuffer.getGraphics();
 
         // Draw based on current GameState.
         switch (gameState) {
             case MAIN_MENU:
-            {
-                // Game open
-                Graphics2D g2d = (Graphics2D) windowBuffer.getGraphics();
-                
-                drawSplash(g2d);
+                _drawSplash(g2d);
                 g2d.dispose();
-                
-                g.drawImage(windowBuffer, 0, 0, this);
                 break;
-            }
             case PLAYING:
-                // Main application loop here
+                _drawBackground(g2d);
+                _drawGameObjects(g2d);
+                _drawUIPanel(g2d);
                 break;
-            case TESTING_DRAWING:
-            {
-                // Test stage draw.
-                Graphics2D g2d = (Graphics2D) gameAreaBuffer.getGraphics();
-
-                this.testStage.draw(g2d);
-                this.testBall.draw(g2d);
-                for (PowerUp _p : powerups) {
-                    _p.draw(g2d);
-                }
-                this.testShip.draw(g2d);
-                drawUIPanel(g2d);
-
-                // Draw window.
-                g.drawImage(gameAreaBuffer, 0, 0, this);
+            case PAUSE_MENU:
+                _drawBackground(g2d);
+                _drawGameObjects(g2d);
+                _drawUIPanel(g2d);
+                _drawUIPause(g2d);
                 break;
-            }
             case GAME_OVER:
-            {
-                Graphics2D g2d = (Graphics2D) windowBuffer.getGraphics();
-                drawKillScreen(g2d);
-                g2d.dispose();
-                
-                // Draw contents of buffer.
-                g.drawImage(windowBuffer, 0, 0, this);
-                
+                _drawGameOverScreen(g2d);
                 break;
-            }
+            case EXITING:
+                break;
             default:
                 // Somehow, we have a bad enum...
-                System.out.println("GameEngine::gameLoop Error: bad enum");
+                System.out.println("GameEngine::paintComponent Error: bad enum");
                 break;
-
         }
+
+        // Drw current frame.
+        g.drawImage(windowBuffer, 0, 0, this);
     }
 
     private void _drawViews(Graphics2D g2d, BufferedImage gameWorldBuffer) {
@@ -385,24 +422,25 @@ public class GameEngine extends JPanel implements Runnable {
     }
 
     private void _drawBackground(Graphics2D g2d) {
-        // Draw the stages background.
+        testStage.draw(g2d);
     }
 
     private void _drawGameObjects(Graphics2D g2d) {
-        // Draw the stage's objects.
+        testBall.draw(g2d);
+        testShip.draw(g2d);
+        for (PowerUp _p : testPowerUps) _p.draw(g2d);
     }
     
-    private void drawSplash(Graphics2D g){
+    private void _drawSplash(Graphics2D g){
         String msg = "Press <Backspace> To Start";
         String msg2 = "Press <P> To Toggle Music";
-        int x;
-        int y;
+        int xPos;
 
         try {
             ClassLoader cl = GameEngine.class.getClassLoader();
-            Image splash = ImageIO.read(cl.getResource(GameEngine.GENERAL_ASSET_PATH + "Splash.png"));
-            x = getWidth()/5;
-            g.drawImage(splash,x,0,splash.getWidth(this),splash.getHeight(this),this);
+            BufferedImage splash = ImageIO.read(cl.getResource(GameEngine.GENERAL_ASSET_PATH + "Splash.png"));
+            xPos = (getWidth()/2) - (splash.getWidth()/2);
+            g.drawImage(splash, xPos, 0, splash.getWidth(), splash.getHeight(), this);
         } catch (IOException ex) {
             Logger.getLogger(GameEngine.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -413,7 +451,6 @@ public class GameEngine extends JPanel implements Runnable {
         int stringWidth = fm.stringWidth(msg);
         int stringWidth2 = fm.stringWidth(msg2);
         int string2Ascent = fm.getAscent();
-        
 
         int stringX = getWidth() /2 - stringWidth /2;
         int stringY = (int)(getHeight() *.8);
@@ -423,16 +460,16 @@ public class GameEngine extends JPanel implements Runnable {
         // On Enter Change GameState
         HashMap<Controls, Boolean> buttonStates = testShip.getButtonStates();
         if(buttonStates.get(Controls.START)){
-            gameState = GameState.TESTING_DRAWING;
+            gameState = GameState.PLAYING;
         }
 
         g.drawString(msg,stringX,stringY);
     }
      
-    private void drawKillScreen(Graphics2D g){
+    private void _drawGameOverScreen(Graphics2D g){
         String msg = "GAME OVER!";
         g.setColor(Color.BLACK);
-        g.fillRect(0,0,WINDOW_WIDTH , WINDOW_HEIGHT);
+        g.fillRect(0,0, MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT);
         
 
         // Set font for rendering stats.
@@ -444,22 +481,91 @@ public class GameEngine extends JPanel implements Runnable {
         int stringWidth = fm.stringWidth(msg);
         int stringHeight = fm.getAscent();
 
-        int x = getWidth() /2 - stringWidth /2;
+        int x = getWidth() /2 - stringWidth/2;
         int y = getHeight() /2 + stringHeight/2;
-                
+
         g.drawString(msg,x,y);
         
     }
 
-    private void drawUIPanel(Graphics2D g2d) {
+    private void _drawUIPanel(Graphics2D g2d) {
+        int commonXoffset = GAME_WINDOW_WIDTH+10;
 
-        // Set font for rendering stats.
-        g2d.setColor(Color.WHITE);
-        g2d.setFont(new Font("Courier", Font.BOLD, 18));
+        // Draw branding.
+        g2d.drawImage(logoImage, commonXoffset, 15, 180, 40, null);
+
+        // Draw lives count.
+        g2d.setColor(Color.RED);
+        g2d.setFont(new Font("Courier", Font.BOLD, 15));
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.drawString("1UP x" + testLives, commonXoffset, 75);
 
-        // Draw player 1's stats.
-        g2d.drawString("" + this.testScore, 25, 35);
+        // Draw Score.
+        g2d.setColor(Color.WHITE);
+        g2d.setFont(new Font("Courier", Font.BOLD, 15));
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.drawString("" + this.testScore, commonXoffset, 90);
+
+        // Draw powerup type if active.
+        if (testActivePowerUp != null) {
+            g2d.setColor(Color.GREEN);
+            g2d.setFont(new Font("Courier", Font.BOLD, 14));
+            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2d.drawString("Active Power-up", commonXoffset, 110);
+            g2d.drawString(testActivePowerUp.type.name(), commonXoffset, 125);
+        }
+    }
+
+    private void _drawUIPause(Graphics2D g2d) {
+        int commonXoffset = GAME_WINDOW_WIDTH+10;
+
+        g2d.setColor(Color.WHITE);
+        g2d.setFont(new Font("Courier", Font.BOLD, 15));
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.drawString("GAME PAUSED", commonXoffset + 40, MAIN_WINDOW_HEIGHT - 40);
+    }
+
+    @Override
+    public void update(Observable obj, Object e) {
+
+        // onKey event
+        if (e instanceof KeyEvent) {
+            KeyEvent ke = (KeyEvent) e;
+            int keyCode = ke.getKeyCode();
+            int keyId = ke.getID();
+            GameActions buttonPressed = gameControls.get(keyCode);
+
+            // Only react to buttons the game engine is interested in.
+            if (buttonPressed == null) {
+                return;
+            }
+
+            if (keyId == KeyEvent.KEY_PRESSED) {
+                // Toggle game pause on P press.
+                if (buttonPressed == GameActions.PAUSE) {
+                    if (gameState != GameState.PAUSE_MENU) {
+                        gameState = GameState.PAUSE_MENU;
+                        soundManager.pauseBgMusic();
+                    } else {
+                        gameState = GameState.PLAYING;
+                        soundManager.pauseBgMusic();
+                    }
+                }
+
+                // Toggle music on M press.
+                if (buttonPressed == GameActions.MUSIC_STOP) {
+                    // Note: this will toggle play/pause depending on clip state.
+                    soundManager.pauseBgMusic();
+                }
+
+                // Exit game on escape press.
+                if (buttonPressed == GameActions.EXIT) {
+                    gameState = GameState.EXITING;
+                }
+            }
+
+
+        }
     }
 
 }

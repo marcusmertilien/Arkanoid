@@ -7,20 +7,13 @@ import java.awt.Graphics2D;
 
 public abstract class GameObject extends Rectangle {
 
-    protected static int nextId = 1; // id for next object
-    protected int _id;               // current object id
-
-    protected int x;                 // horizontal position
-    protected int y;                 // vertical position
+    private static int nextId = 1; // id for next object
+    private int _id;               // current object id
 
     protected int previousX;         // Previous x position
     protected int previousY;         // Previous y position
 
-    protected boolean isVisible;     // dictates if the object is visible
-
-    protected int width;             // Object width
-    protected int height;            // Object height
-
+    private boolean isVisible;     // dictates if the object is visible
     protected BufferedImage sprite;  // the image to be drawn each frame.
 
 
@@ -34,17 +27,14 @@ public abstract class GameObject extends Rectangle {
         int height,
         boolean isVisible
     ) {
+        // Setup rectangle props
+        super(x, y, width, height);
         // Stripe each game object with an Id.
         this._id = ++GameObject.nextId;
-
-        // Set basic props.
-        this.x = this.previousX = x;
-        this.y = this.previousY = y;
-        this.width = width;
-        this.height = height;
-
         // Set flags.
         this.isVisible = isVisible;
+        this.previousX = x;
+        this.previousY = y;
     }
 
 
@@ -84,10 +74,6 @@ public abstract class GameObject extends Rectangle {
 
     // Movement
     // ========
-
-    public Rectangle getBounds() {
-        return new Rectangle(x, y, width, height);
-    }
 
     public void resetLocation() {
         x = previousX;
