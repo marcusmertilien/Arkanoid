@@ -45,23 +45,6 @@ public class Ship extends Actor {
     public int getSpeed(){
         return SPEED;
     }
-    public int getshipWidth(){
-        return SHIP_WIDTH;
-    }
-    public int getshipHeight(){
-        return SHIP_HEIGHT;
-    }
-    public void setshipWidth(int w){
-        SHIP_WIDTH=w;
-    }
-    public void setshipHeight(int h){
-        SHIP_HEIGHT=h;
-    }
-    public void reduce(){
-        BufferedImage spriteSheet = AssetLoader.load(SPRITE_PATH, 1);
-        BufferedImage rawAsset = spriteSheet.getSubimage(0, 64, BASE_SHIP_WIDTH, BASE_SHIP_HEIGHT);
-        SHIP_ASSET = AssetLoader.getScaledInstance(rawAsset, BASE_SHIP_WIDTH, BASE_SHIP_HEIGHT);
-        sprite = SHIP_ASSET;
-    }
+    
     
 }
