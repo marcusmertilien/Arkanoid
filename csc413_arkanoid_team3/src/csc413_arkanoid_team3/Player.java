@@ -19,6 +19,8 @@ public class Player extends Ship implements Observer {
     //PowerUp Attributes
     private boolean fire;
     private int shotCooldown;
+    private boolean slowDown;
+    private int slowDownTimer;
     
     private int lives;
     
@@ -53,6 +55,10 @@ public class Player extends Ship implements Observer {
         shotCooldown = FIRING_SPEED; // Shot cooldown
         fire = true;
     }
+    private void _primeEngines(){
+        slowDownTimer = 0;
+        slowDown = false;
+    }
 
 
     // Public API
@@ -61,6 +67,7 @@ public class Player extends Ship implements Observer {
     public void update(ArrayList<Projectile> shots) {
         _updatePosition();
         _updateShoot(shots);
+        _updateSlowDown();
     }
 
     private void _updatePosition() {
@@ -98,6 +105,16 @@ public class Player extends Ship implements Observer {
             }
         }
         shotCooldown--;
+    }
+    
+    private void _updateSlowDown(){
+        if(slowDown){
+            slowDownTimer--;
+            if(slowDownTimer == 0){
+                slowDown = false;
+                speed = super.getSpeed();
+            }
+        }
     }
 
     @Override
@@ -142,7 +159,9 @@ public class Player extends Ship implements Observer {
                 break;
             case SLOW:
                 if(this.speed>1){
-                    this.speed = this.speed--;
+                    this.speed = this.speed/2;
+                    slowDown = true;
+                    slowDownTimer = 280;
                 }
                 break;
             case CATCH:
