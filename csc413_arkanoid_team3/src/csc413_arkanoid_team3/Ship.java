@@ -21,7 +21,7 @@ public class Ship extends Actor {
     
     
 
-    private static final int SPEED = 3;
+    private static final int SPEED = 5;
 
     // The class' static image assets
     private static final String SPRITE_PATH = GameEngine.SHIP_PATH + "ship-sprite-map.png";

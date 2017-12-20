@@ -141,7 +141,7 @@ public class Player extends Ship implements Observer {
             case EXTEND:
                 break;
             case SLOW:
-                this.speed = this.speed/2;
+                this.speed = 2;
                 break;
             case CATCH:
                 break;
