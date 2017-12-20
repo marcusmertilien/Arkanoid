@@ -82,10 +82,13 @@ public class Player extends Ship implements Observer {
                     break;
             }
         }
+        
     }
 
     public HashMap<Controls, Boolean> getButtonStates(){
        return this.buttonStates;
     }
+    
+    
     
 }

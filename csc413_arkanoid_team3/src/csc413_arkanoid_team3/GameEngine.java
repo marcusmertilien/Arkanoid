@@ -111,7 +111,7 @@ public class GameEngine extends JPanel implements Runnable {
         isRunning = true;
 
         // Active test mode for BG.
-        gameState = GameState.GAME_OVER;
+        gameState = GameState.MAIN_MENU;
 
         inputHandler = InputHandler.getInstance();
         soundManager = SoundManager.getInstance();
@@ -423,7 +423,7 @@ public class GameEngine extends JPanel implements Runnable {
         //On Enter Change GameState
         HashMap<Controls, Boolean> buttonStates = testShip.getButtonStates();
         if(buttonStates.get(Controls.START)){
-            gameState = GameState.PLAYING;
+            gameState = GameState.TESTING_DRAWING;
         }
         
         g.drawString(msg,stringX,stringY);
