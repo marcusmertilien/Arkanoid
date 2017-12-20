@@ -6,8 +6,11 @@ import java.awt.event.KeyListener;
 
 public class InputHandler implements KeyListener {
 
-    private static InputHandler instance;
-    private static EventManager eventManager;
+    // Class fields
+    // ============
+
+    private static InputHandler instance;      // the singleton instance
+    private static EventManager eventManager;  // access to the event system
 
 
     // Constructors
@@ -18,6 +21,7 @@ public class InputHandler implements KeyListener {
     }
 
     public static InputHandler getInstance() {
+        // Create or return the singleton instance.
         if (instance == null) {
             instance = new InputHandler();
         }

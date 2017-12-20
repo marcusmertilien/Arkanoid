@@ -8,54 +8,51 @@ import java.util.HashMap;
 
 public class PowerUp extends Prop {
 
-    public Types type;
+    // Class Constants
+    // ===============
+
     public enum Types {
-        LAZER, EXTEND, SLOW, CATCH, BREAK, DISRUPT, T, N, P, R
+        LAZER, EXTEND, SLOW, CATCH, BREAK, DISRUPT, TWIN, NEWDISRUPT, PLAYER, REDUCE
     }
 
-    private static int POWERUP_SPRITE_WIDTH = 16;             // width of stage area
-    private static int POWERUP_SPRITE_HEIGHT = 8;             // height of stage area
-    public static int POWERUP_WIDTH = 2*POWERUP_SPRITE_WIDTH;
-    public static int POWERUP_HEIGHT = 2*POWERUP_SPRITE_HEIGHT;
+    private static final int POWERUP_SPRITE_WIDTH = 16;                // width of stage area
+    private static final int POWERUP_SPRITE_HEIGHT = 8;                // height of stage area
+    private static final int POWERUP_WIDTH = 2*POWERUP_SPRITE_WIDTH;   // visible width
+    private static final int POWERUP_HEIGHT = 2*POWERUP_SPRITE_HEIGHT; // visible height
+    private static final int ANIMATION_COOLDOWN = 64;                  // animation max time out.
 
-    private static String FILE_NAME = "powerups-sprite-sheet.png";
-    private static HashMap<Types, BufferedImage> assetMap;
+    // The class' static image assets
+    private static final String SPRITE_PATH = GameEngine.POWERUPS_ASSET_PATH + "powerups-sprite-sheet.png";
+    private static final HashMap<Types, BufferedImage> ASSET_MAP;
     static {
-        try {
-            // Init images assets
-            // ==================
-            ClassLoader cl = GameEngine.class.getClassLoader();
-            BufferedImage spriteSheet, rawAsset;
-            Image tempScaledImage;
-            Graphics2D g2d;
+        // Init images assets
+        BufferedImage spriteSheet = AssetLoader.load(SPRITE_PATH, 2);
+        ASSET_MAP = new HashMap<Types, BufferedImage>();
 
-            rawAsset = ImageIO.read(cl.getResource(GameEngine.POWERUPS_ASSET_PATH + FILE_NAME));
-            tempScaledImage = rawAsset.getScaledInstance(2*rawAsset.getWidth(), 2*rawAsset.getHeight(), BufferedImage.TYPE_INT_ARGB);
-            spriteSheet =  new BufferedImage(2*rawAsset.getWidth(), 2*rawAsset.getHeight(), BufferedImage.TYPE_INT_ARGB);
-            g2d = spriteSheet.createGraphics();
-            g2d.drawImage(tempScaledImage, 0, 0, null);
-
-            assetMap = new HashMap<Types, BufferedImage>();
-
-            for (int i = 0; i < Types.values().length; i++) {
-                BufferedImage powerUp = spriteSheet.getSubimage(0, i*POWERUP_HEIGHT, spriteSheet.getWidth(), POWERUP_HEIGHT);
-                assetMap.put(Types.values()[i], powerUp);
-            }
-
-        } catch (Exception e) {
-            System.out.print("No resources found\n");
+        // Build a map of block types to image assets.
+        for (int i = 0; i < Types.values().length; i++) {
+            BufferedImage powerUp = spriteSheet.getSubimage(0, i*POWERUP_HEIGHT, spriteSheet.getWidth(), POWERUP_HEIGHT);
+            ASSET_MAP.put(Types.values()[i], powerUp);
         }
     }
 
-    private static final int ANIMATION_COOLDOWN = 64;
-    private int animationTimer = ANIMATION_COOLDOWN;
-    private BufferedImage assetRow;
-    int spriteX;
+
+    // Class Fields
+    // ============
+
+    private int animationTimer = ANIMATION_COOLDOWN; // animation timer for roll effect
+    private BufferedImage assetRow;                  // the animation asset row
+    private int spriteAnimationX;                    // the current x positon of the animation
+    public Types type;                               // the power up's type
+
+
+    // Constructors
+    // ============
 
     public PowerUp(int x, int y, Types type) {
         super(x, y, POWERUP_WIDTH, POWERUP_HEIGHT);
         this.type = type;
-        this.assetRow = assetMap.get(this.type);
+        this.assetRow = ASSET_MAP.get(this.type);
         this.sprite = this.assetRow.getSubimage(0, 0, POWERUP_WIDTH, POWERUP_HEIGHT);
     }
 
@@ -66,14 +63,15 @@ public class PowerUp extends Prop {
         if (animationTimer <= 0) {
             // Reset animation frame.
             animationTimer = ANIMATION_COOLDOWN;
-            spriteX = 0;
-            this.sprite = this.assetRow.getSubimage(spriteX, 0, POWERUP_WIDTH, POWERUP_HEIGHT);
+            spriteAnimationX = 0;
+            this.sprite = this.assetRow.getSubimage(spriteAnimationX, 0, POWERUP_WIDTH, POWERUP_HEIGHT);
         } else if (animationTimer%8 == 0) {
             // Move to next spriate.
-            spriteX += POWERUP_WIDTH;
-            this.sprite = this.assetRow.getSubimage(spriteX, 0, POWERUP_WIDTH, POWERUP_HEIGHT);
+            spriteAnimationX += POWERUP_WIDTH;
+            this.sprite = this.assetRow.getSubimage(spriteAnimationX, 0, POWERUP_WIDTH, POWERUP_HEIGHT);
         }
 
-
+        // Powerups move to the bottom of the screen.
+        this.y++;
     }
 }
