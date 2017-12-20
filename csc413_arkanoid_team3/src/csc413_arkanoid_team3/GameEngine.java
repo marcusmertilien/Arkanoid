@@ -82,11 +82,14 @@ public class GameEngine extends JPanel implements Runnable, Observer {
     // Load static assets
     // TODO: move this somewhere else.
     private static BufferedImage logoImage;
+    private static BufferedImage splashLogo;
+
     static {
         try {
             // Load Arkanoid logo.
             ClassLoader cl = GameEngine.class.getClassLoader();
             logoImage = ImageIO.read(cl.getResource(GameEngine.GENERAL_ASSET_PATH + "logo.png"));
+            splashLogo = ImageIO.read(cl.getResource(GameEngine.GENERAL_ASSET_PATH + "Splash.png"));
         } catch (Exception e) {
             System.out.println(e.toString());
         }
@@ -417,10 +420,6 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         g.drawImage(windowBuffer, 0, 0, this);
     }
 
-    private void _drawViews(Graphics2D g2d, BufferedImage gameWorldBuffer) {
-        // Assess if we actually needs x2 players here, might be cool but more work.
-    }
-
     private void _drawBackground(Graphics2D g2d) {
         testStage.draw(g2d);
     }
@@ -432,38 +431,38 @@ public class GameEngine extends JPanel implements Runnable, Observer {
     }
     
     private void _drawSplash(Graphics2D g){
+
+        // Draw logo.
+        int xPos = (MAIN_WINDOW_WIDTH/2) - (splashLogo.getWidth()/2);
+        g.drawImage(splashLogo, xPos, 40, splashLogo.getWidth(), splashLogo.getHeight(), this);
+
+
+        // Draw start messaging.
         String msg = "Press <Backspace> To Start";
         String msg2 = "Press <P> To Toggle Music";
-        int xPos;
 
-        try {
-            ClassLoader cl = GameEngine.class.getClassLoader();
-            BufferedImage splash = ImageIO.read(cl.getResource(GameEngine.GENERAL_ASSET_PATH + "Splash.png"));
-            xPos = (getWidth()/2) - (splash.getWidth()/2);
-            g.drawImage(splash, xPos, 0, splash.getWidth(), splash.getHeight(), this);
-        } catch (IOException ex) {
-            Logger.getLogger(GameEngine.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
         g.setFont(new Font("Courier", Font.BOLD, 16));
-        
         FontMetrics fm = g.getFontMetrics();
+
         int stringWidth = fm.stringWidth(msg);
         int stringWidth2 = fm.stringWidth(msg2);
         int string2Ascent = fm.getAscent();
 
-        int stringX = getWidth() /2 - stringWidth /2;
+        int stringX = (MAIN_WINDOW_WIDTH/2) - (stringWidth/2);
         int stringY = (int)(getHeight() *.8);
-        int stringX2 = getWidth() /2 - stringWidth2 /2;
-        int stringY2 = stringY+string2Ascent;
+        int stringX2 = (MAIN_WINDOW_WIDTH/2) - (stringWidth2/2);
+        int stringY2 = stringY+string2Ascent+10;
+
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g.drawString(msg, stringX, stringY);
+        g.drawString(msg2, stringX2, stringY2);
 
         // On Enter Change GameState
         HashMap<Controls, Boolean> buttonStates = testShip.getButtonStates();
-        if(buttonStates.get(Controls.START)){
+        if(buttonStates.get(Controls.START)) {
             gameState = GameState.PLAYING;
         }
 
-        g.drawString(msg,stringX,stringY);
     }
      
     private void _drawGameOverScreen(Graphics2D g){
@@ -471,7 +470,6 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         g.setColor(Color.BLACK);
         g.fillRect(0,0, MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT);
         
-
         // Set font for rendering stats.
         g.setColor(Color.RED);
         g.setFont(new Font("Courier", Font.BOLD, 36));
