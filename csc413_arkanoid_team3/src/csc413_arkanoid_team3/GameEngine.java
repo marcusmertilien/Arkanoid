@@ -195,7 +195,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
 
         // Score and lives
         testScore = 0;
-        testLives = 1;
+        testLives = 3;
 
         // Powerups
         testPowerUps = new ArrayList<PowerUp>();
@@ -300,6 +300,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         if (testBall.y > GAME_WINDOW_HEIGHT-32) {
             testBall.resetLocation();
             testBall.ySpeed = -(testBall.ySpeed);
+            explosions.add(new Explode(testShip.x,testShip.y,Explode.Type.SHIP));
             testLives--;
         }
 
@@ -337,6 +338,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         // Check for ball vs block.
         for (Block _b : this.testStage.blocks) {
             if (Physics.doesCollideWith(_b, testBall)) {
+                explosions.add(new Explode(this.testBall.x,this.testBall.y,Explode.Type.ENEMY));
                 // Reset location before calculating.
                 testBall.resetLocation();
 
@@ -427,6 +429,8 @@ public class GameEngine extends JPanel implements Runnable, Observer {
             case PLAYING:
                 _drawGameWorld(g2d);
                 _drawUIPanel(g2d);
+                _drawFXObjects(g2d);
+                
                 break;
             case PAUSE_MENU:
                 _drawGameWorld(g2d);
@@ -494,7 +498,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
     }
     
 
-    private void drawFXObjects(Graphics2D g2d) {
+    private void _drawFXObjects(Graphics2D g2d) {
         for (Explode _e : explosions) _e.draw(g2d);
     }
       
