@@ -42,5 +42,8 @@ public class Ship extends Actor {
         sprite = this.SHIP_ASSET;
     }
     
+    public int getSpeed(){
+        return SPEED;
+    }
     
 }

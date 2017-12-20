@@ -16,9 +16,11 @@ import java.awt.event.KeyEvent;
 public class Player extends Ship implements Observer {
 
     private final static  int FIRING_SPEED = 30;
-    //Shoot Switch
+    //PowerUp Attributes
     private boolean fire;
     private int shotCooldown;
+    
+    private int lives;
     
     // Class fields
     // ============
@@ -32,6 +34,7 @@ public class Player extends Ship implements Observer {
 
     public Player(int x, int y, HashMap<Integer, Controls> controls) {
         super(x, y);
+        lives = 3;
         _initControls(controls);
         _primeCanons();
     }
@@ -138,20 +141,31 @@ public class Player extends Ship implements Observer {
             case EXTEND:
                 break;
             case SLOW:
+                this.speed = this.speed/2;
                 break;
             case CATCH:
                 break;
             case DISRUPT:
+                this.fire = false;
+                this.speed = super.getSpeed();
                 break;
             case TWIN:
                 break;
             case NEWDISRUPT:
                 break;
             case PLAYER:
+                lives++;
                 break;
             case REDUCE:
                 break;
             
         }
+    }
+    
+    public int getLives(){
+        return lives;
+    }
+    public void setLives(int change){
+        lives = change;
     }
 }
