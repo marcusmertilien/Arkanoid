@@ -19,7 +19,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
 
     // Game world size.
     public static final int WINDOW_BORDER_WIDTH = 5;
-    public static final int GAME_WINDOW_WIDTH = 448;
+    public static final int GAME_WINDOW_WIDTH = 450;
     public static final int GAME_WINDOW_HEIGHT = 500;
     public static final int UI_PANEL_WIDTH = 200;
     public static final int UI_PANEL_HEIGHT = 200;
@@ -180,7 +180,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
 
         // Score and lives
         testScore = 0;
-        testLives = 5;
+        testLives = 1;
 
         // Powerups
         testPowerUps = new ArrayList<PowerUp>();
@@ -217,7 +217,8 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                 case PAUSE_MENU:
                     break;
                 case GAME_OVER:
-                    isRunning = false;
+                    // isRunning = false;
+                    break;
                 case EXITING:
                     System.exit(0);
                     break;
@@ -266,7 +267,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         }
 
         // Check ball vs side walls.
-        if (testBall.x < 16 || testBall.x > GAME_WINDOW_WIDTH -16) {
+        if (testBall.x < 16 || (testBall.x + testBall.width + 16) > GAME_WINDOW_WIDTH) {
             testBall.resetLocation();
             testBall.xSpeed = -(testBall.xSpeed);
         }
@@ -367,6 +368,13 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                 soundManager.playPowerUpCollision();
             }
         }
+
+        // Transition to game over if all lives are lost
+        if (testLives == 0) {
+            gameState = GameState.GAME_OVER;
+            soundManager.stopBgMusic();
+            soundManager.playGameOverMusic();
+        }
     }
 
 
@@ -395,13 +403,11 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                 g2d.dispose();
                 break;
             case PLAYING:
-                _drawBackground(g2d);
-                _drawGameObjects(g2d);
+                _drawGameWorld(g2d);
                 _drawUIPanel(g2d);
                 break;
             case PAUSE_MENU:
-                _drawBackground(g2d);
-                _drawGameObjects(g2d);
+                _drawGameWorld(g2d);
                 _drawUIPanel(g2d);
                 _drawUIPause(g2d);
                 break;
@@ -420,14 +426,48 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         g.drawImage(windowBuffer, 0, 0, this);
     }
 
-    private void _drawBackground(Graphics2D g2d) {
+    private void _drawGameWorld(Graphics2D g2d) {
         testStage.draw(g2d);
-    }
-
-    private void _drawGameObjects(Graphics2D g2d) {
         testBall.draw(g2d);
         testShip.draw(g2d);
         for (PowerUp _p : testPowerUps) _p.draw(g2d);
+    }
+
+    private void _drawUIPanel(Graphics2D g2d) {
+        int commonXoffset = GAME_WINDOW_WIDTH+10;
+
+        // Draw branding.
+        g2d.drawImage(logoImage, commonXoffset, 15, 180, 40, null);
+
+        // Draw lives count.
+        g2d.setColor(Color.RED);
+        g2d.setFont(new Font("Courier", Font.BOLD, 15));
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.drawString("1UP x" + testLives, commonXoffset, 75);
+
+        // Draw Score.
+        g2d.setColor(Color.WHITE);
+        g2d.setFont(new Font("Courier", Font.BOLD, 15));
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.drawString("" + this.testScore, commonXoffset, 90);
+
+        // Draw powerup type if active.
+        if (testActivePowerUp != null) {
+            g2d.setColor(Color.GREEN);
+            g2d.setFont(new Font("Courier", Font.BOLD, 14));
+            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2d.drawString("Active Power-up", commonXoffset, 110);
+            g2d.drawString(testActivePowerUp.type.name(), commonXoffset, 125);
+        }
+    }
+
+    private void _drawUIPause(Graphics2D g2d) {
+        int commonXoffset = GAME_WINDOW_WIDTH+10;
+
+        g2d.setColor(Color.WHITE);
+        g2d.setFont(new Font("Courier", Font.BOLD, 15));
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.drawString("GAME PAUSED", commonXoffset + 40, MAIN_WINDOW_HEIGHT - 40);
     }
     
     private void _drawSplash(Graphics2D g){
@@ -435,7 +475,6 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         // Draw logo.
         int xPos = (MAIN_WINDOW_WIDTH/2) - (splashLogo.getWidth()/2);
         g.drawImage(splashLogo, xPos, 40, splashLogo.getWidth(), splashLogo.getHeight(), this);
-
 
         // Draw start messaging.
         String msg = "Press <Backspace> To Start";
@@ -483,44 +522,6 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         int y = getHeight() /2 + stringHeight/2;
 
         g.drawString(msg,x,y);
-        
-    }
-
-    private void _drawUIPanel(Graphics2D g2d) {
-        int commonXoffset = GAME_WINDOW_WIDTH+10;
-
-        // Draw branding.
-        g2d.drawImage(logoImage, commonXoffset, 15, 180, 40, null);
-
-        // Draw lives count.
-        g2d.setColor(Color.RED);
-        g2d.setFont(new Font("Courier", Font.BOLD, 15));
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2d.drawString("1UP x" + testLives, commonXoffset, 75);
-
-        // Draw Score.
-        g2d.setColor(Color.WHITE);
-        g2d.setFont(new Font("Courier", Font.BOLD, 15));
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2d.drawString("" + this.testScore, commonXoffset, 90);
-
-        // Draw powerup type if active.
-        if (testActivePowerUp != null) {
-            g2d.setColor(Color.GREEN);
-            g2d.setFont(new Font("Courier", Font.BOLD, 14));
-            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            g2d.drawString("Active Power-up", commonXoffset, 110);
-            g2d.drawString(testActivePowerUp.type.name(), commonXoffset, 125);
-        }
-    }
-
-    private void _drawUIPause(Graphics2D g2d) {
-        int commonXoffset = GAME_WINDOW_WIDTH+10;
-
-        g2d.setColor(Color.WHITE);
-        g2d.setFont(new Font("Courier", Font.BOLD, 15));
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2d.drawString("GAME PAUSED", commonXoffset + 40, MAIN_WINDOW_HEIGHT - 40);
     }
 
     @Override

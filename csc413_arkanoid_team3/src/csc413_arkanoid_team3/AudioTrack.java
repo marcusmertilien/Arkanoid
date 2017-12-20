@@ -29,7 +29,7 @@ public class AudioTrack {
             System.out.println("AudioTrack::AudioTrack - error opening file");
         }
 
-        // Set loop state.
+        // Set default volume.
         setVolume(0.3f);
     }
 
