@@ -6,8 +6,11 @@ import java.util.*;
 
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 
 import javax.imageio.ImageIO;
 
@@ -62,6 +65,9 @@ public class GameEngine extends JPanel implements Runnable, Observer {
     public static String GENERAL_ASSET_PATH = ASSET_PATH + "general/";
     public static String BALL_ASSET_PATH = ASSET_PATH + "ball/";
     public static String POWERUPS_ASSET_PATH = ASSET_PATH + "power-ups/";
+    
+    //Moving Away From Test Data
+    private Player player1;
 
     // Test data
     private Player testShip;
@@ -103,7 +109,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         isRunning = true;
 
         // Active test mode for BG.
-        gameState = GameState.PLAYING;
+        gameState = GameState.MAIN_MENU;
 
         // Application control.
         inputHandler = InputHandler.getInstance();
@@ -137,6 +143,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         p1Keys.put(KeyEvent.VK_LEFT, Controls.LEFT);
         p1Keys.put(KeyEvent.VK_RIGHT, Controls.RIGHT);
         p1Keys.put(KeyEvent.VK_ENTER, Controls.SHOOT);
+        p1Keys.put(KeyEvent.VK_BACK_SPACE, Controls.START);
 
         // Setup player 2 key mapping (Do we still need 2 player?)
         p2Keys = new HashMap<Integer, Controls>();
@@ -189,14 +196,15 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         long lastFrameTime = System.nanoTime(); // previous frame time
         long lastFps = 0;                       // previous frame fps
         long fps = 0;                           // frames per second
-
+        
         // Main application loop...
         while (isRunning) {
 
             // Switch on current GameState.
             switch (gameState) {
                 case INITIALIZING:
-                    // Game open
+                    break;
+                case MAIN_MENU:
                     break;
                 case PLAYING:
                     _updateData();
@@ -205,6 +213,8 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                     break;
                 case PAUSE_MENU:
                     break;
+                case GAME_OVER:
+                    isRunning = false;
                 case EXITING:
                     System.exit(0);
                     break;
@@ -377,9 +387,9 @@ public class GameEngine extends JPanel implements Runnable, Observer {
 
         // Draw based on current GameState.
         switch (gameState) {
-            case INITIALIZING:
-                // Game open
-                // TODO: draw splash screen.
+            case MAIN_MENU:
+                _drawSplash(g2d);
+                g2d.dispose();
                 break;
             case PLAYING:
                 _drawBackground(g2d);
@@ -391,6 +401,9 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                 _drawGameObjects(g2d);
                 _drawUIPanel(g2d);
                 _drawUIPause(g2d);
+                break;
+            case GAME_OVER:
+                _drawGameOverScreen(g2d);
                 break;
             case EXITING:
                 break;
@@ -416,6 +429,63 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         testBall.draw(g2d);
         testShip.draw(g2d);
         for (PowerUp _p : testPowerUps) _p.draw(g2d);
+    }
+    
+    private void _drawSplash(Graphics2D g){
+        String msg = "Press <Backspace> To Start";
+        String msg2 = "Press <P> To Toggle Music";
+        int xPos;
+
+        try {
+            ClassLoader cl = GameEngine.class.getClassLoader();
+            BufferedImage splash = ImageIO.read(cl.getResource(GameEngine.GENERAL_ASSET_PATH + "Splash.png"));
+            xPos = (getWidth()/2) - (splash.getWidth()/2);
+            g.drawImage(splash, xPos, 0, splash.getWidth(), splash.getHeight(), this);
+        } catch (IOException ex) {
+            Logger.getLogger(GameEngine.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        g.setFont(new Font("Courier", Font.BOLD, 16));
+        
+        FontMetrics fm = g.getFontMetrics();
+        int stringWidth = fm.stringWidth(msg);
+        int stringWidth2 = fm.stringWidth(msg2);
+        int string2Ascent = fm.getAscent();
+
+        int stringX = getWidth() /2 - stringWidth /2;
+        int stringY = (int)(getHeight() *.8);
+        int stringX2 = getWidth() /2 - stringWidth2 /2;
+        int stringY2 = stringY+string2Ascent;
+
+        // On Enter Change GameState
+        HashMap<Controls, Boolean> buttonStates = testShip.getButtonStates();
+        if(buttonStates.get(Controls.START)){
+            gameState = GameState.PLAYING;
+        }
+
+        g.drawString(msg,stringX,stringY);
+    }
+     
+    private void _drawGameOverScreen(Graphics2D g){
+        String msg = "GAME OVER!";
+        g.setColor(Color.BLACK);
+        g.fillRect(0,0, MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT);
+        
+
+        // Set font for rendering stats.
+        g.setColor(Color.RED);
+        g.setFont(new Font("Courier", Font.BOLD, 36));
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        
+        FontMetrics fm = g.getFontMetrics();
+        int stringWidth = fm.stringWidth(msg);
+        int stringHeight = fm.getAscent();
+
+        int x = getWidth() /2 - stringWidth/2;
+        int y = getHeight() /2 + stringHeight/2;
+
+        g.drawString(msg,x,y);
+        
     }
 
     private void _drawUIPanel(Graphics2D g2d) {
