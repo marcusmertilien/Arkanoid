@@ -79,6 +79,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
     private int testScore;
     private int testLives;
     private ArrayList<PowerUp> testPowerUps;
+    private ArrayList<Enemy> testEnemies;
     private PowerUp testActivePowerUp;
 
 
@@ -89,7 +90,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
 
     static {
         try {
-            // Load Arkanoid logo.
+            // Load Arkanoid logo assets.
             ClassLoader cl = GameEngine.class.getClassLoader();
             logoImage = ImageIO.read(cl.getResource(GameEngine.GENERAL_ASSET_PATH + "logo.png"));
             splashLogo = ImageIO.read(cl.getResource(GameEngine.GENERAL_ASSET_PATH + "Splash.png"));
@@ -168,9 +169,6 @@ public class GameEngine extends JPanel implements Runnable, Observer {
 
     private void _setupGameData() {
 
-        explosions = new ArrayList<Explode>();
-        
-        
         // TODO: we'll likely need to so _something_ here.
         this.testShip = new Player(200, 420, p1Keys);
         this.testStage = new Stage(Stage.Rounds.ROUND_1);
@@ -197,13 +195,19 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         testScore = 0;
         testLives = 3;
 
-        // Powerups
         testPowerUps = new ArrayList<PowerUp>();
+        testEnemies = new ArrayList<Enemy>();
+        explosions = new ArrayList<Explode>();
+
+        testEnemies.add(new Enemy(220, 300, Enemy.Types.GREEN));
+        testEnemies.add(new Enemy(120, 300, Enemy.Types.BLUE));
+        testEnemies.add(new Enemy(320, 300, Enemy.Types.RED));
     }
 
     private void _setupGameAudio() {
         soundManager.playBgMusic();
     }
+
 
     // ==========
     // Update API
@@ -270,10 +274,10 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         }
     }
 
-
     private void _updateData() {
         for (Explode _e : explosions) _e.update();
         for (PowerUp _p : testPowerUps) _p.update();
+        for (Enemy _e: testEnemies) _e.update();
         testShip.update();
         testBall.update();
     }
@@ -348,7 +352,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                     testBall.ySpeed = -Math.abs(testBall.ySpeed);
                 }
                 else if (testBall.y >= _b.y + _b.height) {
-                    // COntact bottom.
+                    // Contact bottom.
                     testBall.ySpeed = Math.abs(testBall.ySpeed);
                 }
                 else if (testBall.x <= _b.x) {
@@ -360,13 +364,13 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                     testBall.xSpeed = Math.abs(testBall.ySpeed);
                 }
 
-                // Updare user score.
+                // Update user score.
                 this.testScore += _b.registerHit();
 
                 // Play SFX.
                 this.soundManager.playBallCollision(_b);
 
-                // Test for powerups, create a random type on every brick break.
+                // Test for power ups, create a random type on every brick break.
                 if (_b.isHidden()) {
                     testPowerUps.add(new PowerUp(
                         _b.x, _b.y, PowerUp.Types.values()[new Random().nextInt(PowerUp.Types.values().length)]
@@ -374,6 +378,38 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                 }
 
                 // Only register one collision per cycle.
+                break;
+            }
+        }
+
+        for (Enemy _e : testEnemies) {
+            if (Physics.doesCollideWith(_e, testBall)) {
+                testBall.resetLocation();
+
+                // Calculate new x,y speeds based on contact with block
+                if (testBall.y <= _e.y) {
+                    // Contact top.
+                    testBall.ySpeed = -Math.abs(testBall.ySpeed);
+                }
+                else if (testBall.y >= _e.y + _e.height) {
+                    // Contact bottom.
+                    testBall.ySpeed = Math.abs(testBall.ySpeed);
+                }
+                else if (testBall.x <= _e.x) {
+                    // Contact left.
+                    testBall.xSpeed = -Math.abs(testBall.xSpeed);
+                }
+                else if (testBall.x >= _e.x + _e.width) {
+                    // Contact right.
+                    testBall.xSpeed = Math.abs(testBall.ySpeed);
+                }
+
+                _e.registerHit();
+
+                // Play SFX.
+                this.soundManager.playBallCollision(_e);
+
+                // Only register one collision per update cycle.
                 break;
             }
         }
@@ -396,6 +432,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         testStage.blocks.removeIf(_b -> _b.isHidden());
         testPowerUps.removeIf(_p -> _p.isHidden());
         explosions.removeIf(e -> e.isHidden());
+        testEnemies.removeIf(_e -> _e.isHidden());
     }
 
     private void _checkState() {
@@ -449,7 +486,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                 break;
         }
 
-        // Drw current frame.
+        // Draw current frame.
         g.drawImage(windowBuffer, 0, 0, this);
     }
 
@@ -457,7 +494,9 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         testStage.draw(g2d);
         testBall.draw(g2d);
         testShip.draw(g2d);
+        for (Enemy _e: testEnemies) _e.draw(g2d);
         for (PowerUp _p : testPowerUps) _p.draw(g2d);
+        for (Explode _e : explosions) _e.draw(g2d);
     }
 
     private void _drawUIPanel(Graphics2D g2d) {
@@ -478,7 +517,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.drawString("" + this.testScore, commonXoffset, 90);
 
-        // Draw powerup type if active.
+        // Draw power up type if active.
         if (testActivePowerUp != null) {
             g2d.setColor(Color.GREEN);
             g2d.setFont(new Font("Courier", Font.BOLD, 14));
@@ -496,12 +535,11 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.drawString("GAME PAUSED", commonXoffset + 40, MAIN_WINDOW_HEIGHT - 40);
     }
-    
 
     private void _drawFXObjects(Graphics2D g2d) {
         for (Explode _e : explosions) _e.draw(g2d);
     }
-      
+     
     private void _drawSplash(Graphics2D g){
 
         // Draw logo.
@@ -534,7 +572,6 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.drawString(msg, stringX, stringY);
         g.drawString(msg2, stringX2, stringY2);
-        
     }
      
     private void _drawGameOverScreen(Graphics2D g){

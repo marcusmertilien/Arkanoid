@@ -3,19 +3,9 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/mmertilien/csc413-secondgame/csc413_arkanoid_team3/src/csc413_arkanoid_team3/DebugState.java</file>
-            <file>file:/C:/Users/mmertilien/csc413-secondgame/csc413_arkanoid_team3/src/csc413_arkanoid_team3/Prop.java</file>
-            <file>file:/C:/Users/mmertilien/csc413-secondgame/csc413_arkanoid_team3/src/csc413_arkanoid_team3/GameObject.java</file>
-            <file>file:/C:/Users/mmertilien/csc413-secondgame/csc413_arkanoid_team3/src/csc413_arkanoid_team3/Actor.java</file>
-            <file>file:/C:/Users/mmertilien/csc413-secondgame/csc413_arkanoid_team3/src/csc413_arkanoid_team3/PowerUp.java</file>
-            <file>file:/C:/Users/mmertilien/csc413-secondgame/csc413_arkanoid_team3/src/csc413_arkanoid_team3/Controls.java</file>
-            <file>file:/C:/Users/mmertilien/csc413-secondgame/csc413_arkanoid_team3/src/csc413_arkanoid_team3/GameEngine.java</file>
-            <file>file:/C:/Users/mmertilien/csc413-secondgame/csc413_arkanoid_team3/src/csc413_arkanoid_team3/AudioTrack.java</file>
-            <file>file:/C:/Users/mmertilien/csc413-secondgame/csc413_arkanoid_team3/src/csc413_arkanoid_team3/EventManager.java</file>
-            <file>file:/C:/Users/mmertilien/csc413-secondgame/csc413_arkanoid_team3/src/csc413_arkanoid_team3/InputHandler.java</file>
-            <file>file:/C:/Users/mmertilien/csc413-secondgame/csc413_arkanoid_team3/src/csc413_arkanoid_team3/SoundManager.java</file>
-            <file>file:/C:/Users/mmertilien/csc413-secondgame/csc413_arkanoid_team3/src/csc413_arkanoid_team3/Physics.java</file>
-            <file>file:/C:/Users/mmertilien/csc413-secondgame/csc413_arkanoid_team3/src/csc413_arkanoid_team3/Stage.java</file>
+            <file>file:/Users/EnSabanNur/Repos/fall-2017/secondgame-marcusmertilien/csc413_arkanoid_team3/src/csc413_arkanoid_team3/Stage.java</file>
+            <file>file:/Users/EnSabanNur/Repos/fall-2017/secondgame-marcusmertilien/csc413_arkanoid_team3/src/csc413_arkanoid_team3/Arkanoid.java</file>
+            <file>file:/Users/EnSabanNur/Repos/fall-2017/secondgame-marcusmertilien/csc413_arkanoid_team3/src/csc413_arkanoid_team3/AssetLoader.java</file>
         </group>
-   </open-files>
+    </open-files>
 </project-private>
