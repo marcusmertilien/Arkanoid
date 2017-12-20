@@ -52,7 +52,7 @@ public class Block extends Prop {
             hitPointsMap.put(Types.PINK, 1);
             hitPointsMap.put(Types.YELLOW, 1);
             hitPointsMap.put(Types.SILVER, 2);
-            hitPointsMap.put(Types.GOLD, -1); // Gold blocks are indestructible.
+            hitPointsMap.put(Types.GOLD, 4); // Gold blocks are indestructible.
 
             // Init images assets
             // ==================
