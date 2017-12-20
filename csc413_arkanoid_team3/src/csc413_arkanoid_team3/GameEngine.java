@@ -150,6 +150,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         p1Keys.put(KeyEvent.VK_LEFT, Controls.LEFT);
         p1Keys.put(KeyEvent.VK_RIGHT, Controls.RIGHT);
         p1Keys.put(KeyEvent.VK_ENTER, Controls.SHOOT);
+        p1Keys.put(KeyEvent.VK_BACK_SPACE, Controls.START);
 
         // Setup player 2 key mapping (Do we still need 2 player?)
         p2Keys = new HashMap<Integer, Controls>();
@@ -161,7 +162,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         gameControls = new HashMap<Integer, GameActions>();
         gameControls.put(KeyEvent.VK_P, GameActions.PAUSE);
         gameControls.put(KeyEvent.VK_ESCAPE, GameActions.EXIT);
-        gameControls.put(KeyEvent.VK_BACK_SPACE, GameActions.START);
+        gameControls.put(KeyEvent.VK_1, GameActions.START);
         gameControls.put(KeyEvent.VK_M, GameActions.MUSIC_STOP);
     }
 
@@ -229,15 +230,6 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                     _cleanupObjects();
                     _checkState();
                     break;
-                case TESTING_DRAWING:
-                    // Test area
-                    updateData();
-                    this.testShip.update();
-                    this.testBall.update();
-                    for (PowerUp _p : powerups) { _p.update(); }
-                    checkCollisions();
-                    cleanupObjects();
-
                 case PAUSE_MENU:
                     break;
                 case GAME_OVER:
@@ -280,7 +272,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
 
 
     private void _updateData() {
-        for (Explode _e : explosions){ _e.update();
+        for (Explode _e : explosions) _e.update();
         for (PowerUp _p : testPowerUps) _p.update();
         testShip.update();
         testBall.update();
@@ -315,7 +307,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
 
         // Check ship vs ball.
         if (Physics.doesCollideWith(testBall, testShip)) {
-            // Calculate new ball speed based on contact point with ship.
+            // Claculate new ball speed based on contact point with padd
             int ballCenter = (testBall.x - testShip.x) + (testBall.width/2);
             int shipCenter = (testShip.width/2);
             int newXspeed = (ballCenter - shipCenter);
@@ -385,11 +377,11 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         }
 
         for (PowerUp _p: testPowerUps) {
-            // Check power up vs lower bound.
+            // Check powerup vs lower bound.
             if (_p.y > GAME_WINDOW_HEIGHT-42)
                 _p.hide();
 
-            // Check power up vs ship.
+            // Check powerup vs ship.
             if (Physics.doesCollideWith(_p, testShip)) {
                 _p.hide();
                 testActivePowerUp = _p;
@@ -436,27 +428,6 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                 _drawGameWorld(g2d);
                 _drawUIPanel(g2d);
                 break;
-
-            case TESTING_DRAWING:
-            {
-                // Test stage draw.
-                Graphics2D g2d = (Graphics2D) gameAreaBuffer.getGraphics();
-
-                this.testStage.draw(g2d);
-                this.testBall.draw(g2d);
-                for (PowerUp _p : powerups) {
-                    _p.draw(g2d);
-                }
-                this.testShip.draw(g2d);
-                drawUIPanel(g2d);
-                
-                g2d = (Graphics2D) gameAreaBuffer.getGraphics();
-                drawFXObjects(g2d);
-                g2d.dispose();
-
-                // Draw window.
-                g.drawImage(gameAreaBuffer, 0, 0, this);
-
             case PAUSE_MENU:
                 _drawGameWorld(g2d);
                 _drawUIPanel(g2d);
@@ -545,26 +516,21 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         int stringWidth2 = fm.stringWidth(msg2);
         int string2Ascent = fm.getAscent();
 
+        int stringX = getWidth() /2 - stringWidth /2;
+        int stringY = (int)(getHeight() *.8);
         int stringX2 = getWidth() /2 - stringWidth2 /2;
-        int stringY2 = stringY+string2Ascent;
+        int stringY2 = stringY+string2Ascent+10;
         
         //On Enter Change GameState
         HashMap<Controls, Boolean> buttonStates = testShip.getButtonStates();
         if(buttonStates.get(Controls.START)){
-            gameState = GameState.TESTING_DRAWING;
+            gameState = GameState.PLAYING;
         }
-        
-        g.drawString(msg,stringX,stringY);
-        //g.drawString(msg2,stringX2,stringY2);
-        
-
-        int stringX2 = (MAIN_WINDOW_WIDTH/2) - (stringWidth2/2);
-        int stringY2 = stringY+string2Ascent+10;
 
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.drawString(msg, stringX, stringY);
         g.drawString(msg2, stringX2, stringY2);
-
+        
     }
      
     private void _drawGameOverScreen(Graphics2D g){
@@ -603,12 +569,6 @@ public class GameEngine extends JPanel implements Runnable, Observer {
             }
 
             if (keyId == KeyEvent.KEY_PRESSED) {
-
-                // Start if on splash screen.
-                if (buttonPressed == GameActions.START && gameState == GameState.MAIN_MENU) {
-                    gameState = GameState.PLAYING;
-                }
-
                 // Toggle game pause on P press.
                 if (buttonPressed == GameActions.PAUSE) {
                     if (gameState != GameState.PAUSE_MENU) {

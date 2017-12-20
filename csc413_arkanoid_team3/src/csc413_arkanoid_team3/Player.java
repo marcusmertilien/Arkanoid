@@ -96,5 +96,5 @@ public class Player extends Ship implements Observer {
        return this.buttonStates;
     }
     
-
+    
 }

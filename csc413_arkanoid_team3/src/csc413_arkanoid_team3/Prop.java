@@ -18,8 +18,8 @@ public abstract class Prop extends GameObject {
     }
 
 
-    // Public API
-    // ==========
+    // Draw API
+    // ========
 
     @Override
     public void draw(Graphics2D g2d) {

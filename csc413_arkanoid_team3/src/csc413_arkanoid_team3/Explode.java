@@ -86,7 +86,7 @@ public class Explode extends GameObject {
             case ENEMY:
             {
                 if (animationTimerE == 0) {
-                    this.isVisible = false;
+                    this.hide();
                 } else {
                     this.sprite = enemy.get(--animationTimerE/2);
                 }
@@ -94,7 +94,7 @@ public class Explode extends GameObject {
             case SHIP:
             {
                 if (animationTimerS == 0) {
-                    this.isVisible = false;
+                    this.hide();
                 } else {
                     this.sprite = enemy.get(--animationTimerS/2);
                 }
