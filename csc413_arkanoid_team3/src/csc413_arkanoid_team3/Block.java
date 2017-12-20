@@ -10,25 +10,29 @@ import javax.imageio.ImageIO;
 
 public class Block extends Prop {
 
-    private static String SPRITE_PATH = GameEngine.GENERAL_ASSET_PATH + "blocks.png";
+    // Class Constants
+    // ===============
 
     // Dimensional constants.
     private static int BLOCK_SPRITE_WIDTH = 16;             // width of stage area
     private static int BLOCK_SPRITE_HEIGHT = 8;             // height of stage area
-    public static int BLOCK_WIDTH = 2*BLOCK_SPRITE_WIDTH;
-    public static int BLOCK_HEIGHT = 2*BLOCK_SPRITE_HEIGHT;
+    public static int BLOCK_WIDTH = 2*BLOCK_SPRITE_WIDTH;   // visible block width
+    public static int BLOCK_HEIGHT = 2*BLOCK_SPRITE_HEIGHT; // visible block height
 
     // Possible block types.
     public static enum Types {
         WHITE, YELLOW, PINK, BLUE, RED, GREEN, CYAN, ORANGE, SILVER, GOLD
     }
 
+    // The class' static data assets
     private static HashMap<Types, Integer> pointsMap;
     private static HashMap<Types, Integer> healthMap;
+
+    // The class' static image assets
     private static HashMap<Types, BufferedImage> assetMap;
+    private static String SPRITE_PATH = GameEngine.GENERAL_ASSET_PATH + "blocks.png";
     static {
         // Init point data
-        // ===============
         pointsMap = new HashMap<Types, Integer>(){{
             put(Types.WHITE, 50);
             put(Types.ORANGE, 60);
@@ -42,6 +46,7 @@ public class Block extends Prop {
             put(Types.GOLD, 0);
         }};
 
+        // Init health data
         healthMap = new HashMap<Types, Integer>(){{
             put(Types.WHITE, 1);
             put(Types.ORANGE, 1);
@@ -56,7 +61,6 @@ public class Block extends Prop {
         }};
 
         // Init images assets
-        // ==================
         BufferedImage spriteSheet = AssetLoader.load(SPRITE_PATH, 2);
         assetMap = new HashMap<Types, BufferedImage>();
 
@@ -72,8 +76,8 @@ public class Block extends Prop {
 
     private BufferedImage bgSprite;
     public Types type;
-    public int points;
-    public int hitPoints;
+    private int points;
+    private int hitPoints;
 
 
     // Constructors
@@ -86,7 +90,6 @@ public class Block extends Prop {
         this.sprite = assetMap.get(this.type);
         this.points = pointsMap.get(this.type);
         this.hitPoints = healthMap.get(this.type);
-        // this.powerUp = ...;
     }
 
     public int registerHit() {

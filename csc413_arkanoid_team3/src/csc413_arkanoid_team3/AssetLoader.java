@@ -10,6 +10,7 @@ import javax.imageio.ImageIO;
 public class AssetLoader {
 
     public static BufferedImage getScaledInstance(BufferedImage source, int width, int height) {
+        // Create a new BufferedImage at the supplied width and height.
         BufferedImage destImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         Image scaledImage = source.getScaledInstance(width, height, Image.SCALE_SMOOTH);
         Graphics2D g2d = destImage.createGraphics();
@@ -19,6 +20,7 @@ public class AssetLoader {
     }
 
     public static BufferedImage load(String filePath, int scale) {
+        // Create a new BufferedImage from a file url against the provided sacle.
         ClassLoader cl = GameEngine.class.getClassLoader();
         BufferedImage imageAsset = new BufferedImage(1,1,Image.SCALE_SMOOTH);
 

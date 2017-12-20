@@ -6,11 +6,13 @@ import java.awt.Graphics2D;
 
 public abstract class Actor extends GameObject {
 
-    protected int xSpeed;   // horizontal speed
-    protected int ySpeed;   // vertical speed
-    protected int speed;    // base speed of actor
+    // Class fields
+    // ============
 
-    protected SoundManager soundManager;
+    protected int xSpeed;                // horizontal speed
+    protected int ySpeed;                // vertical speed
+    protected int speed;                 // base speed
+    protected SoundManager soundManager; // access to audio system
 
 
     // Constructors
@@ -34,8 +36,9 @@ public abstract class Actor extends GameObject {
     }
 
 
-    // Draw API
-    // ========
+    // Public API
+    // ==========
+
     @Override
     public void draw(Graphics2D g2d) {
         if (DebugState.showBoundsActive)

@@ -6,7 +6,10 @@ import java.util.Observable;
 
 public class EventManager extends Observable {
 
-    private static EventManager instance;
+    // Class fields
+    // ============
+
+    private static EventManager instance; // the singleton instance
 
 
     // Constructors
@@ -15,6 +18,7 @@ public class EventManager extends Observable {
     protected EventManager() { }
 
     public static EventManager getInstance() {
+        // Create or return the singleton.
         if (instance == null) {
             instance = new EventManager();
         }
@@ -29,11 +33,6 @@ public class EventManager extends Observable {
     public void keyPressed(KeyEvent e) {
         setChanged();
         notifyObservers(e);
-
-         // TODO: this isn't in the right place yet - only for testing
-        if (e.getKeyCode() == KeyEvent.VK_P) {
-
-        }
     }
 
     public void keyReleased(KeyEvent e) {

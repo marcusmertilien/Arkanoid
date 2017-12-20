@@ -7,13 +7,16 @@ import java.awt.Graphics2D;
 
 public abstract class GameObject extends Rectangle {
 
-    private static int nextId = 1; // id for next object
-    private int _id;               // current object id
+    // Class fields
+    // ============
+
+    private static int nextId = 1;   // id for next object
+    private int _id;                 // current object id
 
     protected int previousX;         // Previous x position
     protected int previousY;         // Previous y position
 
-    private boolean isVisible;     // dictates if the object is visible
+    private boolean isVisible;       // dictates if the object is visible
     protected BufferedImage sprite;  // the image to be drawn each frame.
 
 

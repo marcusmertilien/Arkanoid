@@ -8,6 +8,9 @@ import javax.sound.sampled.FloatControl;
 
 public class AudioTrack {
 
+    // Class fields
+    // ============
+
     private Clip clip;           // the audio clip to be played
     private Boolean shouldLoop;  // Whether the clip loops
     private int currentLocation; // the location of the current pause point
@@ -18,6 +21,7 @@ public class AudioTrack {
 
     public AudioTrack(String soundFilePath, Boolean _shouldLoop) {
         try {
+            // Try to load the provided audio file.
             ClassLoader cl = AudioTrack.class.getClassLoader();
             AudioInputStream soundStream = AudioSystem.getAudioInputStream(
                 cl.getResource(soundFilePath)
@@ -27,6 +31,7 @@ public class AudioTrack {
             shouldLoop = _shouldLoop;
         } catch(Exception e) {
             System.out.println("AudioTrack::AudioTrack - error opening file");
+            System.out.println(e.toString());
         }
 
         // Set default volume.

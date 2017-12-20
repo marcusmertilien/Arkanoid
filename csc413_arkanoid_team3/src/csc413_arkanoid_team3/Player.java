@@ -15,14 +15,17 @@ import java.awt.event.KeyEvent;
 
 public class Player extends Ship implements Observer {
 
-    private HashMap<Controls, Boolean> buttonStates;
-    private HashMap<Integer, Controls> controlMap;
+    // Class fields
+    // ============
 
-    public Player(
-        int x,
-        int y,
-        HashMap<Integer, Controls> controls
-    ) {
+    private HashMap<Controls, Boolean> buttonStates; // current pressed buttons
+    private HashMap<Integer, Controls> controlMap;   // map of keys to player controls
+
+
+    // Constructors
+    // ============
+
+    public Player(int x, int y, HashMap<Integer, Controls> controls) {
         super(x, y);
 
         _initControls(controls);
@@ -32,11 +35,15 @@ public class Player extends Ship implements Observer {
         buttonStates = new HashMap<Controls, Boolean>();
         controlMap = controls;
 
-        // Create controls mapping.
+        // Create control mapping.
         for (Controls c : controlMap.values()) {
             buttonStates.put(c, false);
         }
     }
+
+
+    // Public API
+    // ==========
 
     public void update() {
         _updatePosition();
