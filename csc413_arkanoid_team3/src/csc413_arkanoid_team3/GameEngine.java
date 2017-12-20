@@ -111,7 +111,7 @@ public class GameEngine extends JPanel implements Runnable {
         isRunning = true;
 
         // Active test mode for BG.
-        gameState = GameState.GAME_OVER;
+        gameState = GameState.MAIN_MENU;
 
         inputHandler = InputHandler.getInstance();
         soundManager = SoundManager.getInstance();
@@ -363,7 +363,7 @@ public class GameEngine extends JPanel implements Runnable {
             }
             case GAME_OVER:
             {
-              Graphics2D g2d = (Graphics2D) windowBuffer.getGraphics();
+                Graphics2D g2d = (Graphics2D) windowBuffer.getGraphics();
                 drawKillScreen(g2d);
                 g2d.dispose();
                 
@@ -397,6 +397,7 @@ public class GameEngine extends JPanel implements Runnable {
         String msg2 = "Press <P> To Toggle Music";
         int x;
         int y;
+
         try {
             ClassLoader cl = GameEngine.class.getClassLoader();
             Image splash = ImageIO.read(cl.getResource(GameEngine.GENERAL_ASSET_PATH + "Splash.png"));
@@ -404,7 +405,7 @@ public class GameEngine extends JPanel implements Runnable {
             g.drawImage(splash,x,0,splash.getWidth(this),splash.getHeight(this),this);
         } catch (IOException ex) {
             Logger.getLogger(GameEngine.class.getName()).log(Level.SEVERE, null, ex);
-        }        
+        }
         
         g.setFont(new Font("Courier", Font.BOLD, 16));
         
@@ -418,17 +419,14 @@ public class GameEngine extends JPanel implements Runnable {
         int stringY = (int)(getHeight() *.8);
         int stringX2 = getWidth() /2 - stringWidth2 /2;
         int stringY2 = stringY+string2Ascent;
-        
-        
-        //On Enter Change GameState
+
+        // On Enter Change GameState
         HashMap<Controls, Boolean> buttonStates = testShip.getButtonStates();
         if(buttonStates.get(Controls.START)){
-            gameState = GameState.PLAYING;
+            gameState = GameState.TESTING_DRAWING;
         }
-        
+
         g.drawString(msg,stringX,stringY);
-        //g.drawString(msg2,stringX2,stringY2);
-        
     }
      
     private void drawKillScreen(Graphics2D g){
@@ -437,7 +435,7 @@ public class GameEngine extends JPanel implements Runnable {
         g.fillRect(0,0,WINDOW_WIDTH , WINDOW_HEIGHT);
         
 
-//         Set font for rendering stats.
+        // Set font for rendering stats.
         g.setColor(Color.RED);
         g.setFont(new Font("Courier", Font.BOLD, 36));
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
