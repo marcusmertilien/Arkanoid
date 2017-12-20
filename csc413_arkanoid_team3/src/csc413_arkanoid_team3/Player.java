@@ -15,6 +15,11 @@ import java.awt.event.KeyEvent;
 
 public class Player extends Ship implements Observer {
 
+    private final static  int FIRING_SPEED = 30;
+    //Shoot Switch
+    private boolean fire;
+    private int shotCooldown;
+    
     // Class fields
     // ============
 
@@ -27,8 +32,8 @@ public class Player extends Ship implements Observer {
 
     public Player(int x, int y, HashMap<Integer, Controls> controls) {
         super(x, y);
-
         _initControls(controls);
+        _primeCanons();
     }
 
     private void _initControls(HashMap<Integer, Controls> controls) {
@@ -40,13 +45,19 @@ public class Player extends Ship implements Observer {
             buttonStates.put(c, false);
         }
     }
+    
+    private void _primeCanons(){
+        shotCooldown = FIRING_SPEED; // Shot cooldown
+        fire = true;
+    }
 
 
     // Public API
     // ==========
 
-    public void update() {
+    public void update(ArrayList<Projectile> shots) {
         _updatePosition();
+        _updateShoot(shots);
     }
 
     private void _updatePosition() {
@@ -61,6 +72,29 @@ public class Player extends Ship implements Observer {
 
         // Update location.
         x += xSpeed;
+    }
+    
+    private void _updateShoot(ArrayList<Projectile> shots){
+        if(fire){
+            if (shotCooldown <= 0 && buttonStates.get(Controls.SHOOT)) {
+
+                int projX;
+                int projY;
+                int projXSpeed;
+                int projYSpeed;
+                int projSize = Projectile.PROJECTILE_SIZE;
+
+                projX = x + (this.width-projSize)/2;
+                projY = this.y;
+
+                // Add new shot.
+                shots.add(new Projectile(projX, projY, xSpeed, ySpeed));
+
+                // Reset shot cooldown.
+                shotCooldown = FIRING_SPEED;
+            }
+        }
+        shotCooldown--;
     }
 
     @Override
@@ -96,5 +130,28 @@ public class Player extends Ship implements Observer {
        return this.buttonStates;
     }
     
-    
+    public void powerUp(PowerUp p){
+        switch(p.type){
+            case LAZER:
+                this.fire = true;
+                break;
+            case EXTEND:
+                break;
+            case SLOW:
+                break;
+            case CATCH:
+                break;
+            case DISRUPT:
+                break;
+            case TWIN:
+                break;
+            case NEWDISRUPT:
+                break;
+            case PLAYER:
+                break;
+            case REDUCE:
+                break;
+            
+        }
+    }
 }

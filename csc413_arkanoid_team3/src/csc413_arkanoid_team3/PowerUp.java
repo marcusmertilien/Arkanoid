@@ -72,5 +72,8 @@ public class PowerUp extends Prop {
 
         // Powerups move to the bottom of the screen.
         this.y++;
+        
+        
+        
     }
 }

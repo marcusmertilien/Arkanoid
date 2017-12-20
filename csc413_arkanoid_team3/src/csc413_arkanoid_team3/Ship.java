@@ -16,8 +16,10 @@ public class Ship extends Actor {
 
     private static final int BASE_SHIP_WIDTH = 32;
     private static final int BASE_SHIP_HEIGHT = 8;
-    private static final int SHIP_WIDTH = 2*BASE_SHIP_WIDTH;
-    private static final int SHIP_HEIGHT = 2*BASE_SHIP_HEIGHT;
+    private static final int SHIP_WIDTH = BASE_SHIP_WIDTH;
+    private static final int SHIP_HEIGHT = BASE_SHIP_HEIGHT;
+    
+    
 
     private static final int SPEED = 3;
 
@@ -39,5 +41,6 @@ public class Ship extends Actor {
         super(x, y, SHIP_WIDTH, SHIP_HEIGHT, 0, 0, SPEED);
         sprite = this.SHIP_ASSET;
     }
-
+    
+    
 }
