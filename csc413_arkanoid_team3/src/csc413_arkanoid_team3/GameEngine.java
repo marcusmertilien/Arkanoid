@@ -79,6 +79,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
     private int testScore;
     private int testLives;
     private ArrayList<PowerUp> testPowerUps;
+    private ArrayList<Enemy> testEnemies;
     private PowerUp testActivePowerUp;
 
 
@@ -199,6 +200,11 @@ public class GameEngine extends JPanel implements Runnable, Observer {
 
         // Power ups
         testPowerUps = new ArrayList<PowerUp>();
+        testEnemies = new ArrayList<Enemy>();
+
+        testEnemies.add(new Enemy(220, 300, Enemy.Types.GREEN));
+        testEnemies.add(new Enemy(120, 300, Enemy.Types.BLUE));
+        testEnemies.add(new Enemy(320, 300, Enemy.Types.RED));
     }
 
     private void _setupGameAudio() {
@@ -274,6 +280,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
     private void _updateData() {
         for (Explode _e : explosions) _e.update();
         for (PowerUp _p : testPowerUps) _p.update();
+        for (Enemy _e: testEnemies) _e.update();
         testShip.update();
         testBall.update();
     }
@@ -376,6 +383,21 @@ public class GameEngine extends JPanel implements Runnable, Observer {
             }
         }
 
+        for (Enemy _e : testEnemies) {
+            if (Physics.doesCollideWith(_e, testBall)) {
+                testBall.resetLocation();
+
+                // TODO: use same logic as above for directionality post contact.
+                testBall.xSpeed = -testBall.xSpeed;
+                testBall.ySpeed = -testBall.ySpeed;
+
+                _e.registerHit();
+
+                // Play SFX.
+                this.soundManager.playBallCollision(_e);
+            }
+        }
+
         for (PowerUp _p: testPowerUps) {
             // Check powerup vs lower bound.
             if (_p.y > GAME_WINDOW_HEIGHT-42)
@@ -394,6 +416,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         testStage.blocks.removeIf(_b -> _b.isHidden());
         testPowerUps.removeIf(_p -> _p.isHidden());
         explosions.removeIf(e -> e.isHidden());
+        testEnemies.removeIf(_e -> _e.isHidden());
     }
 
     private void _checkState() {
@@ -453,6 +476,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         testStage.draw(g2d);
         testBall.draw(g2d);
         testShip.draw(g2d);
+        for (Enemy _e: testEnemies) _e.draw(g2d);
         for (PowerUp _p : testPowerUps) _p.draw(g2d);
     }
 

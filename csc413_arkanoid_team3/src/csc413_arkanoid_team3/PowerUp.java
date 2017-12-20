@@ -15,8 +15,8 @@ public class PowerUp extends Prop {
         LAZER, EXTEND, SLOW, CATCH, BREAK, DISRUPT, TWIN, NEWDISRUPT, PLAYER, REDUCE
     }
 
-    private static final int POWERUP_SPRITE_WIDTH = 16;                // width of stage area
-    private static final int POWERUP_SPRITE_HEIGHT = 8;                // height of stage area
+    private static final int POWERUP_SPRITE_WIDTH = 16;                // width of power up
+    private static final int POWERUP_SPRITE_HEIGHT = 8;                // height of power up
     private static final int POWERUP_WIDTH = 2*POWERUP_SPRITE_WIDTH;   // visible width
     private static final int POWERUP_HEIGHT = 2*POWERUP_SPRITE_HEIGHT; // visible height
     private static final int ANIMATION_COOLDOWN = 64;                  // animation max time out.
