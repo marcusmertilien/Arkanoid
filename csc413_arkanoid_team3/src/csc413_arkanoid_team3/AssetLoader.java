@@ -20,7 +20,7 @@ public class AssetLoader {
     }
 
     public static BufferedImage load(String filePath, int scale) {
-        // Create a new BufferedImage from a file url against the provided sacle.
+        // Create a new BufferedImage from a file url against the provided scale.
         ClassLoader cl = GameEngine.class.getClassLoader();
         BufferedImage imageAsset = new BufferedImage(1,1,Image.SCALE_SMOOTH);
 
@@ -35,7 +35,7 @@ public class AssetLoader {
 
             Graphics2D g2d = imageAsset.createGraphics();
 
-            // Scale image based on arguyment.
+            // Scale image based on argument.
             Image tempScaledImage = rawAsset.getScaledInstance(width, height, Image.SCALE_SMOOTH);
 
             // Draw scaled instance to return image.

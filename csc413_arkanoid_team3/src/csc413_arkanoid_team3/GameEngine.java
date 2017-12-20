@@ -146,7 +146,6 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         p1Keys.put(KeyEvent.VK_LEFT, Controls.LEFT);
         p1Keys.put(KeyEvent.VK_RIGHT, Controls.RIGHT);
         p1Keys.put(KeyEvent.VK_ENTER, Controls.SHOOT);
-        p1Keys.put(KeyEvent.VK_BACK_SPACE, Controls.START);
 
         // Setup player 2 key mapping (Do we still need 2 player?)
         p2Keys = new HashMap<Integer, Controls>();
@@ -158,7 +157,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         gameControls = new HashMap<Integer, GameActions>();
         gameControls.put(KeyEvent.VK_P, GameActions.PAUSE);
         gameControls.put(KeyEvent.VK_ESCAPE, GameActions.EXIT);
-        gameControls.put(KeyEvent.VK_1, GameActions.START);
+        gameControls.put(KeyEvent.VK_BACK_SPACE, GameActions.START);
         gameControls.put(KeyEvent.VK_M, GameActions.MUSIC_STOP);
     }
 
@@ -289,7 +288,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
 
         // Check ship vs ball.
         if (Physics.doesCollideWith(testBall, testShip)) {
-            // Claculate new ball speed based on contact point with padd
+            // Calculate new ball speed based on contact point with ship.
             int ballCenter = (testBall.x - testShip.x) + (testBall.width/2);
             int shipCenter = (testShip.width/2);
             int newXspeed = (ballCenter - shipCenter);
@@ -358,11 +357,11 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         }
 
         for (PowerUp _p: testPowerUps) {
-            // Check powerup vs lower bound.
+            // Check power up vs lower bound.
             if (_p.y > GAME_WINDOW_HEIGHT-42)
                 _p.hide();
 
-            // Check powerup vs ship.
+            // Check power up vs ship.
             if (Physics.doesCollideWith(_p, testShip)) {
                 _p.hide();
                 testActivePowerUp = _p;
@@ -498,13 +497,6 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.drawString(msg, stringX, stringY);
         g.drawString(msg2, stringX2, stringY2);
-
-        // On Enter Change GameState
-        HashMap<Controls, Boolean> buttonStates = testShip.getButtonStates();
-        if(buttonStates.get(Controls.START)) {
-            gameState = GameState.PLAYING;
-        }
-
     }
      
     private void _drawGameOverScreen(Graphics2D g){
@@ -543,6 +535,12 @@ public class GameEngine extends JPanel implements Runnable, Observer {
             }
 
             if (keyId == KeyEvent.KEY_PRESSED) {
+
+                // Start if on splash screen.
+                if (buttonPressed == GameActions.START && gameState == GameState.MAIN_MENU) {
+                    gameState = GameState.PLAYING;
+                }
+
                 // Toggle game pause on P press.
                 if (buttonPressed == GameActions.PAUSE) {
                     if (gameState != GameState.PAUSE_MENU) {

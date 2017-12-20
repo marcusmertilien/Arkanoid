@@ -17,6 +17,7 @@ public class SoundManager {
         GAME_OVER
     }
 
+    // The class' static audio assets
     private static final HashMap<Type, AudioTrack> SOUND_BANK;
     static {
         SOUND_BANK = new HashMap<Type, AudioTrack>();
@@ -41,6 +42,7 @@ public class SoundManager {
     protected SoundManager() { }
 
     public static SoundManager getInstance() {
+        // Create or return the singleton instance.
         if (instance == null) {
             instance = new SoundManager();
         }
@@ -48,8 +50,14 @@ public class SoundManager {
         return instance;
     }
 
+
+    // Public API
+    // ==========
+
     public void playBallCollision(GameObject obj) {
+        // Check the type of object colliding with the ball.
         if (obj instanceof Block) {
+            // If the collision type was a block...
             Block _b = (Block) obj;
 
             if (_b.type == Block.Types.GOLD) {
@@ -58,6 +66,7 @@ public class SoundManager {
                 SOUND_BANK.get(Type.BALL_V_BLOCK).play();
             }
         } else if (obj instanceof Ship) {
+            // If the collision type was a ship
             SOUND_BANK.get(Type.BALL_V_SHIP).play();
         }
     }

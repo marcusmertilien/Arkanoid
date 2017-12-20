@@ -29,6 +29,7 @@ public class PowerUp extends Prop {
         BufferedImage spriteSheet = AssetLoader.load(SPRITE_PATH, 2);
         ASSET_MAP = new HashMap<Types, BufferedImage>();
 
+        // Build a map of block types to image assets.
         for (int i = 0; i < Types.values().length; i++) {
             BufferedImage powerUp = spriteSheet.getSubimage(0, i*POWERUP_HEIGHT, spriteSheet.getWidth(), POWERUP_HEIGHT);
             ASSET_MAP.put(Types.values()[i], powerUp);

@@ -91,8 +91,4 @@ public class Player extends Ship implements Observer {
         }
     }
 
-    public HashMap<Controls, Boolean> getButtonStates(){
-       return this.buttonStates;
-    }
-    
 }

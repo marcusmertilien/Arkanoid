@@ -13,8 +13,8 @@ public abstract class GameObject extends Rectangle {
     private static int nextId = 1;   // id for next object
     private int _id;                 // current object id
 
-    protected int previousX;         // Previous x position
-    protected int previousY;         // Previous y position
+    protected int previousX;         // previous x position
+    protected int previousY;         // previous y position
 
     private boolean isVisible;       // dictates if the object is visible
     protected BufferedImage sprite;  // the image to be drawn each frame.
@@ -32,8 +32,10 @@ public abstract class GameObject extends Rectangle {
     ) {
         // Setup rectangle props
         super(x, y, width, height);
+
         // Stripe each game object with an Id.
         this._id = ++GameObject.nextId;
+
         // Set flags.
         this.isVisible = isVisible;
         this.previousX = x;
