@@ -109,6 +109,7 @@ public class Block extends Prop {
     public int registerHit() {
         if (--this.hitPoints == 0) {
             this.hide();
+            
             return this.points;
         }
 

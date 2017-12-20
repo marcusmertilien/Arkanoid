@@ -20,12 +20,14 @@ public class Explode extends GameObject {
     
     public Type type;
     public enum Type{
-        SHIP,Enemy
+        SHIP,ENEMY
     }
 
     private static int EXPLOSION_SIZE = 30;
-    private static int COOL_DOWN_MAX = 16;
-    private int animationTimer = COOL_DOWN_MAX;
+    private static int COOL_DOWN_MAX_E = 24;
+    private static int COOL_DOWN_MAX_S=8;
+    private int animationTimerE = COOL_DOWN_MAX_E;
+    private int animationTimerS = COOL_DOWN_MAX_S;
 
     private static ArrayList<BufferedImage> ship;
     private static ArrayList<BufferedImage> enemy;
@@ -52,15 +54,15 @@ public class Explode extends GameObject {
                 ship.add(temp);
             }
             
-            for (int i=1; i<=3; i++){
-                filePath = GameEngine.SHIP_PATH + i + ".png";
+            for (int i=1; i<=12; i++){
+                filePath = GameEngine.ENEMIES_ASSET_PATH+"explosion" + i + ".png";
                 asset = ImageIO.read(cl.getResource(filePath));
                 tempScaledImage = asset.getScaledInstance(EXPLOSION_SIZE,-1,Image.SCALE_SMOOTH);
                 temp = new BufferedImage(EXPLOSION_SIZE, EXPLOSION_SIZE, BufferedImage.TYPE_INT_ARGB);
                 g2d = temp.createGraphics();
                 g2d.drawImage(tempScaledImage, 0, 0, null);
                 g2d.dispose();
-                ship.add(temp);
+                enemy.add(temp);
             }
 
         } catch (IOException ex) {
@@ -70,7 +72,8 @@ public class Explode extends GameObject {
 
     public Explode(int x, int y, Type explosionType) {
         super(x, y, EXPLOSION_SIZE, EXPLOSION_SIZE, true);
-        sprite = ship.get(0);
+        this.type = explosionType;
+        this.sprite = (this.type == Type.SHIP) ? ship.get(0) : enemy.get(0);
     }
 
     @Override
@@ -79,10 +82,26 @@ public class Explode extends GameObject {
     }
 
     void update() {
-        if (animationTimer == 0) {
-            this.isVisible = false;
-        } else {
-            this.sprite = ship.get(--animationTimer/2);
+        switch(type){
+            case ENEMY:
+            {
+                if (animationTimerE == 0) {
+                    this.isVisible = false;
+                } else {
+                    this.sprite = enemy.get(--animationTimerE/2);
+                }
+            }
+            case SHIP:
+            {
+                if (animationTimerS == 0) {
+                    this.isVisible = false;
+                } else {
+                    this.sprite = enemy.get(--animationTimerS/2);
+                }
+            }  
         }
     }
 }
+
+//For adding an explosion to an object in gameEngine
+//explosions.add(new Explode(this.testBall.x,this.testBall.y,Explode.Type.ENEMY));

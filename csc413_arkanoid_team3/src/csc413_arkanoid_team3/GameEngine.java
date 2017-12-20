@@ -48,9 +48,12 @@ public class GameEngine extends JPanel implements Runnable {
     // Players
     private HashMap<Integer, Controls> p1Keys;
     private HashMap<Integer, Controls> p2Keys;
+    
+    private ArrayList<Explode> explosions;
 
     // Assets
     public static String ASSET_PATH = "resources/";
+    public static String ENEMIES_ASSET_PATH = ASSET_PATH + "enemies/";
     public static String SHIP_PATH = ASSET_PATH + "ship/";
     public static String STAGE_BG_PATH = ASSET_PATH + "stage-background/";
     public static String SOUND_ASSET_PATH = ASSET_PATH + "sounds/";
@@ -125,6 +128,7 @@ public class GameEngine extends JPanel implements Runnable {
         this.setOpaque(false);
         this.addKeyListener(inputHandler); // attach input handler to panel
 
+        
         // Setup player keys.
         _setupControls();
 
@@ -154,6 +158,9 @@ public class GameEngine extends JPanel implements Runnable {
     }
 
     private void _setupGameData() {
+        explosions = new ArrayList<Explode>();
+        
+        
         // TODO: we'll likely need to so _something_ here.
         this.testShip = new Player(200, 420, p1Keys);
         this.testStage = new Stage(Stage.Rounds.ROUND_1);
@@ -202,6 +209,7 @@ public class GameEngine extends JPanel implements Runnable {
                     break;
                 case TESTING_DRAWING:
                     // Test area
+                    updateData();
                     this.testShip.update();
                     this.testBall.update();
                     for (PowerUp _p : powerups) { _p.update(); }
@@ -252,6 +260,7 @@ public class GameEngine extends JPanel implements Runnable {
     // =================
     private void updateData() {
         // Update application data.
+        for (Explode _e : explosions){ _e.update(); }
     }
 
     private void checkCollisions() {
@@ -287,6 +296,7 @@ public class GameEngine extends JPanel implements Runnable {
 
                 if (_i.y == _b.y) {
                     this.testBall.ySpeed = -this.testBall.ySpeed;
+                    
                 }
 
                 if (_i.y == this.testBall.y) {
@@ -311,6 +321,7 @@ public class GameEngine extends JPanel implements Runnable {
     private void cleanupObjects() {
         // Object cleanup.
         this.testStage.blocks.removeIf(_b -> _b.isHidden());
+        explosions.removeIf(e -> e.isHidden());
     }
 
 
@@ -356,6 +367,10 @@ public class GameEngine extends JPanel implements Runnable {
                 }
                 this.testShip.draw(g2d);
                 drawUIPanel(g2d);
+                
+                g2d = (Graphics2D) gameAreaBuffer.getGraphics();
+                drawFXObjects(g2d);
+                g2d.dispose();
 
                 // Draw window.
                 g.drawImage(gameAreaBuffer, 0, 0, this);
@@ -390,6 +405,10 @@ public class GameEngine extends JPanel implements Runnable {
 
     private void _drawGameObjects(Graphics2D g2d) {
         // Draw the stage's objects.
+    }
+    
+    private void drawFXObjects(Graphics2D g2d) {
+        for (Explode _e : explosions) _e.draw(g2d);
     }
     
     private void drawSplash(Graphics2D g){
