@@ -159,7 +159,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
 
         // TODO: we'll likely need to so _something_ here.
         player = new Player(200, 420, p1Keys);
-        currentStage = new Stage(Stage.Rounds.ROUND_1);
+        //currentStage = new Stage(Stage.Rounds.ROUND_1);
         ball = new Ball(205, 400);
         ball.xSpeed = 3;
         ball.ySpeed = -3;

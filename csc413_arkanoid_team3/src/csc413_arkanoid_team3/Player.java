@@ -63,7 +63,7 @@ public class Player extends Ship implements Observer {
     
     private void _primeCanons(){
         shotCooldown = FIRING_SPEED; // Shot cooldown
-        fire = true;
+        fire = false;
     }
     private void _primeEngines(){
         slowDownTimer = 0;

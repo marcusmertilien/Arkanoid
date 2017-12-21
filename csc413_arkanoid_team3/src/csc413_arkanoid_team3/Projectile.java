@@ -8,8 +8,8 @@ import javax.imageio.ImageIO;
 
 public class Projectile extends Actor {
 
-    public static int PROJECTILE_SIZE = 5;
-    public static int PROJECTILE_SPEED = 5;
+    public static int PROJECTILE_SIZE = 7;
+    public static int PROJECTILE_SPEED = 6;
 
 
     // Constructors
