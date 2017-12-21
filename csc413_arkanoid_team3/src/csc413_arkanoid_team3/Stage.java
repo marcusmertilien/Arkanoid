@@ -46,7 +46,6 @@ public class Stage {
 
     // A hash map representing the block layours of the stages.
     private static final HashMap<Rounds, String[][]> stageMap = new HashMap<Rounds, String[][]>(){{
-
         put(Rounds.ROUND_1, new String[][] {
             {"+", "+", "+", "+", "+", "+", "+", "+", "+", "+", "+", "+", "+"},
             {"r", "r", "r", "r", "r", "r", "r", "r", "r", "r", "r", "r", "r"},
@@ -55,7 +54,6 @@ public class Stage {
             {"p", "p", "p", "p", "p", "p", "p", "p", "p", "p", "p", "p", "p"},
             {"g", "g", "g", "g", "g", "g", "g", "g", "g", "g", "g", "g", "g"}
         });
-
         put(Rounds.ROUND_2, new String[][] {
             {"p"},
             {"p", "c"},
