@@ -375,10 +375,12 @@ public class GameEngine extends JPanel implements Runnable, Observer {
 
                 if (_b.isHidden()) {
 
-                     // Test for power ups, create a random type on every brick break.
-                    powerUps.add(new PowerUp(
-                        _b.x, _b.y, PowerUp.Types.values()[new Random().nextInt(PowerUp.Types.values().length)]
-                    ));
+                    // Spawn a powerup 1:4 times.
+                    if ((new Random().nextInt(4)+1) % 4 == 0) {
+                        powerUps.add(new PowerUp(
+                            _b.x, _b.y, PowerUp.Types.values()[new Random().nextInt(PowerUp.Types.values().length)]
+                        ));
+                    }
 
                     // Add new explosion.
                     explosions.add(new Explode(_b.x, _b.y, Explode.Type.ENEMY));

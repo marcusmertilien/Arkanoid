@@ -4,8 +4,18 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/Users/EnSabanNur/Repos/fall-2017/secondgame-marcusmertilien/csc413_arkanoid_team3/src/csc413_arkanoid_team3/Stage.java</file>
+            <file>file:/Users/EnSabanNur/Repos/fall-2017/secondgame-marcusmertilien/csc413_arkanoid_team3/src/csc413_arkanoid_team3/Ball.java</file>
+            <file>file:/Users/EnSabanNur/Repos/fall-2017/secondgame-marcusmertilien/csc413_arkanoid_team3/src/csc413_arkanoid_team3/Enemy.java</file>
+            <file>file:/Users/EnSabanNur/Repos/fall-2017/secondgame-marcusmertilien/csc413_arkanoid_team3/src/resources/enemies/explosion9.png</file>
+            <file>file:/Users/EnSabanNur/Repos/fall-2017/secondgame-marcusmertilien/csc413_arkanoid_team3/src/csc413_arkanoid_team3/GameEngine.java</file>
+            <file>file:/Users/EnSabanNur/Repos/fall-2017/secondgame-marcusmertilien/csc413_arkanoid_team3/src/resources/enemies/explosion11.png</file>
+            <file>file:/Users/EnSabanNur/Repos/fall-2017/secondgame-marcusmertilien/csc413_arkanoid_team3/src/resources/enemies/explosion1.png</file>
             <file>file:/Users/EnSabanNur/Repos/fall-2017/secondgame-marcusmertilien/csc413_arkanoid_team3/src/csc413_arkanoid_team3/Arkanoid.java</file>
+            <file>file:/Users/EnSabanNur/Repos/fall-2017/secondgame-marcusmertilien/csc413_arkanoid_team3/src/resources/enemies/explosion8.png</file>
             <file>file:/Users/EnSabanNur/Repos/fall-2017/secondgame-marcusmertilien/csc413_arkanoid_team3/src/csc413_arkanoid_team3/AssetLoader.java</file>
+            <file>file:/Users/EnSabanNur/Repos/fall-2017/secondgame-marcusmertilien/csc413_arkanoid_team3/src/csc413_arkanoid_team3/Player.java</file>
+            <file>file:/Users/EnSabanNur/Repos/fall-2017/secondgame-marcusmertilien/csc413_arkanoid_team3/src/resources/enemies/explosion12.png</file>
+            <file>file:/Users/EnSabanNur/Repos/fall-2017/secondgame-marcusmertilien/csc413_arkanoid_team3/src/resources/enemies/explosion10.png</file>
         </group>
     </open-files>
 </project-private>
