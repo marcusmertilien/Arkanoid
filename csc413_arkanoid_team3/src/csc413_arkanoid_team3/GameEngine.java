@@ -37,6 +37,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         GAME_RUNNING,
         PAUSE_MENU,
         ROUND_CHANGE,
+        PLAYER_DIED,
         GAME_OVER,
         GAME_WON,
         EXITING
@@ -218,6 +219,8 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                 case MAIN_MENU:
                 case PAUSE_MENU:
                 case ROUND_CHANGE:
+                case PLAYER_DIED:
+                    // Defaults, no update needed.
                     break;
                 case GAME_RUNNING:
                     _updateData();
@@ -227,7 +230,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                     break;
                 case GAME_OVER:
                     _resetPlayer();
-                    _resetState();
+                    _resetStage();
                     break;
                 case GAME_WON:
                     break;
@@ -278,6 +281,15 @@ public class GameEngine extends JPanel implements Runnable, Observer {
     }
 
     private void _checkCollisions() {
+        // Check ball vs gutter.
+        if (ball.y > GAME_WINDOW_HEIGHT-32) {
+            player.decrementLives();
+            gameState = GameState.PLAYER_DIED;
+            soundManager.stopBgMusic();
+            soundManager.playGutterCollision();
+            _resetStage();
+        }
+
         // Check ship vs side walls.
         if (player.x < 16 || (player.width + player.x + 16) > GAME_WINDOW_WIDTH) {
             player.resetLocation();
@@ -293,14 +305,6 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         if (ball.y < 16) {
             ball.resetLocation();
             ball.ySpeed = -(ball.ySpeed);
-        }
-
-        // Check ball vs gutter.
-        if (ball.y > GAME_WINDOW_HEIGHT-32) {
-            ball.resetLocation();
-            ball.ySpeed = -(ball.ySpeed);
-            explosions.add(new Explode(player.x, player.y, Explode.Type.SHIP));
-            player.decrementLives();
         }
 
         // Check player vs ball.
@@ -333,18 +337,16 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         }
         
         //Check Block vs Projectile
-        for (Block _b : this.currentStage.blocks){
-            for(Projectile _p :this.projectiles){
-                if(Physics.doesCollideWith(_b, _p)){
-                    _b.hide();
-                    _p.hide();
-                    
-                    player.score += _b.registerHit();
-                    soundManager.playBallCollision(_b);
+        for (Block _b : this.currentStage.blocks) {
+        for (Projectile _p :this.projectiles) {
+            if (Physics.doesCollideWith(_b, _p)) {
+                _b.hide();
+                _p.hide();
 
-                }
+                player.score += _b.registerHit();
+                soundManager.playBallCollision(_b);
             }
-        }
+        }}
 
         // Check for ball vs block.
         for (Block _b : this.currentStage.blocks) {
@@ -470,7 +472,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                 currentStage = new Stage(currentStage.round.next());
 
                 // Reset the game objects.
-                _resetState();
+                _resetStage();
             } else {
                 gameState = GameState.GAME_WON;
             }
@@ -482,7 +484,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         currentStage = new Stage(Stage.Rounds.ROUND_1);
     }
 
-    private void _resetState() {
+    private void _resetStage() {
         // Reset ship for new round.
         player.x = DEFAULT_SHIP_X;
         player.y = DEFAULT_SHIP_Y;
@@ -530,14 +532,18 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                 _drawGameUI(g2d);
                 _drawPauseMenu(g2d);
                 break;
+            case PLAYER_DIED:
+                _drawSplashScreen(g2d, "YOU DIED!", "Press <1> To Continue", Color.RED);
+                break;
             case ROUND_CHANGE:
-                _drawSplashScreen(g2d, currentStage.round.name().replaceAll("_"," "), Color.BLUE);
+                String formattedTitle = currentStage.round.name().replaceAll("_"," ");
+                _drawSplashScreen(g2d, formattedTitle, "Press <1> To Start Round", Color.BLUE);
                 break;
             case GAME_WON:
-                _drawSplashScreen(g2d, "YOU WON!", Color.GREEN);
+                _drawSplashScreen(g2d, "YOU WON!", "Press <1> To Return to Menu", Color.GREEN);
                 break;
             case GAME_OVER:
-                _drawSplashScreen(g2d, "GAME OVER!", Color.RED);
+                _drawSplashScreen(g2d, "GAME OVER!", "Press <1> To Return to Menu", Color.RED);
                 break;
             case EXITING:
                 break;
@@ -634,7 +640,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         }
     }
 
-    private void _drawSplashScreen(Graphics2D g2d, String title, Color titleColor) {
+    private void _drawSplashScreen(Graphics2D g2d, String title, String cta, Color titleColor) {
         int commonYoffset = 400;
 
         // Draw bg.
@@ -645,7 +651,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         // Drawing messaging.
         String[] messages = new String[] {
             title,
-            "Press <1> To Return to the Menu",
+            cta,
             "Press <ESCAPE> To Quit Game"
         };
 
@@ -701,6 +707,12 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                     // If on the main menu, start the first round.
                     if (gameState == GameState.MAIN_MENU)
                         gameState = GameState.GAME_RUNNING;
+
+                    // If on the main menu, start the first round.
+                    if (gameState == GameState.PLAYER_DIED) {
+                        soundManager.playBgMusic();
+                        gameState = GameState.GAME_RUNNING;
+                    }
 
                     // If on the round change screen, start the next round.
                     if (gameState == GameState.ROUND_CHANGE)

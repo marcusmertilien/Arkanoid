@@ -13,6 +13,7 @@ public class SoundManager {
         BALL_V_BLOCK,
         BALL_V_GOLD_BLOCK,
         BALL_V_ENEMY,
+        BALL_V_GUTTER,
         POWERUP_V_SHIP,
         BG_MUSIC,
         GAME_OVER
@@ -25,6 +26,7 @@ public class SoundManager {
         SOUND_BANK.put(Type.BALL_V_GOLD_BLOCK, new AudioTrack(GameEngine.SOUND_ASSET_PATH + "arkanoid-sfx-8.wav", false));
         SOUND_BANK.put(Type.BALL_V_SHIP, new AudioTrack(GameEngine.SOUND_ASSET_PATH + "arkanoid-sfx-7.wav", false));
         SOUND_BANK.put(Type.BALL_V_ENEMY, new AudioTrack(GameEngine.SOUND_ASSET_PATH + "arkanoid-sfx-5.wav", false));
+        SOUND_BANK.put(Type.BALL_V_GUTTER, new AudioTrack(GameEngine.SOUND_ASSET_PATH + "arkanoid-sfx-10.wav", false));
         SOUND_BANK.put(Type.POWERUP_V_SHIP, new AudioTrack(GameEngine.SOUND_ASSET_PATH + "arkanoid-sfx-4.wav", false));
         SOUND_BANK.put(Type.GAME_OVER, new AudioTrack(GameEngine.SOUND_ASSET_PATH + "game-over.wav", false));
         SOUND_BANK.put(Type.BG_MUSIC, new AudioTrack(GameEngine.SOUND_ASSET_PATH + "bg-music.wav", true));
@@ -69,6 +71,10 @@ public class SoundManager {
 
     public void playPowerUpCollision() {
         SOUND_BANK.get(Type.POWERUP_V_SHIP).play();
+    }
+
+    public void playGutterCollision() {
+        SOUND_BANK.get(Type.BALL_V_GUTTER).play();
     }
 
     public void playGameOverMusic() {
