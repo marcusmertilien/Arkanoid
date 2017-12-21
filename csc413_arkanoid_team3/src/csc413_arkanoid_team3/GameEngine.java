@@ -66,25 +66,26 @@ public class GameEngine extends JPanel implements Runnable, Observer {
     public static String BALL_ASSET_PATH = ASSET_PATH + "ball/";
     public static String POWERUPS_ASSET_PATH = ASSET_PATH + "power-ups/";
 
+
     // Default positions
     private static final int DEFAULT_SHIP_X = 200;
     private static final int DEFAULT_SHIP_Y = 450;
     private static final int DEFAULT_BALL_X = 205;
     private static final int DEFAULT_BALL_Y = 400;
 
-    // Test data
+    // Game data.
     private Player player;
     private Stage currentStage;
     private Ball ball;
+    private PowerUp activePowerUp;
+    private int enemySpawnTimer;
 
     private ArrayList<PowerUp> powerUps;
     private ArrayList<Enemy> enemies;
-    private PowerUp activePowerUp;
     private ArrayList<Explode> explosions;
     private ArrayList<Projectile> projectiles;
 
     // Load static assets
-    // TODO: move this somewhere else.
     private static BufferedImage logoImage;
     private static BufferedImage splashLogo;
 
@@ -153,6 +154,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         gameControls.put(KeyEvent.VK_ESCAPE, GameActions.EXIT);
         gameControls.put(KeyEvent.VK_1, GameActions.START);
         gameControls.put(KeyEvent.VK_M, GameActions.MUSIC_STOP);
+        gameControls.put(KeyEvent.VK_2, GameActions.SKIP_LEVEL);
     }
 
     private void _setupGameData() {
@@ -218,6 +220,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                     break;
                 case GAME_RUNNING:
                     _updateData();
+                    _updateEnemies();
                     _checkCollisions();
                     _cleanupObjects();
                     _checkState();
@@ -264,19 +267,47 @@ public class GameEngine extends JPanel implements Runnable, Observer {
     }
 
     private void _updateData() {
-
         player.update(projectiles);
         ball.update();
-        
+
         for (Explode _e : explosions) _e.update();
         for (PowerUp _p : powerUps) _p.update();
         for (Enemy _e: enemies) _e.update();
         for (Projectile _p : projectiles) _p.update();
     }
+    
+    private void _updateEnemies() {
+        Random r = new Random(enemySpawnTimer);
+        int x = r.nextInt((GAME_WINDOW_WIDTH -50) - 20) + 20;
+        int type = ((r.nextInt(2)) +1);
+
+        if (enemySpawnTimer % 730 == 0) {
+            switch (enemySpawnTimer % 3) {
+                case 0:
+                    enemies.add(new Enemy(x, 0, Enemy.Types.BLUE));
+                    break;
+                case 1:
+                    enemies.add(new Enemy(x, 0, Enemy.Types.GREEN));
+                    break;
+                case 2:
+                    enemies.add(new Enemy(x, 0, Enemy.Types.RED));
+                    break;
+            }
+        }
+
+        enemySpawnTimer++;
+    }
 
     private void _checkCollisions() {
         // Check ball vs gutter.
         if (ball.y > GAME_WINDOW_HEIGHT-32) {
+            explosions.add(
+                new Explode(
+                    player.x + (int) player.getWidth()/4,
+                    player.y,
+                    Explode.Type.SHIP
+                )
+            );
             player.decrementLives();
             gameState = GameState.PLAYER_DIED;
             soundManager.stopBgMusic();
@@ -301,6 +332,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
             ball.ySpeed = -(ball.ySpeed);
         }
 
+
         // Check player vs ball.
         if (Physics.doesCollideWith(ball, player)) {
             // Calculate new ball speed based on contact point with player.
@@ -311,6 +343,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
             // Reset location.
             ball.resetLocation();
             ball.incrementBounce();
+
 
             // Use new ball speed.
             ball.ySpeed = -ball.ySpeed;
@@ -391,17 +424,32 @@ public class GameEngine extends JPanel implements Runnable, Observer {
             }
         }
         
-        //Enemy vs. Ball
+
+        
         for (Enemy _e : enemies) {
-            if (Physics.doesCollideWith(_e, ball)) {
+            // Enemy vs. Lazer
+            for(Projectile _p :this.projectiles){
+                if (Physics.doesCollideWith(_e, _p)) {
+                    _e.registerHit();
+                    _p.hide();
+
+                    this.soundManager.playBallCollision(_e);
+                }
+            }
+
+            // Enemy vs. Ball
+            if (Physics.doesCollideWith(_e, ball) && !_e.isDestroyed()) {
                 ball.resetLocation();
+
 
                 // Calculate new x,y speeds based on contact with block
                 if (ball.y <= _e.y) {
                     // Contact top.
                     ball.ySpeed = -Math.abs(ball.ySpeed);
                 }
+
                 else if (ball.y >= _e.y + _e.height) {
+
                     // Contact bottom.
                     ball.ySpeed = Math.abs(ball.ySpeed);
                 }
@@ -409,7 +457,9 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                     // Contact left.
                     ball.xSpeed = -Math.abs(ball.xSpeed);
                 }
+
                 else if (ball.x >= _e.x + _e.width) {
+
                     // Contact right.
                     ball.xSpeed = Math.abs(ball.ySpeed);
                 }
@@ -422,7 +472,15 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                 // Only register one collision per update cycle.
                 break;
             }
+            //Enemy vs Ship
+            if (Physics.doesCollideWith(_e, player) && !_e.isDestroyed()) {
+                _e.registerHit();
+                explosions.add(new Explode((player.x+((int)player.getWidth()/4)),player.y,Explode.Type.SHIP));
+            }
+            
         }
+        
+        
 
         for (PowerUp _p: powerUps) {
             // Check powerup vs lower bound.
@@ -735,6 +793,13 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                 // Exit game on escape press.
                 if (buttonPressed == GameActions.EXIT) {
                     gameState = GameState.EXITING;
+                }
+
+                // Skip level for testing.
+                if (buttonPressed == GameActions.SKIP_LEVEL) {
+                    gameState = GameState.ROUND_CHANGE;
+                    currentStage = new Stage(currentStage.round.next());
+                    _resetStage();
                 }
             }
 

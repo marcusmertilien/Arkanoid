@@ -32,8 +32,10 @@ public abstract class GameObject extends Rectangle {
     ) {
         // Setup rectangle props
         super(x, y, width, height);
+
         // Stripe each game object with an Id.
         this._id = ++GameObject.nextId;
+
         // Set flags.
         this.isVisible = isVisible;
         this.previousX = x;

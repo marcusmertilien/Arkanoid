@@ -83,6 +83,9 @@ public class Enemy extends Prop {
             spriteAnimationX += ENEMY_WIDTH;
             this.sprite = this.assetRow.getSubimage(spriteAnimationX, 0, ENEMY_WIDTH, ENEMY_HEIGHT);
         }
+
+        // Move down screen
+        this.y++;
     }
 
     public void _updateDead() {
@@ -103,5 +106,9 @@ public class Enemy extends Prop {
         isDestroyed = true;
         animationTimer = 6*8;
         spriteAnimationX = 12*ENEMY_WIDTH;
+    }
+
+    public Boolean isDestroyed() {
+        return isDestroyed;
     }
 }
