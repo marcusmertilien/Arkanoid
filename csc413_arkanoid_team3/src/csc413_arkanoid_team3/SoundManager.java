@@ -17,6 +17,7 @@ public class SoundManager {
         POWERUP_V_SHIP,
         PROJECTILE_V_BLOCK,
         MENU_MUSIC,
+        MENU_SELECT,
         BG_MUSIC,
         GAME_OVER
     }
@@ -33,6 +34,7 @@ public class SoundManager {
         SOUND_BANK.put(Type.PROJECTILE_V_BLOCK, new AudioTrack(GameEngine.SOUND_ASSET_PATH + "arkanoid-sfx-1.wav", false));
         SOUND_BANK.put(Type.GAME_OVER, new AudioTrack(GameEngine.SOUND_ASSET_PATH + "arkanoid-game-over.wav", false));
         SOUND_BANK.put(Type.MENU_MUSIC, new AudioTrack(GameEngine.SOUND_ASSET_PATH + "arkanoid-menu.wav", true));
+        SOUND_BANK.put(Type.MENU_SELECT, new AudioTrack(GameEngine.SOUND_ASSET_PATH + "arkanoid-sfx-9.wav", false));
         SOUND_BANK.put(Type.BG_MUSIC, new AudioTrack(GameEngine.SOUND_ASSET_PATH + "arkanoid-bg.wav", true));
     }
 
@@ -84,6 +86,14 @@ public class SoundManager {
     public void playMenuMusic() {
         SOUND_BANK.get(Type.BG_MUSIC).stop();
         SOUND_BANK.get(Type.MENU_MUSIC).play();
+    }
+
+    public void stopMenuMusic() {
+        SOUND_BANK.get(Type.MENU_MUSIC).stop();
+    }
+
+    public void playMenuSelect() {
+        SOUND_BANK.get(Type.MENU_SELECT).play();
     }
 
     public void playBgMusic() {

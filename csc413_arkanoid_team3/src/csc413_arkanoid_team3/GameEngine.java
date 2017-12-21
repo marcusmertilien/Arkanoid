@@ -311,7 +311,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
             // Calculate new ball speed based on contact point with player.
             int ballCenter = (ball.x - player.x) + (ball.width/2);
             int shipCenter = (player.width/2);
-            int newXspeed = (ballCenter - shipCenter);
+            int newXspeed = (ballCenter - shipCenter)/7;
 
             // Reset location.
             ball.resetLocation();
@@ -319,7 +319,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
 
             // Use new ball speed.
             ball.ySpeed = -ball.ySpeed;
-            ball.xSpeed = newXspeed/8;
+            ball.xSpeed = newXspeed;
 
             // Allow paddle movement to contribute to reflected speed.
             ball.xSpeed += player.xSpeed/2;
@@ -705,6 +705,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                 if (buttonPressed == GameActions.START) {
                     // If on the main menu, start the first round.
                     if (gameState == GameState.MAIN_MENU) {
+                        soundManager.playMenuSelect();
                         soundManager.playBgMusic();
                         gameState = GameState.GAME_RUNNING;
                     }
