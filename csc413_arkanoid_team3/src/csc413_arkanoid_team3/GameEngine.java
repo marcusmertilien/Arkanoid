@@ -186,10 +186,6 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         enemies = new ArrayList<Enemy>();
         explosions = new ArrayList<Explode>();
         projectiles = new ArrayList<Projectile>();
-
-        // enemies.add(new Enemy(220, 300, Enemy.Types.GREEN));
-        // enemies.add(new Enemy(120, 300, Enemy.Types.BLUE));
-        // enemies.add(new Enemy(320, 300, Enemy.Types.RED));
     }
 
     private void _setupGameAudio() {
@@ -343,7 +339,6 @@ public class GameEngine extends JPanel implements Runnable, Observer {
             ball.resetLocation();
             ball.incrementBounce();
 
-
             // Use new ball speed.
             ball.ySpeed = -ball.ySpeed;
             ball.xSpeed = newXspeed;
@@ -409,8 +404,29 @@ public class GameEngine extends JPanel implements Runnable, Observer {
 
                     // Spawn a powerup 1:4 times.
                     if ((new Random().nextInt(4)+1) % 4 == 0) {
+
+                        PowerUp.Types pType;
+
+                        switch (new Random().nextInt(4)) {
+                            case 0:
+                                pType = PowerUp.Types.LAZER;
+                                break;
+                            case 1:
+                                pType = PowerUp.Types.SLOW;
+                                break;
+                            case 2:
+                                pType = PowerUp.Types.SPEED_UP;
+                                break;
+                            case 3:
+                                pType = PowerUp.Types.PLAYER;
+                                break;
+                            default:
+                                pType = PowerUp.Types.PLAYER;
+                                break;
+                        }
+    
                         powerUps.add(new PowerUp(
-                            _b.x, _b.y, PowerUp.Types.values()[new Random().nextInt(PowerUp.Types.values().length)]
+                            _b.x, _b.y, pType
                         ));
                     }
 

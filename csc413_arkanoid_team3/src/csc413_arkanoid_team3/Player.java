@@ -32,11 +32,8 @@ public class Player extends Ship implements Observer {
     public int score;
 
     // PowerUp Attributes
-    private boolean fire;
+    private boolean lazerActive;
     private int shotCooldown;
-    private boolean slowDown;
-    private int slowDownTimer;
-
 
     // Constructors
     // ============
@@ -46,9 +43,9 @@ public class Player extends Ship implements Observer {
 
         this.lives = DEFAULT_LIVES;
         this.score = DEFAULT_SCORE;
+        this.shotCooldown = FIRING_SPEED;
 
         _initControls(controls);
-        _primeCanons();
     }
 
     private void _initControls(HashMap<Integer, Controls> controls) {
@@ -60,16 +57,6 @@ public class Player extends Ship implements Observer {
             buttonStates.put(c, false);
         }
     }
-    
-    private void _primeCanons(){
-        shotCooldown = FIRING_SPEED; // Shot cooldown
-        fire = false;
-    }
-    private void _primeEngines(){
-        slowDownTimer = 0;
-        slowDown = false;
-    }
-
 
     // Public API
     // ==========
@@ -77,7 +64,6 @@ public class Player extends Ship implements Observer {
     public void update(ArrayList<Projectile> shots) {
         _updatePosition();
         _updateShoot(shots);
-        _updateSlowDown();
     }
 
     private void _updatePosition() {
@@ -94,18 +80,13 @@ public class Player extends Ship implements Observer {
         x += xSpeed;
     }
     
-    private void _updateShoot(ArrayList<Projectile> shots){
-        if(fire){
+    private void _updateShoot(ArrayList<Projectile> shots) {
+        if (lazerActive) {
             if (shotCooldown <= 0 && buttonStates.get(Controls.SHOOT)) {
 
-                int projX;
-                int projY;
-                int projXSpeed;
-                int projYSpeed;
                 int projSize = Projectile.PROJECTILE_SIZE;
-
-                projX = x + (this.width-projSize)/2;
-                projY = this.y;
+                int projX = x + (this.width-projSize)/2;
+                int projY = this.y;
 
                 // Add new shot.
                 shots.add(new Projectile(projX, projY, xSpeed, ySpeed));
@@ -114,17 +95,8 @@ public class Player extends Ship implements Observer {
                 shotCooldown = FIRING_SPEED;
             }
         }
+
         shotCooldown--;
-    }
-    
-    private void _updateSlowDown(){
-        if(slowDown) {
-            slowDownTimer--;
-            if(slowDownTimer == 0) {
-                slowDown = false;
-                speed = super.getSpeed();
-            }
-        }
     }
 
     @Override
@@ -156,35 +128,21 @@ public class Player extends Ship implements Observer {
         
     }
     
-    public void powerUp(PowerUp p){
-        switch(p.type){
+    public void powerUp(PowerUp p) {
+        switch(p.type) {
             case LAZER:
-                this.fire = true;
-                break;
-            case EXTEND:
+                lazerActive = true;
                 break;
             case SLOW:
-                if (this.speed > 1) {
-                    this.speed = this.speed/2;
-                    slowDown = true;
-                    slowDownTimer = 280;
-                }
-
+                lazerActive = false;
+                if (speed > 2) speed--;
                 break;
-            case CATCH:
-                break;
-            case DISRUPT:
-                this.fire = false;
-                this.speed = super.getSpeed();
-                break;
-            case TWIN:
-                break;
-            case NEWDISRUPT:
+            case SPEED_UP:
+                lazerActive = false;
+                if (speed > 6) this.speed++;
                 break;
             case PLAYER:
                 lives++;
-                break;
-            case REDUCE:
                 break;
         }
     }

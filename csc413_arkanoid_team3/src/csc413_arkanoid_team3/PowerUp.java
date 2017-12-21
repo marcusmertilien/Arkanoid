@@ -12,7 +12,7 @@ public class PowerUp extends Prop {
     // ===============
 
     public enum Types {
-        LAZER, EXTEND, SLOW, CATCH, BREAK, DISRUPT, TWIN, NEWDISRUPT, PLAYER, REDUCE
+        LAZER, EXTEND, SLOW, CATCH, BREAK, SPEED_UP, TWIN, NEWDISRUPT, PLAYER, REDUCE
     }
 
     private static final int POWERUP_SPRITE_WIDTH = 16;                // width of power up

@@ -18,7 +18,7 @@ public class Ship extends Actor {
     private static final int BASE_SHIP_HEIGHT = 8;
     private static int SHIP_WIDTH = 2*BASE_SHIP_WIDTH;
     private static int SHIP_HEIGHT = 2*BASE_SHIP_HEIGHT;
-    private static final int SPEED = 4;
+    public static final int DEFAULT_SPEED = 4;
 
     // The class' static image assets
     private static final String SPRITE_PATH = GameEngine.SHIP_PATH + "ship-sprite-map.png";
@@ -35,13 +35,8 @@ public class Ship extends Actor {
     // ============
 
     public Ship(int x, int y) {
-        super(x, y, SHIP_WIDTH, SHIP_HEIGHT, 0, 0, SPEED);
+        super(x, y, SHIP_WIDTH, SHIP_HEIGHT, 0, 0, DEFAULT_SPEED);
         sprite = this.SHIP_ASSET;
     }
-    
-    public int getSpeed(){
-        return SPEED;
-    }
-    
-    
+
 }
