@@ -243,7 +243,6 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                 case PAUSE_MENU:
                     break;
                 case ROUND_CHANGE:
-                    System.out.println("update round change");
                     break;
                 case GAME_OVER:
                     // isRunning = false;
@@ -291,7 +290,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         for (Explode _e : explosions) _e.update();
         for (PowerUp _p : testPowerUps) _p.update();
         for (Enemy _e: testEnemies) _e.update();
-        for (Projectile _p : projectiles) _p.update();       
+        for (Projectile _p : projectiles) _p.update();
     }
 
     private void _checkCollisions() {
@@ -647,6 +646,26 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         y = getHeight() /2 + stringHeight/2;
 
         g.drawString(msg2, x, y);
+    }
+
+    private void _drawGameWinScreen(Graphics2D g){
+        String msg = "You won!";
+        g.setColor(Color.BLACK);
+        g.fillRect(0,0, MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT);
+        
+        // Set font for rendering stats.
+        g.setColor(Color.GREEN);
+        g.setFont(new Font("Courier", Font.BOLD, 36));
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        
+        FontMetrics fm = g.getFontMetrics();
+        int stringWidth = fm.stringWidth(msg);
+        int stringHeight = fm.getAscent();
+
+        int x = getWidth() /2 - stringWidth/2;
+        int y = getHeight() /2 + stringHeight/2;
+
+        g.drawString(msg,x,y);
     }
      
     private void _drawGameOverScreen(Graphics2D g){
