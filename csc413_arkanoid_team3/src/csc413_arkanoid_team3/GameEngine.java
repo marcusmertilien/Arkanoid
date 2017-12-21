@@ -277,7 +277,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         int x = r.nextInt((GAME_WINDOW_WIDTH -50) - 20) + 20;
         int type = ((r.nextInt(2)) +1);
 
-        if (enemySpawnTimer % 730 == 0) {
+        if (enemySpawnTimer % 350 == 0) {
             switch (enemySpawnTimer % 3) {
                 case 0:
                     enemies.add(new Enemy(x, 0, Enemy.Types.BLUE));
@@ -403,7 +403,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                 if (_b.isHidden()) {
 
                     // Spawn a powerup 1:4 times.
-                    if ((new Random().nextInt(4)+1) % 4 == 0) {
+                    if (new Random().nextInt(3) == 0) {
 
                         PowerUp.Types pType;
 
@@ -438,10 +438,9 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                 break;
             }
         }
-        
 
-        
         for (Enemy _e : enemies) {
+
             // Enemy vs. Lazer
             for(Projectile _p :this.projectiles){
                 if (Physics.doesCollideWith(_e, _p)) {
@@ -494,8 +493,6 @@ public class GameEngine extends JPanel implements Runnable, Observer {
             }
             
         }
-        
-        
 
         for (PowerUp _p: powerUps) {
             // Check powerup vs lower bound.

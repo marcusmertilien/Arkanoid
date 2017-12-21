@@ -18,8 +18,8 @@ public class Ball extends Actor {
     private static final int BALL_SPRITE_HEIGHT = 4;             // sprite asset height
     private static final int BALL_WIDTH = 2*BALL_SPRITE_WIDTH;   // visible ball width
     private static final int BALL_HEIGHT = 2*BALL_SPRITE_HEIGHT; // visible ball height
-    private static final int BOUNCES_PER_SPEEDUP = 5;            // speed up marker
-    public static final int BALL_SPEED = 3;                      // default ball speed
+    private static final int BOUNCES_PER_SPEEDUP = 8;            // speed up marker
+    public static final int BALL_SPEED = 2;                      // default ball speed
     public static final int BALL_MAX_SPEED = 5;                  // the max ball speed
 
 
