@@ -49,9 +49,8 @@ public class GameEngine extends JPanel implements Runnable, Observer {
     private InputHandler inputHandler;
     private SoundManager soundManager;
 
-    // Players
+    // Player controls.
     private HashMap<Integer, Controls> p1Keys;
-    private HashMap<Integer, Controls> p2Keys;
 
     // Game interface controls.
     private HashMap<Integer, GameActions> gameControls;
@@ -73,11 +72,10 @@ public class GameEngine extends JPanel implements Runnable, Observer {
     private static final int DEFAULT_BALL_Y = 400;
 
     // Test data
-    private Player ship;
+    private Player player;
     private Stage currentStage;
     private Ball ball;
-    private int testScore;
-    
+
     private ArrayList<PowerUp> powerUps;
     private ArrayList<Enemy> enemies;
     private PowerUp activePowerUp;
@@ -154,12 +152,6 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         p1Keys.put(KeyEvent.VK_SPACE, Controls.SHOOT);
         p1Keys.put(KeyEvent.VK_BACK_SPACE, Controls.START);
 
-        // Setup player 2 key mapping (Do we still need 2 player?)
-        p2Keys = new HashMap<Integer, Controls>();
-        p2Keys.put(KeyEvent.VK_F, Controls.LEFT);
-        p2Keys.put(KeyEvent.VK_H, Controls.RIGHT);
-        p2Keys.put(KeyEvent.VK_ENTER, Controls.SHOOT);
-
         // Setup game action controls.
         gameControls = new HashMap<Integer, GameActions>();
         gameControls.put(KeyEvent.VK_P, GameActions.PAUSE);
@@ -171,7 +163,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
     private void _setupGameData() {
 
         // TODO: we'll likely need to so _something_ here.
-        this.ship = new Player(200, 420, p1Keys);
+        this.player = new Player(200, 420, p1Keys);
         this.currentStage = new Stage(Stage.Rounds.ROUND_1);
         this.ball = new Ball(205, 400);
         this.ball.xSpeed = 3;
@@ -181,8 +173,8 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         eventManager.addObserver(this);
 
         // Ship
-        ship = new Player(DEFAULT_SHIP_X, DEFAULT_SHIP_Y, p1Keys);
-        eventManager.addObserver(ship);
+        player = new Player(DEFAULT_SHIP_X, DEFAULT_SHIP_Y, p1Keys);
+        eventManager.addObserver(player);
 
         // Stage
         currentStage = new Stage(Stage.Rounds.ROUND_1);
@@ -192,10 +184,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         ball.xSpeed = Ball.BALL_SPEED;
         ball.ySpeed = -Ball.BALL_SPEED;
 
-        // Score and lives
-        testScore = 0;
-        //testLives = 3;
-
+        // Data collections.
         powerUps = new ArrayList<PowerUp>();
         enemies = new ArrayList<Enemy>();
         explosions = new ArrayList<Explode>();
@@ -229,14 +218,18 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                 case MAIN_MENU:
                 case PAUSE_MENU:
                 case ROUND_CHANGE:
-                case GAME_OVER:
-                case GAME_WON:
                     break;
                 case GAME_RUNNING:
                     _updateData();
                     _checkCollisions();
                     _cleanupObjects();
                     _checkState();
+                    break;
+                case GAME_OVER:
+                    _resetPlayer();
+                    _resetState();
+                    break;
+                case GAME_WON:
                     break;
                 case EXITING:
                     System.exit(0);
@@ -274,8 +267,8 @@ public class GameEngine extends JPanel implements Runnable, Observer {
     }
 
     private void _updateData() {
-        
-        ship.update(projectiles);
+
+        player.update(projectiles);
         ball.update();
         
         for (Explode _e : explosions) _e.update();
@@ -286,8 +279,8 @@ public class GameEngine extends JPanel implements Runnable, Observer {
 
     private void _checkCollisions() {
         // Check ship vs side walls.
-        if (ship.x < 16 || (ship.width + ship.x + 16) > GAME_WINDOW_WIDTH) {
-            ship.resetLocation();
+        if (player.x < 16 || (player.width + player.x + 16) > GAME_WINDOW_WIDTH) {
+            player.resetLocation();
         }
 
         // Check ball vs side walls.
@@ -306,18 +299,17 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         if (ball.y > GAME_WINDOW_HEIGHT-32) {
             ball.resetLocation();
             ball.ySpeed = -(ball.ySpeed);
-            explosions.add(new Explode(ship.x,ship.y,Explode.Type.SHIP));
-            //Take a life away
-            ship.setLives(ship.getLives()-1);
+            explosions.add(new Explode(player.x, player.y, Explode.Type.SHIP));
+            player.decrementLives();
         }
 
 
 
-        // Check ship vs ball.
-        if (Physics.doesCollideWith(ball, ship)) {
-            // Claculate new ball speed based on contact point with padd
-            int ballCenter = (ball.x - ship.x) + (ball.width/2);
-            int shipCenter = (ship.width/2);
+        // Check player vs ball.
+        if (Physics.doesCollideWith(ball, player)) {
+            // Calculate new ball speed based on contact point with player.
+            int ballCenter = (ball.x - player.x) + (ball.width/2);
+            int shipCenter = (player.width/2);
             int newXspeed = (ballCenter - shipCenter);
 
 
@@ -329,10 +321,10 @@ public class GameEngine extends JPanel implements Runnable, Observer {
             ball.xSpeed = newXspeed/8;
 
             // Allow paddle movement to contribute to reflected speed.
-            ball.xSpeed += ship.xSpeed/2;
+            ball.xSpeed += player.xSpeed/2;
 
             // Trigger SFX.
-            soundManager.playBallCollision(ship);
+            soundManager.playBallCollision(player);
 
             if (DebugState.showPaddleActive) {
                 System.out.printf(
@@ -349,8 +341,8 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                     _b.hide();
                     _p.hide();
                     
-                    this.testScore += _b.registerHit();
-                    this.soundManager.playBallCollision(_b);
+                    player.score += _b.registerHit();
+                    soundManager.playBallCollision(_b);
 
                 }
             }
@@ -382,7 +374,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                 }
 
                 // Update user score.
-                testScore += _b.registerHit();
+                player.score += _b.registerHit();
 
                 // Play SFX.
                 soundManager.playBallCollision(_b);
@@ -441,10 +433,10 @@ public class GameEngine extends JPanel implements Runnable, Observer {
             if (_p.y > GAME_WINDOW_HEIGHT-42)
                 _p.hide();
 
-            // Check powerup vs ship.
-            if (Physics.doesCollideWith(_p, ship)) {
+            // Check powerup vs player.
+            if (Physics.doesCollideWith(_p, player)) {
                 _p.hide();
-                ship.powerUp(_p);
+                player.powerUp(_p);
                 activePowerUp = _p;
                 soundManager.playPowerUpCollision();
             }
@@ -461,29 +453,41 @@ public class GameEngine extends JPanel implements Runnable, Observer {
 
     private void _checkState() {
         // Transition to game over if all lives are lost
-        if (ship.getLives() == 0) {
+        if (player.getLives() == 0) {
+
+            // Move to GAME_OVER state.
             gameState = GameState.GAME_OVER;
             soundManager.stopBgMusic();
             soundManager.playGameOverMusic();
+
         } else if (currentStage.blocks.isEmpty()) {
-            // Update to the new stage.
+
             Stage.Rounds nextStage = currentStage.round.next();
 
             if (nextStage != null) {
+                // Move to ROUND_CHANGE state.
                 gameState = GameState.ROUND_CHANGE;
+
+                // Create the next stage.
                 currentStage = new Stage(currentStage.round.next());
+
                 // Reset the game objects.
-                __resetState(currentStage.round.next());
+                _resetState();
             } else {
                 gameState = GameState.GAME_WON;
             }
         }
     }
 
-    private void __resetState(Stage.Rounds round) {
+    private void _resetPlayer() {
+        player.reset();
+        currentStage = new Stage(Stage.Rounds.ROUND_1);
+    }
+
+    private void _resetState() {
         // Reset ship for new round.
-        ship.x = DEFAULT_SHIP_X;
-        ship.y = DEFAULT_SHIP_Y;
+        player.x = DEFAULT_SHIP_X;
+        player.y = DEFAULT_SHIP_Y;
 
         // Rest ball's position and speed.
         ball.x = DEFAULT_BALL_X;
@@ -550,7 +554,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
     private void _drawGameWorld(Graphics2D g2d) {
         currentStage.draw(g2d);
         ball.draw(g2d);
-        ship.draw(g2d);
+        player.draw(g2d);
         for (Enemy _e: enemies) _e.draw(g2d);
         for (PowerUp _p : powerUps) _p.draw(g2d);
         for (Explode _e : explosions) _e.draw(g2d);
@@ -567,13 +571,13 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         g2d.setColor(Color.RED);
         g2d.setFont(new Font("Courier", Font.BOLD, 15));
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2d.drawString("1UP x" + ship.getLives(), commonXoffset, 75);
+        g2d.drawString("1UP x" + player.getLives(), commonXoffset, 75);
 
         // Draw Score.
         g2d.setColor(Color.WHITE);
         g2d.setFont(new Font("Courier", Font.BOLD, 15));
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2d.drawString("" + this.testScore, commonXoffset, 90);
+        g2d.drawString("" + player.score, commonXoffset, 90);
 
         // Draw power up type if active.
         if (activePowerUp != null) {
@@ -631,7 +635,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
 
         // Drawing messaging.
         String[] messages = new String[] {
-            currentStage.round.name(),
+            currentStage.round.name().replaceAll("_"," "),
             "Press <1> To Start",
             "Press <ESCAPE> To Quit Game"
         };
@@ -653,7 +657,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         }
     }
 
-    private void _drawGameWinScreen(Graphics2D g){
+    private void _drawGameWinScreen(Graphics2D g) {
         String msg = "YOU WON!";
         g.setColor(Color.BLACK);
         g.fillRect(0,0, MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT);
@@ -673,24 +677,39 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         g.drawString(msg,x,y);
     }
      
-    private void _drawGameOverScreen(Graphics2D g){
-        String msg = "GAME OVER!";
+    private void _drawGameOverScreen(Graphics2D g) {
+        // Draw bg.
         g.setColor(Color.BLACK);
         g.fillRect(0,0, MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT);
-        
-        // Set font for rendering stats.
+
+        // Drawing messaging.
+        String[] messages = new String[] {
+            "GAME OVER!",
+            "Press <1> To Return to the Menu",
+            "Press <ESCAPE> To Quit Game"
+        };
+
         g.setColor(Color.RED);
         g.setFont(new Font("Courier", Font.BOLD, 36));
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        
+
         FontMetrics fm = g.getFontMetrics();
-        int stringWidth = fm.stringWidth(msg);
-        int stringHeight = fm.getAscent();
+        int startingY = (int)(MAIN_WINDOW_HEIGHT *.7);
 
-        int x = getWidth() /2 - stringWidth/2;
-        int y = getHeight() /2 + stringHeight/2;
+        for (int i = 0; i < messages.length; i++) {
+            if (i > 0) {
+                g.setColor(Color.WHITE);
+                g.setFont(new Font("Courier", Font.BOLD, 16));
+                fm = g.getFontMetrics();
+            }
 
-        g.drawString(msg,x,y);
+            String _message = messages[i];
+            int width = fm.stringWidth(_message);
+            int x = (MAIN_WINDOW_WIDTH/2) - (width/2);
+            int y = (i==0) ? 60 : (startingY + (i-1)*(20));
+
+            g.drawString(_message, x, y);
+        }
     }
 
     @Override
@@ -731,6 +750,10 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                     // If on the round change screen, start the next round.
                     if (gameState == GameState.ROUND_CHANGE)
                         gameState = GameState.GAME_RUNNING;
+
+                    // If on the round change screen, start the next round.
+                    if (gameState == GameState.GAME_OVER)
+                        gameState = GameState.MAIN_MENU;
                 }
 
                 // Toggle music on M press.
