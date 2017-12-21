@@ -56,5 +56,11 @@ public class Ball extends Actor {
         x += xSpeed;
         y += ySpeed;
     }
+    
+    
+    public void resetLocationE(){
+        x = previousX;
+        y = previousY;
+    }
 
 }

@@ -295,8 +295,8 @@ public class GameEngine extends JPanel implements Runnable, Observer {
     private void _updateEnemies(){
         Random r = new Random(SPAWN_TIMER);
         int x = r.nextInt((GAME_WINDOW_WIDTH -50) - 20)+20;
-        int type = ((r.nextInt(2)) +1);
-        if(SPAWN_TIMER %82 == 0){
+        int type = ((r.nextInt(2)) +1);//730 = 3^6 + 1
+        if(SPAWN_TIMER %10 == 0){
             switch(SPAWN_TIMER%3){
                 case 0:
                     testEnemies.add(new Enemy(x, 0, Enemy.Types.BLUE));
@@ -350,6 +350,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
 
 
             // Reset location.
+            
             testBall.resetLocation();
 
             // Use new ball speed.
@@ -430,14 +431,14 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         //Enemy vs. Ball
         for (Enemy _e : testEnemies) {
             if (Physics.doesCollideWith(_e, testBall)) {
-                testBall.resetLocation();
+                testBall.resetLocationE();
 
                 // Calculate new x,y speeds based on contact with block
                 if (testBall.y <= _e.y) {
                     // Contact top.
                     testBall.ySpeed = -Math.abs(testBall.ySpeed);
                 }
-                else if (testBall.y >= _e.y + _e.height) {
+                else if (testBall.y >= _e.y ){//+ _e.height) {
                     // Contact bottom.
                     testBall.ySpeed = Math.abs(testBall.ySpeed);
                 }
@@ -445,7 +446,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                     // Contact left.
                     testBall.xSpeed = -Math.abs(testBall.xSpeed);
                 }
-                else if (testBall.x >= _e.x + _e.width) {
+                else if (testBall.x >= _e.x ){//+ _e.width) {
                     // Contact right.
                     testBall.xSpeed = Math.abs(testBall.ySpeed);
                 }

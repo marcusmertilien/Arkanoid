@@ -36,7 +36,7 @@ public class Player extends Ship implements Observer {
 
     public Player(int x, int y, HashMap<Integer, Controls> controls) {
         super(x, y);
-        lives = 3;
+        lives = 300000;
         _initControls(controls);
         _primeCanons();
     }
