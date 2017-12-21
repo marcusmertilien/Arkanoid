@@ -280,7 +280,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
             player.decrementLives();
             gameState = GameState.PLAYER_DIED;
             soundManager.stopBgMusic();
-            soundManager.playGutterCollision();
+            soundManager.playOutOfBounds();
             _resetStage();
         }
 
@@ -338,7 +338,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                 _p.hide();
 
                 player.score += _b.registerHit();
-                soundManager.playBallCollision(_b);
+                soundManager.playProjectile();
             }
         }}
 
@@ -434,7 +434,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                 _p.hide();
                 player.powerUp(_p);
                 activePowerUp = _p;
-                soundManager.playPowerUpCollision();
+                soundManager.playPowerUp();
             }
         }
     }

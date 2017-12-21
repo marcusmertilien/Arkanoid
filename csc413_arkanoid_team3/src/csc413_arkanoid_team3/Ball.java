@@ -20,7 +20,7 @@ public class Ball extends Actor {
     private static final int BALL_HEIGHT = 2*BALL_SPRITE_HEIGHT; // visible ball height
     private static final int BOUNCES_PER_SPEEDUP = 5;            // speed up marker
     public static final int BALL_SPEED = 3;                      // default ball speed
-    public static final int BALL_MAX_SPEED = 6;                  // the max ball speed
+    public static final int BALL_MAX_SPEED = 5;                  // the max ball speed
 
 
     // The class' static image assets

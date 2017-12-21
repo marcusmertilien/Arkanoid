@@ -25,12 +25,7 @@ public class SoundManager {
     private static final HashMap<Type, AudioTrack> SOUND_BANK;
     static {
         SOUND_BANK = new HashMap<Type, AudioTrack>();
-        SOUND_BANK.put(Type.BALL_V_BLOCK, new AudioTrack(GameEngine.SOUND_ASSET_PATH + "arkanoid-sfx-6.wav", false));
-        SOUND_BANK.put(Type.BALL_V_GOLD_BLOCK, new AudioTrack(GameEngine.SOUND_ASSET_PATH + "arkanoid-sfx-8.wav", false));
-        SOUND_BANK.put(Type.BALL_V_SHIP, new AudioTrack(GameEngine.SOUND_ASSET_PATH + "arkanoid-sfx-7.wav", false));
-        SOUND_BANK.put(Type.BALL_V_ENEMY, new AudioTrack(GameEngine.SOUND_ASSET_PATH + "arkanoid-sfx-5.wav", false));
         SOUND_BANK.put(Type.BALL_V_GUTTER, new AudioTrack(GameEngine.SOUND_ASSET_PATH + "arkanoid-sfx-10.wav", false));
-        SOUND_BANK.put(Type.POWERUP_V_SHIP, new AudioTrack(GameEngine.SOUND_ASSET_PATH + "arkanoid-sfx-4.wav", false));
         SOUND_BANK.put(Type.PROJECTILE_V_BLOCK, new AudioTrack(GameEngine.SOUND_ASSET_PATH + "arkanoid-sfx-1.wav", false));
         SOUND_BANK.put(Type.GAME_OVER, new AudioTrack(GameEngine.SOUND_ASSET_PATH + "arkanoid-game-over.wav", false));
         SOUND_BANK.put(Type.MENU_MUSIC, new AudioTrack(GameEngine.SOUND_ASSET_PATH + "arkanoid-menu.wav", true));
@@ -63,25 +58,30 @@ public class SoundManager {
             Block _b = (Block) obj;
 
             if (_b.type == Block.Types.GOLD) {
-                SOUND_BANK.get(Type.BALL_V_GOLD_BLOCK).play();
+                (new AudioTrack(GameEngine.SOUND_ASSET_PATH + "arkanoid-sfx-8.wav", false)).play();
             } else {
-                SOUND_BANK.get(Type.BALL_V_BLOCK).play();
+                (new AudioTrack(GameEngine.SOUND_ASSET_PATH + "arkanoid-sfx-6.wav", false)).play();
             }
+
         } else if (obj instanceof Ship) {
             // If the collision type was a enemy
-            SOUND_BANK.get(Type.BALL_V_SHIP).play();
+            (new AudioTrack(GameEngine.SOUND_ASSET_PATH + "arkanoid-sfx-7.wav", false)).play();
         } else if (obj instanceof Enemy) {
             // If the collision type was a enemy
-            SOUND_BANK.get(Type.BALL_V_ENEMY).play();
+            (new AudioTrack(GameEngine.SOUND_ASSET_PATH + "arkanoid-sfx-5.wav", false)).play();
         }
     }
 
-    public void playPowerUpCollision() {
-        SOUND_BANK.get(Type.POWERUP_V_SHIP).play();
+    public void playPowerUp() {
+        (new AudioTrack(GameEngine.SOUND_ASSET_PATH + "arkanoid-sfx-4.wav", false)).play();
     }
 
-    public void playGutterCollision() {
-        SOUND_BANK.get(Type.BALL_V_GUTTER).play();
+    public void playOutOfBounds() {
+        (new AudioTrack(GameEngine.SOUND_ASSET_PATH + "arkanoid-sfx-10.wav", false)).play();
+    }
+
+    public void playProjectile() {
+        (new AudioTrack(GameEngine.SOUND_ASSET_PATH + "arkanoid-sfx-1.wav", false)).play();
     }
 
     public void playMenuMusic() {
