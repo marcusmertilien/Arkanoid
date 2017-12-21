@@ -30,6 +30,9 @@ public class GameEngine extends JPanel implements Runnable, Observer {
     private static final int TARGET_FPS     = 60;
     private static final long ONE_SECOND_NS = 1000000000;
     private static final long OPTIMAL_TIME  = ONE_SECOND_NS / TARGET_FPS;
+    
+    private int SPAWN_TIMER = 0;
+    
 
     // Game state
     private static enum GameState {
@@ -68,15 +71,13 @@ public class GameEngine extends JPanel implements Runnable, Observer {
     public static String GENERAL_ASSET_PATH = ASSET_PATH + "general/";
     public static String BALL_ASSET_PATH = ASSET_PATH + "ball/";
     public static String POWERUPS_ASSET_PATH = ASSET_PATH + "power-ups/";
-    
-    //Moving Away From Test Data
-    private Player player1;
 
     // Test data
     private Player testShip;
     private Stage testStage;
     private Ball testBall;
     private int testScore;
+    
     
     private ArrayList<PowerUp> testPowerUps;
     private ArrayList<Enemy> testEnemies;
@@ -234,6 +235,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                     break;
                 case PLAYING:
                     _updateData();
+                    _updateEnemies();
                     _checkCollisions();
                     _cleanupObjects();
                     _checkState();
@@ -283,10 +285,31 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         testShip.update(projectiles);
         testBall.update();
         
+        
         for (Explode _e : explosions) _e.update();
         for (PowerUp _p : testPowerUps) _p.update();
         for (Enemy _e: testEnemies) _e.update();
         for (Projectile _p : projectiles) _p.update();       
+    }
+    
+    private void _updateEnemies(){
+        Random r = new Random(SPAWN_TIMER);
+        int x = r.nextInt((GAME_WINDOW_WIDTH -50) - 20)+20;
+        int type = ((r.nextInt(2)) +1);
+        if(SPAWN_TIMER %82 == 0){
+            switch(SPAWN_TIMER%3){
+                case 0:
+                    testEnemies.add(new Enemy(x, 0, Enemy.Types.BLUE));
+                    break;
+                case 1:
+                    testEnemies.add(new Enemy(x, 0, Enemy.Types.GREEN));
+                    break;
+                case 2:
+                    testEnemies.add(new Enemy(x, 0, Enemy.Types.RED));
+                    break;
+            }
+        }
+        SPAWN_TIMER++;
     }
 
     private void _checkCollisions() {

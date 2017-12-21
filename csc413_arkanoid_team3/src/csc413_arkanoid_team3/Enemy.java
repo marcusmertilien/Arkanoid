@@ -83,6 +83,8 @@ public class Enemy extends Prop {
             spriteAnimationX += ENEMY_WIDTH;
             this.sprite = this.assetRow.getSubimage(spriteAnimationX, 0, ENEMY_WIDTH, ENEMY_HEIGHT);
         }
+        //Move down screen
+        this.y+=1;
     }
 
     public void _updateDead() {
