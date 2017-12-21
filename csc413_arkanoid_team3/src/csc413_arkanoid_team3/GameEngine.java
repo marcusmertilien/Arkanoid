@@ -163,11 +163,11 @@ public class GameEngine extends JPanel implements Runnable, Observer {
     private void _setupGameData() {
 
         // TODO: we'll likely need to so _something_ here.
-        this.player = new Player(200, 420, p1Keys);
-        this.currentStage = new Stage(Stage.Rounds.ROUND_1);
-        this.ball = new Ball(205, 400);
-        this.ball.xSpeed = 3;
-        this.ball.ySpeed = -3;
+        player = new Player(200, 420, p1Keys);
+        currentStage = new Stage(Stage.Rounds.ROUND_1);
+        ball = new Ball(205, 400);
+        ball.xSpeed = 3;
+        ball.ySpeed = -3;
 
         // Listen from game engine.
         eventManager.addObserver(this);
@@ -303,8 +303,6 @@ public class GameEngine extends JPanel implements Runnable, Observer {
             player.decrementLives();
         }
 
-
-
         // Check player vs ball.
         if (Physics.doesCollideWith(ball, player)) {
             // Calculate new ball speed based on contact point with player.
@@ -312,9 +310,9 @@ public class GameEngine extends JPanel implements Runnable, Observer {
             int shipCenter = (player.width/2);
             int newXspeed = (ballCenter - shipCenter);
 
-
             // Reset location.
             ball.resetLocation();
+            ball.incrementBounce();
 
             // Use new ball speed.
             ball.ySpeed = -ball.ySpeed;
