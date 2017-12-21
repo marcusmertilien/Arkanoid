@@ -430,7 +430,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         
         //Enemy vs. Ball
         for (Enemy _e : testEnemies) {
-            if (Physics.doesCollideWith(_e, testBall)) {
+            if (Physics.doesCollideWith(_e, testBall) && !_e.isDestroyed()) {
                 testBall.resetLocationE();
 
                 // Calculate new x,y speeds based on contact with block

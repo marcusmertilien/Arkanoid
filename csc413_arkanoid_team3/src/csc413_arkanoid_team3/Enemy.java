@@ -106,4 +106,8 @@ public class Enemy extends Prop {
         animationTimer = 6*8;
         spriteAnimationX = 12*ENEMY_WIDTH;
     }
+
+    public Boolean isDestroyed() {
+        return isDestroyed;
+    }
 }
