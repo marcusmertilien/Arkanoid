@@ -332,9 +332,8 @@ public class GameEngine extends JPanel implements Runnable, Observer {
             ball.ySpeed = -(ball.ySpeed);
         }
 
-
-        // Check player vs ball.
-        if (Physics.doesCollideWith(ball, player)) {
+        // Check player vs ball (only register collision if ball is moving down).
+        if (ball.ySpeed > 0 && Physics.doesCollideWith(ball, player)) {
             // Calculate new ball speed based on contact point with player.
             int ballCenter = (ball.x - player.x) + (ball.width/2);
             int shipCenter = (player.width/2);
