@@ -495,7 +495,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         ball.xSpeed = Ball.BALL_SPEED;
         ball.ySpeed = -Ball.BALL_SPEED;
 
-        // Reset other data
+        // Reset data collections.
         enemies.clear();
         projectiles.clear();
         explosions.clear();
@@ -512,14 +512,16 @@ public class GameEngine extends JPanel implements Runnable, Observer {
     @Override
     protected void paintComponent(Graphics g) {
 
-        BufferedImage windowBuffer = new BufferedImage(MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT, BufferedImage.TYPE_INT_RGB);
+        // Create window buffer.
+        BufferedImage windowBuffer = new BufferedImage(
+            MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT, BufferedImage.TYPE_INT_RGB
+        );
         Graphics2D g2d = (Graphics2D) windowBuffer.getGraphics();
 
         // Draw based on current GameState.
         switch (gameState) {
             case MAIN_MENU:
-                _drawSplash(g2d);
-                g2d.dispose();
+                _drawSplashScreen(g2d);
                 break;
             case GAME_RUNNING:
                 _drawGameWorld(g2d);
@@ -536,9 +538,6 @@ public class GameEngine extends JPanel implements Runnable, Observer {
             case GAME_OVER:
                 _drawGameOverScreen(g2d);
                 break;
-            case GAME_WON:
-                _drawGameWinScreen(g2d);
-                break;
             case EXITING:
                 break;
             default:
@@ -547,14 +546,20 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                 break;
         }
 
+        // Dispose buffer.
+        g2d.dispose();
+
         // Draw current frame.
         g.drawImage(windowBuffer, 0, 0, this);
     }
 
     private void _drawGameWorld(Graphics2D g2d) {
+        // Draw player and world.
         currentStage.draw(g2d);
         ball.draw(g2d);
         player.draw(g2d);
+
+        // Draw game object collections.
         for (Enemy _e: enemies) _e.draw(g2d);
         for (PowerUp _p : powerUps) _p.draw(g2d);
         for (Explode _e : explosions) _e.draw(g2d);
@@ -598,11 +603,12 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         g2d.drawString("GAME PAUSED", commonXoffset + 40, MAIN_WINDOW_HEIGHT - 40);
     }
 
-    private void _drawSplash(Graphics2D g){
+    private void _drawSplashScreen(Graphics2D g2d) {
+        int commonYoffset = 350;
 
         // Draw logo.
         int xPos = (MAIN_WINDOW_WIDTH/2) - (splashLogo.getWidth()/2);
-        g.drawImage(splashLogo, xPos, 40, splashLogo.getWidth(), splashLogo.getHeight(), this);
+        g2d.drawImage(splashLogo, xPos, 40, splashLogo.getWidth(), splashLogo.getHeight(), this);
 
         // Drawing messaging.
         String[] messages = new String[] {
@@ -612,26 +618,27 @@ public class GameEngine extends JPanel implements Runnable, Observer {
             "Press <ESCAPE> To Quit Game"
         };
 
-        g.setFont(new Font("Courier", Font.BOLD, 16));
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.setFont(new Font("Courier", Font.BOLD, 16));
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        FontMetrics fm = g.getFontMetrics();
-        int startingY = (int)(MAIN_WINDOW_HEIGHT *.7);
+        FontMetrics fm = g2d.getFontMetrics();
 
         for (int i = 0; i < messages.length; i++) {
             String _message = messages[i];
             int width = fm.stringWidth(_message);
             int x = (MAIN_WINDOW_WIDTH/2) - (width/2);
-            int y = startingY + (i*20);
+            int y = commonYoffset + (i*20);
 
-            g.drawString(_message, x, y);
+            g2d.drawString(_message, x, y);
         }
     }
 
-    private void _drawRoundChangeScreen(Graphics2D g){
+    private void _drawRoundChangeScreen(Graphics2D g2d) {
+        int commonYoffset = 350;
+
         // Draw bg.
-        g.setColor(Color.BLACK);
-        g.fillRect(0,0, MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT);
+        g2d.setColor(Color.BLACK);
+        g2d.fillRect(0,0, MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT);
 
         // Drawing messaging.
         String[] messages = new String[] {
@@ -640,47 +647,63 @@ public class GameEngine extends JPanel implements Runnable, Observer {
             "Press <ESCAPE> To Quit Game"
         };
 
-        g.setColor(Color.WHITE);
-        g.setFont(new Font("Courier", Font.BOLD, 16));
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.setColor(Color.WHITE);
+        g2d.setFont(new Font("Courier", Font.BOLD, 16));
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        FontMetrics fm = g.getFontMetrics();
-        int startingY = (int)(MAIN_WINDOW_HEIGHT *.7);
+        FontMetrics fm = g2d.getFontMetrics();
 
         for (int i = 0; i < messages.length; i++) {
             String _message = messages[i];
             int width = fm.stringWidth(_message);
             int x = (MAIN_WINDOW_WIDTH/2) - (width/2);
-            int y = (i==0) ? 60 : (startingY + (i-1)*(20));
+            int y = (i==0) ? 60 : (commonYoffset + (i-1)*(20));
 
-            g.drawString(_message, x, y);
+            g2d.drawString(_message, x, y);
         }
     }
 
-    private void _drawGameWinScreen(Graphics2D g) {
-        String msg = "YOU WON!";
-        g.setColor(Color.BLACK);
-        g.fillRect(0,0, MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT);
-        
-        // Set font for rendering stats.
-        g.setColor(Color.GREEN);
-        g.setFont(new Font("Courier", Font.BOLD, 36));
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        
-        FontMetrics fm = g.getFontMetrics();
-        int stringWidth = fm.stringWidth(msg);
-        int stringHeight = fm.getAscent();
+    private void _drawGameWinScreen(Graphics2D g2d) {
+        int commonYoffset = 350;
 
-        int x = getWidth() /2 - stringWidth/2;
-        int y = getHeight() /2 + stringHeight/2;
+        // Draw bg.
+        g2d.setColor(Color.BLACK);
+        g2d.fillRect(0,0, MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT);
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        g.drawString(msg,x,y);
+        // Drawing messaging.
+        String[] messages = new String[] {
+            "YOU WON!",
+            "Press <1> To Return to the Menu",
+            "Press <ESCAPE> To Quit Game"
+        };
+
+        for (int i = 0; i < messages.length; i++) {
+            if (i == 0) {
+                g2d.setColor(Color.GREEN);
+                g2d.setFont(new Font("Courier", Font.BOLD, 36));
+            } else {
+                g2d.setColor(Color.WHITE);
+                g2d.setFont(new Font("Courier", Font.BOLD, 16));
+            }
+
+            FontMetrics fm = g2d.getFontMetrics();
+            String _message = messages[i];
+            int width = fm.stringWidth(_message);
+            int x = (MAIN_WINDOW_WIDTH/2) - (width/2);
+            int y = (i==0) ? 60 : (commonYoffset + (i-1)*(20));
+
+            g2d.drawString(_message, x, y);
+        }
     }
      
-    private void _drawGameOverScreen(Graphics2D g) {
+    private void _drawGameOverScreen(Graphics2D g2d) {
+        int commonYoffset = 350;
+
         // Draw bg.
-        g.setColor(Color.BLACK);
-        g.fillRect(0,0, MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT);
+        g2d.setColor(Color.BLACK);
+        g2d.fillRect(0,0, MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT);
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         // Drawing messaging.
         String[] messages = new String[] {
@@ -689,26 +712,22 @@ public class GameEngine extends JPanel implements Runnable, Observer {
             "Press <ESCAPE> To Quit Game"
         };
 
-        g.setColor(Color.RED);
-        g.setFont(new Font("Courier", Font.BOLD, 36));
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-        FontMetrics fm = g.getFontMetrics();
-        int startingY = (int)(MAIN_WINDOW_HEIGHT *.7);
-
         for (int i = 0; i < messages.length; i++) {
-            if (i > 0) {
-                g.setColor(Color.WHITE);
-                g.setFont(new Font("Courier", Font.BOLD, 16));
-                fm = g.getFontMetrics();
+            if (i == 0) {
+                g2d.setColor(Color.RED);
+                g2d.setFont(new Font("Courier", Font.BOLD, 36));
+            } else {
+                g2d.setColor(Color.WHITE);
+                g2d.setFont(new Font("Courier", Font.BOLD, 16));
             }
 
+            FontMetrics fm = g2d.getFontMetrics();
             String _message = messages[i];
             int width = fm.stringWidth(_message);
             int x = (MAIN_WINDOW_WIDTH/2) - (width/2);
-            int y = (i==0) ? 60 : (startingY + (i-1)*(20));
+            int y = (i==0) ? 60 : (commonYoffset + (i-1)*(20));
 
-            g.drawString(_message, x, y);
+            g2d.drawString(_message, x, y);
         }
     }
 
@@ -732,13 +751,11 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                 // Toggle game pause on P press.
                 if (buttonPressed == GameActions.PAUSE) {
 
-                    if (gameState != GameState.PAUSE_MENU) {
-                        gameState = GameState.PAUSE_MENU;
-                        soundManager.pauseBgMusic();
-                    } else {
-                        gameState = GameState.GAME_RUNNING;
-                        soundManager.pauseBgMusic();
-                    }
+                    gameState = (gameState != GameState.PAUSE_MENU) ?
+                        GameState.PAUSE_MENU :
+                        GameState.GAME_RUNNING;
+
+                    soundManager.pauseBgMusic();
                 }
 
                 // Start press, used to progress forwards to next state.
