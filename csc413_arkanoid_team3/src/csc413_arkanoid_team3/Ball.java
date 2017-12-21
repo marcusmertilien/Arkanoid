@@ -62,12 +62,6 @@ public class Ball extends Actor {
         x += xSpeed;
         y += ySpeed;
     }
-    
-    
-    public void resetLocationE(){
-        x = previousX;
-        y = previousY;
-    }
 
     public void incrementBounce() {
         // Increase the ball speed per bounce count.

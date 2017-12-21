@@ -288,13 +288,13 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         if(SPAWN_TIMER %730 == 0){
             switch(SPAWN_TIMER%3){
                 case 0:
-                    testEnemies.add(new Enemy(x, 0, Enemy.Types.BLUE));
+                    enemies.add(new Enemy(x, 0, Enemy.Types.BLUE));
                     break;
                 case 1:
-                    testEnemies.add(new Enemy(x, 0, Enemy.Types.GREEN));
+                    enemies.add(new Enemy(x, 0, Enemy.Types.GREEN));
                     break;
                 case 2:
-                    testEnemies.add(new Enemy(x, 0, Enemy.Types.RED));
+                    enemies.add(new Enemy(x, 0, Enemy.Types.RED));
                     break;
             }
         }
@@ -304,7 +304,13 @@ public class GameEngine extends JPanel implements Runnable, Observer {
     private void _checkCollisions() {
         // Check ball vs gutter.
         if (ball.y > GAME_WINDOW_HEIGHT-32) {
-            explosions.add(new Explode((testShip.x+((int)testShip.getWidth()/4)),testShip.y,Explode.Type.SHIP));
+            explosions.add(
+                new Explode(
+                    player.x + (int) player.getWidth()/4,
+                    player.y,
+                    Explode.Type.SHIP
+                )
+            );
             player.decrementLives();
             gameState = GameState.PLAYER_DIED;
             soundManager.stopBgMusic();
@@ -421,19 +427,20 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         
 
         
-        for (Enemy _e : testEnemies) {
-            //Enemy vs. Lazer
+        for (Enemy _e : enemies) {
+            // Enemy vs. Lazer
             for(Projectile _p :this.projectiles){
-                if(Physics.doesCollideWith(_e, _p)){
+                if (Physics.doesCollideWith(_e, _p)) {
                     _e.registerHit();
                     _p.hide();
+
                     this.soundManager.playBallCollision(_e);
-                    this.soundManager.playBallCollision(_p);
                 }
             }
-            //Enemy vs. Ball
-            if (Physics.doesCollideWith(_e, testBall) && !_e.isDestroyed()) {
-                testBall.resetLocationE();
+
+            // Enemy vs. Ball
+            if (Physics.doesCollideWith(_e, ball) && !_e.isDestroyed()) {
+                ball.resetLocation();
 
 
                 // Calculate new x,y speeds based on contact with block
@@ -467,9 +474,9 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                 break;
             }
             //Enemy vs Ship
-            if(Physics.doesCollideWith(_e, testShip) && !_e.isDestroyed()) {
+            if (Physics.doesCollideWith(_e, player) && !_e.isDestroyed()) {
                 _e.registerHit();
-                explosions.add(new Explode((testShip.x+((int)testShip.getWidth()/4)),testShip.y,Explode.Type.SHIP));
+                explosions.add(new Explode((player.x+((int)player.getWidth()/4)),player.y,Explode.Type.SHIP));
             }
             
         }

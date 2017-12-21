@@ -73,8 +73,6 @@ public class SoundManager {
         } else if (obj instanceof Enemy) {
             // If the collision type was a enemy
             SOUND_BANK.get(Type.BALL_V_ENEMY).play();
-        }else if (obj instanceof Projectile){
-            
         }
     }
 
