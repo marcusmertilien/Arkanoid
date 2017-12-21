@@ -68,6 +68,7 @@ public class SoundManager {
                 SOUND_BANK.get(Type.BALL_V_BLOCK).play();
             }
         } else if (obj instanceof Ship) {
+            // If the collision type was a enemy
             SOUND_BANK.get(Type.BALL_V_SHIP).play();
         } else if (obj instanceof Enemy) {
             // If the collision type was a enemy
