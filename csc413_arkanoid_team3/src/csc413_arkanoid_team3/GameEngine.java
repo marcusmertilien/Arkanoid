@@ -736,25 +736,26 @@ public class GameEngine extends JPanel implements Runnable, Observer {
 
         // onKey event
         if (e instanceof KeyEvent) {
+
             KeyEvent ke = (KeyEvent) e;
-            int keyCode = ke.getKeyCode();
-            int keyId = ke.getID();
-            GameActions buttonPressed = gameControls.get(keyCode);
+            GameActions buttonPressed = gameControls.get(ke.getKeyCode());
 
             // Only react to buttons the game engine is interested in.
             if (buttonPressed == null) {
                 return;
             }
 
-            if (keyId == KeyEvent.KEY_PRESSED) {
+            if (ke.getID() == KeyEvent.KEY_PRESSED) {
 
                 // Toggle game pause on P press.
-                if (buttonPressed == GameActions.PAUSE) {
+                if (buttonPressed == GameActions.PAUSE && gameState != GameState.MAIN_MENU) {
 
+                    // Toggle the game state on pause.
                     gameState = (gameState != GameState.PAUSE_MENU) ?
-                        GameState.PAUSE_MENU :
-                        GameState.GAME_RUNNING;
+                                GameState.PAUSE_MENU :
+                                GameState.GAME_RUNNING;
 
+                    // Pause bg music.
                     soundManager.pauseBgMusic();
                 }
 
@@ -784,7 +785,6 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                     gameState = GameState.EXITING;
                 }
             }
-
 
         }
     }
