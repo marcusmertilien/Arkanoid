@@ -18,7 +18,7 @@ public class Ball extends Actor {
     private static final int BALL_SPRITE_HEIGHT = 4;             // sprite asset height
     private static final int BALL_WIDTH = 2*BALL_SPRITE_WIDTH;   // visible ball width
     private static final int BALL_HEIGHT = 2*BALL_SPRITE_HEIGHT; // visible ball height
-    private static final int BALL_SPEED = 1;                     // default ball speed
+    public static final int BALL_SPEED = 3;                     // default ball speed
 
     // The class' static image assets
     private static final String SPRITE_PATH = GameEngine.BALL_ASSET_PATH + "ball.png";

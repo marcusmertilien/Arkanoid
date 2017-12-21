@@ -23,7 +23,11 @@ public class Stage {
 
     // The rounds in the game
     public static enum Rounds {
-        ROUND_1, ROUND_2, ROUND_3, ROUND_4, ROUND_5
+        ROUND_1, ROUND_2, ROUND_3, ROUND_4, ROUND_5;
+        private static Rounds[] vals = values();
+        public Rounds next() {
+            return vals[(this.ordinal()+1)%vals.length];
+        }
     }
 
     // A hash map representing a relation between a string and a block type - used for level templating.
@@ -42,6 +46,13 @@ public class Stage {
 
     // A hash map representing the block layours of the stages.
     private static final HashMap<Rounds, String[][]> stageMap = new HashMap<Rounds, String[][]>(){{
+
+        // Test stage for checking level progression.
+        // put(Rounds.ROUND_1, new String[][] {
+        //     {},{},{},{},{},{},{},{},{},
+        //     {" ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "g"} 
+        // });
+
         put(Rounds.ROUND_1, new String[][] {
             {"+", "+", "+", "+", "+", "+", "+", "+", "+", "+", "+", "+", "+"},
             {"r", "r", "r", "r", "r", "r", "r", "r", "r", "r", "r", "r", "r"},
@@ -50,6 +61,7 @@ public class Stage {
             {"p", "p", "p", "p", "p", "p", "p", "p", "p", "p", "p", "p", "p"},
             {"g", "g", "g", "g", "g", "g", "g", "g", "g", "g", "g", "g", "g"}
         });
+
         put(Rounds.ROUND_2, new String[][] {
             {"p"},
             {"p", "c"},
@@ -140,7 +152,10 @@ public class Stage {
             for (int j = 0; j < stage[i].length; j++) {
                 int x = 16 + (j*Block.BLOCK_WIDTH);
                 int y = 60 + (i*Block.BLOCK_HEIGHT);
-                blocks.add(new Block(x, y, map.get(stage[i][j])));
+
+                if (map.get(stage[i][j]) != null) {
+                    blocks.add(new Block(x, y, map.get(stage[i][j])));
+                }
             }
         }
     }
