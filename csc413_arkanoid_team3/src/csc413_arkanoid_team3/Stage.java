@@ -47,20 +47,14 @@ public class Stage {
     // A hash map representing the block layours of the stages.
     private static final HashMap<Rounds, String[][]> stageMap = new HashMap<Rounds, String[][]>(){{
 
-        // Test stage for checking level progression
         put(Rounds.ROUND_1, new String[][] {
-            {},{},{},{},{},{},{},{},{},
-            {" ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "g"} 
+            {"+", "+", "+", "+", "+", "+", "+", "+", "+", "+", "+", "+", "+"},
+            {"r", "r", "r", "r", "r", "r", "r", "r", "r", "r", "r", "r", "r"},
+            {"b", "b", "b", "b", "b", "b", "b", "b", "b", "b", "b", "b", "b"},
+            {"o", "o", "o", "o", "o", "o", "o", "o", "o", "o", "o", "o", "o"},
+            {"p", "p", "p", "p", "p", "p", "p", "p", "p", "p", "p", "p", "p"},
+            {"g", "g", "g", "g", "g", "g", "g", "g", "g", "g", "g", "g", "g"}
         });
-
-        // put(Rounds.ROUND_1, new String[][] {
-        //     {"+", "+", "+", "+", "+", "+", "+", "+", "+", "+", "+", "+", "+"},
-        //     {"r", "r", "r", "r", "r", "r", "r", "r", "r", "r", "r", "r", "r"},
-        //     {"b", "b", "b", "b", "b", "b", "b", "b", "b", "b", "b", "b", "b"},
-        //     {"o", "o", "o", "o", "o", "o", "o", "o", "o", "o", "o", "o", "o"},
-        //     {"p", "p", "p", "p", "p", "p", "p", "p", "p", "p", "p", "p", "p"},
-        //     {"g", "g", "g", "g", "g", "g", "g", "g", "g", "g", "g", "g", "g"}
-        // });
 
         put(Rounds.ROUND_2, new String[][] {
             {"p"},

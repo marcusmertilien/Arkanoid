@@ -33,14 +33,12 @@ public class GameEngine extends JPanel implements Runnable, Observer {
 
     // Game state
     private static enum GameState {
-        INITIALIZING,
-        LOADING,
         MAIN_MENU,
-        OPTIONS_MENU,
+        GAME_RUNNING,
         PAUSE_MENU,
-        PLAYING,
         ROUND_CHANGE,
         GAME_OVER,
+        GAME_WON,
         EXITING
     };
     private Boolean isRunning;
@@ -54,8 +52,6 @@ public class GameEngine extends JPanel implements Runnable, Observer {
     // Players
     private HashMap<Integer, Controls> p1Keys;
     private HashMap<Integer, Controls> p2Keys;
-    
-    
 
     // Game interface controls.
     private HashMap<Integer, GameActions> gameControls;
@@ -82,8 +78,8 @@ public class GameEngine extends JPanel implements Runnable, Observer {
     private Ball ball;
     private int testScore;
     
-    private ArrayList<PowerUp> testPowerUps;
-    private ArrayList<Enemy> testEnemies;
+    private ArrayList<PowerUp> powerUps;
+    private ArrayList<Enemy> enemies;
     private PowerUp activePowerUp;
     private ArrayList<Explode> explosions;
     private ArrayList<Projectile> projectiles;
@@ -200,14 +196,14 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         testScore = 0;
         //testLives = 3;
 
-        testPowerUps = new ArrayList<PowerUp>();
-        testEnemies = new ArrayList<Enemy>();
+        powerUps = new ArrayList<PowerUp>();
+        enemies = new ArrayList<Enemy>();
         explosions = new ArrayList<Explode>();
         projectiles = new ArrayList<Projectile>();
 
-        // testEnemies.add(new Enemy(220, 300, Enemy.Types.GREEN));
-        // testEnemies.add(new Enemy(120, 300, Enemy.Types.BLUE));
-        // testEnemies.add(new Enemy(320, 300, Enemy.Types.RED));
+        // enemies.add(new Enemy(220, 300, Enemy.Types.GREEN));
+        // enemies.add(new Enemy(120, 300, Enemy.Types.BLUE));
+        // enemies.add(new Enemy(320, 300, Enemy.Types.RED));
     }
 
     private void _setupGameAudio() {
@@ -230,22 +226,17 @@ public class GameEngine extends JPanel implements Runnable, Observer {
 
             // Switch on current GameState.
             switch (gameState) {
-                case INITIALIZING:
-                    break;
                 case MAIN_MENU:
+                case PAUSE_MENU:
+                case ROUND_CHANGE:
+                case GAME_OVER:
+                case GAME_WON:
                     break;
-                case PLAYING:
+                case GAME_RUNNING:
                     _updateData();
                     _checkCollisions();
                     _cleanupObjects();
                     _checkState();
-                    break;
-                case PAUSE_MENU:
-                    break;
-                case ROUND_CHANGE:
-                    break;
-                case GAME_OVER:
-                    // isRunning = false;
                     break;
                 case EXITING:
                     System.exit(0);
@@ -288,8 +279,8 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         ball.update();
         
         for (Explode _e : explosions) _e.update();
-        for (PowerUp _p : testPowerUps) _p.update();
-        for (Enemy _e: testEnemies) _e.update();
+        for (PowerUp _p : powerUps) _p.update();
+        for (Enemy _e: enemies) _e.update();
         for (Projectile _p : projectiles) _p.update();
     }
 
@@ -398,7 +389,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
 
                 // Test for power ups, create a random type on every brick break.
                 if (_b.isHidden()) {
-                    testPowerUps.add(new PowerUp(
+                    powerUps.add(new PowerUp(
                         _b.x, _b.y, PowerUp.Types.values()[new Random().nextInt(PowerUp.Types.values().length)]
                     ));
                 }
@@ -409,7 +400,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         }
         
         //Enemy vs. Ball
-        for (Enemy _e : testEnemies) {
+        for (Enemy _e : enemies) {
             if (Physics.doesCollideWith(_e, ball)) {
                 ball.resetLocation();
 
@@ -441,7 +432,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
             }
         }
 
-        for (PowerUp _p: testPowerUps) {
+        for (PowerUp _p: powerUps) {
             // Check powerup vs lower bound.
             if (_p.y > GAME_WINDOW_HEIGHT-42)
                 _p.hide();
@@ -458,9 +449,9 @@ public class GameEngine extends JPanel implements Runnable, Observer {
 
     private void _cleanupObjects() {
         currentStage.blocks.removeIf(_b -> _b.isHidden());
-        testPowerUps.removeIf(_p -> _p.isHidden());
+        powerUps.removeIf(_p -> _p.isHidden());
         explosions.removeIf(_e -> _e.isHidden());
-        testEnemies.removeIf(_e -> _e.isHidden());
+        enemies.removeIf(_e -> _e.isHidden());
         projectiles.removeIf(_p -> _p.isHidden());
     }
 
@@ -471,12 +462,17 @@ public class GameEngine extends JPanel implements Runnable, Observer {
             soundManager.stopBgMusic();
             soundManager.playGameOverMusic();
         } else if (currentStage.blocks.isEmpty()) {
-            // Show next round splash screen.
-            gameState = GameState.ROUND_CHANGE;
             // Update to the new stage.
-            currentStage = new Stage(currentStage.round.next());
-            // Reset the game objects.
-            __resetState(currentStage.round.next());
+            Stage.Rounds nextStage = currentStage.round.next();
+
+            if (nextStage != null) {
+                gameState = GameState.ROUND_CHANGE;
+                currentStage = new Stage(currentStage.round.next());
+                // Reset the game objects.
+                __resetState(currentStage.round.next());
+            } else {
+                gameState = GameState.GAME_WON;
+            }
         }
     }
 
@@ -490,6 +486,12 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         ball.y = DEFAULT_BALL_Y;
         ball.xSpeed = Ball.BALL_SPEED;
         ball.ySpeed = -Ball.BALL_SPEED;
+
+        // Reset other data
+        enemies.clear();
+        projectiles.clear();
+        explosions.clear();
+        powerUps.clear();
     }
 
 
@@ -511,7 +513,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                 _drawSplash(g2d);
                 g2d.dispose();
                 break;
-            case PLAYING:
+            case GAME_RUNNING:
                 _drawGameWorld(g2d);
                 _drawUIPanel(g2d);
                 _drawFXObjects(g2d);
@@ -526,6 +528,9 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                 break;
             case GAME_OVER:
                 _drawGameOverScreen(g2d);
+                break;
+            case GAME_WON:
+                _drawGameWinScreen(g2d);
                 break;
             case EXITING:
                 break;
@@ -543,8 +548,8 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         currentStage.draw(g2d);
         ball.draw(g2d);
         ship.draw(g2d);
-        for (Enemy _e: testEnemies) _e.draw(g2d);
-        for (PowerUp _p : testPowerUps) _p.draw(g2d);
+        for (Enemy _e: enemies) _e.draw(g2d);
+        for (PowerUp _p : powerUps) _p.draw(g2d);
         for (Explode _e : explosions) _e.draw(g2d);
         for(Projectile _p : projectiles) _p.draw(g2d);
     }
@@ -712,7 +717,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                         gameState = GameState.PAUSE_MENU;
                         soundManager.pauseBgMusic();
                     } else {
-                        gameState = GameState.PLAYING;
+                        gameState = GameState.GAME_RUNNING;
                         soundManager.pauseBgMusic();
                     }
                 }
@@ -721,11 +726,11 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                 if (buttonPressed == GameActions.START) {
                     // If on the main menu, start the first round.
                     if (gameState == GameState.MAIN_MENU)
-                        gameState = GameState.PLAYING;
+                        gameState = GameState.GAME_RUNNING;
 
                     // If on the round change screen, start the next round.
                     if (gameState == GameState.ROUND_CHANGE)
-                        gameState = GameState.PLAYING;
+                        gameState = GameState.GAME_RUNNING;
                 }
 
                 // Toggle music on M press.
