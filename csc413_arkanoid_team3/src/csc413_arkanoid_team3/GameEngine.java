@@ -516,7 +516,6 @@ public class GameEngine extends JPanel implements Runnable, Observer {
             case GAME_RUNNING:
                 _drawGameWorld(g2d);
                 _drawUIPanel(g2d);
-                _drawFXObjects(g2d);
                 break;
             case PAUSE_MENU:
                 _drawGameWorld(g2d);
@@ -551,7 +550,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         for (Enemy _e: enemies) _e.draw(g2d);
         for (PowerUp _p : powerUps) _p.draw(g2d);
         for (Explode _e : explosions) _e.draw(g2d);
-        for(Projectile _p : projectiles) _p.draw(g2d);
+        for (Projectile _p : projectiles) _p.draw(g2d);
     }
 
     private void _drawUIPanel(Graphics2D g2d) {
@@ -591,10 +590,6 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         g2d.drawString("GAME PAUSED", commonXoffset + 40, MAIN_WINDOW_HEIGHT - 40);
     }
 
-    private void _drawFXObjects(Graphics2D g2d) {
-        for (Explode _e : explosions) _e.draw(g2d);
-    }
-     
     private void _drawSplash(Graphics2D g){
 
         // Draw logo.
