@@ -296,7 +296,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         Random r = new Random(SPAWN_TIMER);
         int x = r.nextInt((GAME_WINDOW_WIDTH -50) - 20)+20;
         int type = ((r.nextInt(2)) +1);//730 = 3^6 + 1
-        if(SPAWN_TIMER %10 == 0){
+        if(SPAWN_TIMER %730 == 0){
             switch(SPAWN_TIMER%3){
                 case 0:
                     testEnemies.add(new Enemy(x, 0, Enemy.Types.BLUE));
@@ -334,8 +334,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         if (testBall.y > GAME_WINDOW_HEIGHT-32) {
             testBall.resetLocation();
             testBall.ySpeed = -(testBall.ySpeed);
-            explosions.add(new Explode(testShip.x,testShip.y,Explode.Type.SHIP));
-            //Take a life away
+            explosions.add(new Explode((testShip.x+((int)testShip.getWidth()/4)),testShip.y,Explode.Type.SHIP));            //Take a life away
             testShip.setLives(testShip.getLives()-1);
         }
 
@@ -428,8 +427,18 @@ public class GameEngine extends JPanel implements Runnable, Observer {
             }
         }
         
-        //Enemy vs. Ball
+        
         for (Enemy _e : testEnemies) {
+            //Enemy vs. Lazer
+            for(Projectile _p :this.projectiles){
+                if(Physics.doesCollideWith(_e, _p)){
+                    _e.registerHit();
+                    _p.hide();
+                    this.soundManager.playBallCollision(_e);
+                    this.soundManager.playBallCollision(_p);
+                }
+            }
+            //Enemy vs. Ball
             if (Physics.doesCollideWith(_e, testBall) && !_e.isDestroyed()) {
                 testBall.resetLocationE();
 
@@ -459,7 +468,15 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                 // Only register one collision per update cycle.
                 break;
             }
+            //Enemy vs Ship
+            if(Physics.doesCollideWith(_e, testShip) && !_e.isDestroyed()) {
+                _e.registerHit();
+                explosions.add(new Explode((testShip.x+((int)testShip.getWidth()/4)),testShip.y,Explode.Type.SHIP));
+            }
+            
         }
+        
+        
 
         for (PowerUp _p: testPowerUps) {
             // Check powerup vs lower bound.
