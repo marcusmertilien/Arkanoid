@@ -604,7 +604,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
     }
 
     private void _drawSplashScreen(Graphics2D g2d) {
-        int commonYoffset = 350;
+        int commonYoffset = 400;
 
         // Draw logo.
         int xPos = (MAIN_WINDOW_WIDTH/2) - (splashLogo.getWidth()/2);
@@ -634,7 +634,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
     }
 
     private void _drawRoundChangeScreen(Graphics2D g2d) {
-        int commonYoffset = 350;
+        int commonYoffset = 400;
 
         // Draw bg.
         g2d.setColor(Color.BLACK);
@@ -664,7 +664,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
     }
 
     private void _drawGameWinScreen(Graphics2D g2d) {
-        int commonYoffset = 350;
+        int commonYoffset = 400;
 
         // Draw bg.
         g2d.setColor(Color.BLACK);
@@ -698,7 +698,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
     }
      
     private void _drawGameOverScreen(Graphics2D g2d) {
-        int commonYoffset = 350;
+        int commonYoffset = 400;
 
         // Draw bg.
         g2d.setColor(Color.BLACK);
