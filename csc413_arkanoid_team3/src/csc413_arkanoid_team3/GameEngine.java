@@ -519,22 +519,25 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         // Draw based on current GameState.
         switch (gameState) {
             case MAIN_MENU:
-                _drawSplashScreen(g2d);
+                _drawMainMenu(g2d);
                 break;
             case GAME_RUNNING:
                 _drawGameWorld(g2d);
-                _drawUIPanel(g2d);
+                _drawGameUI(g2d);
                 break;
             case PAUSE_MENU:
                 _drawGameWorld(g2d);
-                _drawUIPanel(g2d);
-                _drawUIPause(g2d);
+                _drawGameUI(g2d);
+                _drawPauseMenu(g2d);
                 break;
             case ROUND_CHANGE:
-                _drawRoundChangeScreen(g2d);
+                _drawSplashScreen(g2d, currentStage.round.name().replaceAll("_"," "), Color.BLUE);
+                break;
+            case GAME_WON:
+                _drawSplashScreen(g2d, "YOU WON!", Color.GREEN);
                 break;
             case GAME_OVER:
-                _drawGameOverScreen(g2d);
+                _drawSplashScreen(g2d, "GAME OVER!", Color.RED);
                 break;
             case EXITING:
                 break;
@@ -564,7 +567,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         for (Projectile _p : projectiles) _p.draw(g2d);
     }
 
-    private void _drawUIPanel(Graphics2D g2d) {
+    private void _drawGameUI(Graphics2D g2d) {
         int commonXoffset = GAME_WINDOW_WIDTH+10;
 
         // Draw branding.
@@ -592,7 +595,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         }
     }
 
-    private void _drawUIPause(Graphics2D g2d) {
+    private void _drawPauseMenu(Graphics2D g2d) {
         int commonXoffset = GAME_WINDOW_WIDTH+10;
 
         g2d.setColor(Color.WHITE);
@@ -601,7 +604,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         g2d.drawString("GAME PAUSED", commonXoffset + 40, MAIN_WINDOW_HEIGHT - 40);
     }
 
-    private void _drawSplashScreen(Graphics2D g2d) {
+    private void _drawMainMenu(Graphics2D g2d) {
         int commonYoffset = 400;
 
         // Draw logo.
@@ -631,37 +634,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         }
     }
 
-    private void _drawRoundChangeScreen(Graphics2D g2d) {
-        int commonYoffset = 400;
-
-        // Draw bg.
-        g2d.setColor(Color.BLACK);
-        g2d.fillRect(0,0, MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT);
-
-        // Drawing messaging.
-        String[] messages = new String[] {
-            currentStage.round.name().replaceAll("_"," "),
-            "Press <1> To Start",
-            "Press <ESCAPE> To Quit Game"
-        };
-
-        g2d.setColor(Color.WHITE);
-        g2d.setFont(new Font("Courier", Font.BOLD, 16));
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-        FontMetrics fm = g2d.getFontMetrics();
-
-        for (int i = 0; i < messages.length; i++) {
-            String _message = messages[i];
-            int width = fm.stringWidth(_message);
-            int x = (MAIN_WINDOW_WIDTH/2) - (width/2);
-            int y = (i==0) ? 60 : (commonYoffset + (i-1)*(20));
-
-            g2d.drawString(_message, x, y);
-        }
-    }
-
-    private void _drawGameWinScreen(Graphics2D g2d) {
+    private void _drawSplashScreen(Graphics2D g2d, String title, Color titleColor) {
         int commonYoffset = 400;
 
         // Draw bg.
@@ -671,48 +644,14 @@ public class GameEngine extends JPanel implements Runnable, Observer {
 
         // Drawing messaging.
         String[] messages = new String[] {
-            "YOU WON!",
+            title,
             "Press <1> To Return to the Menu",
             "Press <ESCAPE> To Quit Game"
         };
 
         for (int i = 0; i < messages.length; i++) {
             if (i == 0) {
-                g2d.setColor(Color.GREEN);
-                g2d.setFont(new Font("Courier", Font.BOLD, 36));
-            } else {
-                g2d.setColor(Color.WHITE);
-                g2d.setFont(new Font("Courier", Font.BOLD, 16));
-            }
-
-            FontMetrics fm = g2d.getFontMetrics();
-            String _message = messages[i];
-            int width = fm.stringWidth(_message);
-            int x = (MAIN_WINDOW_WIDTH/2) - (width/2);
-            int y = (i==0) ? 60 : (commonYoffset + (i-1)*(20));
-
-            g2d.drawString(_message, x, y);
-        }
-    }
-     
-    private void _drawGameOverScreen(Graphics2D g2d) {
-        int commonYoffset = 400;
-
-        // Draw bg.
-        g2d.setColor(Color.BLACK);
-        g2d.fillRect(0,0, MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT);
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-        // Drawing messaging.
-        String[] messages = new String[] {
-            "GAME OVER!",
-            "Press <1> To Return to the Menu",
-            "Press <ESCAPE> To Quit Game"
-        };
-
-        for (int i = 0; i < messages.length; i++) {
-            if (i == 0) {
-                g2d.setColor(Color.RED);
+                g2d.setColor(titleColor);
                 g2d.setFont(new Font("Courier", Font.BOLD, 36));
             } else {
                 g2d.setColor(Color.WHITE);
