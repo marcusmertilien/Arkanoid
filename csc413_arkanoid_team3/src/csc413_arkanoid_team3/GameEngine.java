@@ -359,7 +359,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         // Check for ball vs block.
         for (Block _b : this.currentStage.blocks) {
             if (Physics.doesCollideWith(_b, ball)) {
-                explosions.add(new Explode(this.ball.x,this.ball.y,Explode.Type.ENEMY));
+
                 // Reset location before calculating.
                 ball.resetLocation();
 
@@ -382,16 +382,20 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                 }
 
                 // Update user score.
-                this.testScore += _b.registerHit();
+                testScore += _b.registerHit();
 
                 // Play SFX.
-                this.soundManager.playBallCollision(_b);
+                soundManager.playBallCollision(_b);
 
-                // Test for power ups, create a random type on every brick break.
                 if (_b.isHidden()) {
+
+                     // Test for power ups, create a random type on every brick break.
                     powerUps.add(new PowerUp(
                         _b.x, _b.y, PowerUp.Types.values()[new Random().nextInt(PowerUp.Types.values().length)]
                     ));
+
+                    // Add new explosion.
+                    explosions.add(new Explode(_b.x, _b.y, Explode.Type.ENEMY));
                 }
 
                 // Only register one collision per cycle.
@@ -596,60 +600,61 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         int xPos = (MAIN_WINDOW_WIDTH/2) - (splashLogo.getWidth()/2);
         g.drawImage(splashLogo, xPos, 40, splashLogo.getWidth(), splashLogo.getHeight(), this);
 
-        // Draw start messaging.
-
-        String msg = "Press <1> To Start";
-        String msg2 = "Press <P> To Toggle Music";
+        // Drawing messaging.
+        String[] messages = new String[] {
+            "Press <1> To Start",
+            "Press <M> To Toggle Music",
+            "Press <P> To Pause Game",
+            "Press <ESCAPE> To Quit Game"
+        };
 
         g.setFont(new Font("Courier", Font.BOLD, 16));
-        FontMetrics fm = g.getFontMetrics();
-
-        int stringWidth = fm.stringWidth(msg);
-        int stringWidth2 = fm.stringWidth(msg2);
-        int string2Ascent = fm.getAscent();
-
-        int stringX = getWidth() /2 - stringWidth /2;
-        int stringY = (int)(getHeight() *.8);
-        int stringX2 = getWidth() /2 - stringWidth2 /2;
-        int stringY2 = stringY+string2Ascent+10;
-
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g.drawString(msg, stringX, stringY);
-        g.drawString(msg2, stringX2, stringY2);
+
+        FontMetrics fm = g.getFontMetrics();
+        int startingY = (int)(MAIN_WINDOW_HEIGHT *.7);
+
+        for (int i = 0; i < messages.length; i++) {
+            String _message = messages[i];
+            int width = fm.stringWidth(_message);
+            int x = (MAIN_WINDOW_WIDTH/2) - (width/2);
+            int y = startingY + (i*20);
+
+            g.drawString(_message, x, y);
+        }
     }
 
     private void _drawRoundChangeScreen(Graphics2D g){
-        String msg = currentStage.round.name();
-        String msg2 = "Press <1> To Start";
-
+        // Draw bg.
         g.setColor(Color.BLACK);
         g.fillRect(0,0, MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT);
-        
-        // Set font for rendering stats.
+
+        // Drawing messaging.
+        String[] messages = new String[] {
+            currentStage.round.name(),
+            "Press <1> To Start",
+            "Press <ESCAPE> To Quit Game"
+        };
+
         g.setColor(Color.WHITE);
-        g.setFont(new Font("Courier", Font.BOLD, 18));
+        g.setFont(new Font("Courier", Font.BOLD, 16));
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        
+
         FontMetrics fm = g.getFontMetrics();
-        int stringWidth = fm.stringWidth(msg);
-        int stringHeight = fm.getAscent();
+        int startingY = (int)(MAIN_WINDOW_HEIGHT *.7);
 
-        int x = getWidth()/2 - stringWidth/2;
-        int y = 50;
+        for (int i = 0; i < messages.length; i++) {
+            String _message = messages[i];
+            int width = fm.stringWidth(_message);
+            int x = (MAIN_WINDOW_WIDTH/2) - (width/2);
+            int y = (i==0) ? 60 : (startingY + (i-1)*(20));
 
-        g.drawString(msg, x, y);
-
-        stringWidth = fm.stringWidth(msg2);
-        stringHeight = fm.getAscent();
-
-        x = getWidth() /2 - stringWidth/2;
-        y = getHeight() /2 + stringHeight/2;
-
-        g.drawString(msg2, x, y);
+            g.drawString(_message, x, y);
+        }
     }
 
     private void _drawGameWinScreen(Graphics2D g){
-        String msg = "You won!";
+        String msg = "YOU WON!";
         g.setColor(Color.BLACK);
         g.fillRect(0,0, MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT);
         
