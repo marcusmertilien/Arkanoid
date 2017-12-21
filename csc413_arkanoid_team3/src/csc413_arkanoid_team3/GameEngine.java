@@ -131,7 +131,6 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         this.setOpaque(false);
         this.addKeyListener(inputHandler); // attach input handler to panel
 
-        
         // Setup player keys.
         _setupControls();
 
@@ -197,7 +196,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
     }
 
     private void _setupGameAudio() {
-        soundManager.playBgMusic();
+        soundManager.playMenuMusic();
     }
 
 
@@ -705,8 +704,10 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                 // Start press, used to progress forwards to next state.
                 if (buttonPressed == GameActions.START) {
                     // If on the main menu, start the first round.
-                    if (gameState == GameState.MAIN_MENU)
+                    if (gameState == GameState.MAIN_MENU) {
+                        soundManager.playBgMusic();
                         gameState = GameState.GAME_RUNNING;
+                    }
 
                     // If on the main menu, start the first round.
                     if (gameState == GameState.PLAYER_DIED) {
@@ -715,12 +716,16 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                     }
 
                     // If on the round change screen, start the next round.
-                    if (gameState == GameState.ROUND_CHANGE)
+                    if (gameState == GameState.ROUND_CHANGE) {
+                        soundManager.playBgMusic();
                         gameState = GameState.GAME_RUNNING;
+                    }
 
                     // If on the round change screen, start the next round.
-                    if (gameState == GameState.GAME_OVER)
+                    if (gameState == GameState.GAME_OVER) {
+                        soundManager.playMenuMusic();
                         gameState = GameState.MAIN_MENU;
+                    }
                 }
 
                 // Toggle music on M press.

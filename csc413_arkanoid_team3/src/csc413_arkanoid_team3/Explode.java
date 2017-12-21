@@ -57,7 +57,7 @@ public class Explode extends GameObject {
             for (int i=1; i<=12; i++){
                 filePath = GameEngine.ENEMIES_ASSET_PATH+"explosion" + i + ".png";
                 asset = ImageIO.read(cl.getResource(filePath));
-                tempScaledImage = asset.getScaledInstance(EXPLOSION_SIZE, -1 , Image.SCALE_SMOOTH);
+                tempScaledImage = asset.getScaledInstance(EXPLOSION_SIZE, -1, Image.SCALE_SMOOTH);
                 temp = new BufferedImage(EXPLOSION_SIZE, EXPLOSION_SIZE, BufferedImage.TYPE_INT_ARGB);
                 g2d = temp.createGraphics();
                 g2d.drawImage(tempScaledImage, 0, 0, null);

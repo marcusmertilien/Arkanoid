@@ -15,6 +15,8 @@ public class SoundManager {
         BALL_V_ENEMY,
         BALL_V_GUTTER,
         POWERUP_V_SHIP,
+        PROJECTILE_V_BLOCK,
+        MENU_MUSIC,
         BG_MUSIC,
         GAME_OVER
     }
@@ -28,8 +30,10 @@ public class SoundManager {
         SOUND_BANK.put(Type.BALL_V_ENEMY, new AudioTrack(GameEngine.SOUND_ASSET_PATH + "arkanoid-sfx-5.wav", false));
         SOUND_BANK.put(Type.BALL_V_GUTTER, new AudioTrack(GameEngine.SOUND_ASSET_PATH + "arkanoid-sfx-10.wav", false));
         SOUND_BANK.put(Type.POWERUP_V_SHIP, new AudioTrack(GameEngine.SOUND_ASSET_PATH + "arkanoid-sfx-4.wav", false));
-        SOUND_BANK.put(Type.GAME_OVER, new AudioTrack(GameEngine.SOUND_ASSET_PATH + "game-over.wav", false));
-        SOUND_BANK.put(Type.BG_MUSIC, new AudioTrack(GameEngine.SOUND_ASSET_PATH + "bg-music.wav", true));
+        SOUND_BANK.put(Type.PROJECTILE_V_BLOCK, new AudioTrack(GameEngine.SOUND_ASSET_PATH + "arkanoid-sfx-1.wav", false));
+        SOUND_BANK.put(Type.GAME_OVER, new AudioTrack(GameEngine.SOUND_ASSET_PATH + "arkanoid-game-over.wav", false));
+        SOUND_BANK.put(Type.MENU_MUSIC, new AudioTrack(GameEngine.SOUND_ASSET_PATH + "arkanoid-menu.wav", true));
+        SOUND_BANK.put(Type.BG_MUSIC, new AudioTrack(GameEngine.SOUND_ASSET_PATH + "arkanoid-bg.wav", true));
     }
 
 
@@ -77,11 +81,13 @@ public class SoundManager {
         SOUND_BANK.get(Type.BALL_V_GUTTER).play();
     }
 
-    public void playGameOverMusic() {
-        SOUND_BANK.get(Type.GAME_OVER).play();
+    public void playMenuMusic() {
+        SOUND_BANK.get(Type.BG_MUSIC).stop();
+        SOUND_BANK.get(Type.MENU_MUSIC).play();
     }
 
     public void playBgMusic() {
+        SOUND_BANK.get(Type.MENU_MUSIC).stop();
         SOUND_BANK.get(Type.BG_MUSIC).play();
     }
 
@@ -91,6 +97,10 @@ public class SoundManager {
 
     public void pauseBgMusic() {
         SOUND_BANK.get(Type.BG_MUSIC).pause();
+    }
+
+    public void playGameOverMusic() {
+        SOUND_BANK.get(Type.GAME_OVER).play();
     }
 
 }
