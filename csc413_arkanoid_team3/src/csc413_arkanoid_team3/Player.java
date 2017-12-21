@@ -28,8 +28,9 @@ public class Player extends Ship implements Observer {
     private HashMap<Controls, Boolean> buttonStates; // current pressed buttons
     private HashMap<Integer, Controls> controlMap;   // map of keys to player controls
 
-    public int lives;
+    private int lives;
     public int score;
+    private int highScore;
 
     // PowerUp Attributes
     private boolean lazerActive;
@@ -43,7 +44,9 @@ public class Player extends Ship implements Observer {
 
         this.lives = DEFAULT_LIVES;
         this.score = DEFAULT_SCORE;
+        this.highScore = DEFAULT_SCORE;
         this.shotCooldown = FIRING_SPEED;
+        
 
         _initControls(controls);
     }
@@ -64,6 +67,13 @@ public class Player extends Ship implements Observer {
     public void update(ArrayList<Projectile> shots) {
         _updatePosition();
         _updateShoot(shots);
+        _updateHighScore();
+    }
+    
+    private void _updateHighScore(){
+        if(score>highScore){
+            highScore = score;
+        }
     }
 
     private void _updatePosition() {
@@ -162,6 +172,10 @@ public class Player extends Ship implements Observer {
     public void reset() {
         this.score = DEFAULT_SCORE;
         this.lives = DEFAULT_LIVES;
+    }
+    
+    public int getHighScore(){
+        return highScore;
     }
 
 }

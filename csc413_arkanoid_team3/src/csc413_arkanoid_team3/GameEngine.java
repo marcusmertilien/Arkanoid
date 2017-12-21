@@ -270,6 +270,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         for (PowerUp _p : powerUps) _p.update();
         for (Enemy _e: enemies) _e.update();
         for (Projectile _p : projectiles) _p.update();
+        
     }
     
     private void _updateEnemies() {
@@ -644,26 +645,30 @@ public class GameEngine extends JPanel implements Runnable, Observer {
 
         // Draw branding.
         g2d.drawImage(logoImage, commonXoffset, 15, 180, 40, null);
+        
+        g2d.setFont(new Font("Courier", Font.BOLD, 15));
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.drawString("HIGH SCORE:" + player.getHighScore(), commonXoffset,75);
 
         // Draw lives count.
         g2d.setColor(Color.RED);
         g2d.setFont(new Font("Courier", Font.BOLD, 15));
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2d.drawString("1UP x" + player.getLives(), commonXoffset, 75);
+        g2d.drawString("1UP x" + player.getLives(), commonXoffset, 105);
 
         // Draw Score.
         g2d.setColor(Color.WHITE);
         g2d.setFont(new Font("Courier", Font.BOLD, 15));
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2d.drawString("" + player.score, commonXoffset, 90);
+        g2d.drawString("Score:" + player.score, commonXoffset, 135);
 
         // Draw power up type if active.
         if (activePowerUp != null) {
             g2d.setColor(Color.GREEN);
             g2d.setFont(new Font("Courier", Font.BOLD, 14));
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            g2d.drawString("Active Power-up", commonXoffset, 110);
-            g2d.drawString(activePowerUp.type.name(), commonXoffset, 125);
+            g2d.drawString("Active Power-up", commonXoffset, 160);
+            g2d.drawString(activePowerUp.type.name(), commonXoffset, 180);
         }
     }
 
