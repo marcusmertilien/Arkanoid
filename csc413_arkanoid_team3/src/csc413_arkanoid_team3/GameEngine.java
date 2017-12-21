@@ -89,14 +89,9 @@ public class GameEngine extends JPanel implements Runnable, Observer {
     private static BufferedImage splashLogo;
 
     static {
-        try {
-            // Load Arkanoid logo assets.
-            ClassLoader cl = GameEngine.class.getClassLoader();
-            logoImage = ImageIO.read(cl.getResource(GameEngine.GENERAL_ASSET_PATH + "logo.png"));
-            splashLogo = ImageIO.read(cl.getResource(GameEngine.GENERAL_ASSET_PATH + "Splash.png"));
-        } catch (Exception e) {
-            System.out.println(e.toString());
-        }
+        // Load Arkanoid branding assets.
+        logoImage = AssetLoader.load(GameEngine.GENERAL_ASSET_PATH + "logo.png", 1);
+        splashLogo = AssetLoader.load(GameEngine.GENERAL_ASSET_PATH + "Splash.png", 1);
     }
 
     // *** Runnable.run
