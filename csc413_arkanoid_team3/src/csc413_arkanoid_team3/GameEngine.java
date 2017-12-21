@@ -30,9 +30,6 @@ public class GameEngine extends JPanel implements Runnable, Observer {
     private static final int TARGET_FPS     = 60;
     private static final long ONE_SECOND_NS = 1000000000;
     private static final long OPTIMAL_TIME  = ONE_SECOND_NS / TARGET_FPS;
-    
-    private int SPAWN_TIMER = 0;
-    
 
     // Game state
     private static enum GameState {
@@ -76,20 +73,19 @@ public class GameEngine extends JPanel implements Runnable, Observer {
     private static final int DEFAULT_BALL_X = 205;
     private static final int DEFAULT_BALL_Y = 400;
 
-    // Test data
+    // Game data.
     private Player player;
     private Stage currentStage;
     private Ball ball;
+    private PowerUp activePowerUp;
+    private int enemySpawnTimer;
 
     private ArrayList<PowerUp> powerUps;
     private ArrayList<Enemy> enemies;
-    private PowerUp activePowerUp;
-
     private ArrayList<Explode> explosions;
     private ArrayList<Projectile> projectiles;
 
     // Load static assets
-    // TODO: move this somewhere else.
     private static BufferedImage logoImage;
     private static BufferedImage splashLogo;
 
@@ -158,6 +154,7 @@ public class GameEngine extends JPanel implements Runnable, Observer {
         gameControls.put(KeyEvent.VK_ESCAPE, GameActions.EXIT);
         gameControls.put(KeyEvent.VK_1, GameActions.START);
         gameControls.put(KeyEvent.VK_M, GameActions.MUSIC_STOP);
+        gameControls.put(KeyEvent.VK_2, GameActions.SKIP_LEVEL);
     }
 
     private void _setupGameData() {
@@ -270,23 +267,22 @@ public class GameEngine extends JPanel implements Runnable, Observer {
     }
 
     private void _updateData() {
-
         player.update(projectiles);
         ball.update();
-        
-        
+
         for (Explode _e : explosions) _e.update();
         for (PowerUp _p : powerUps) _p.update();
         for (Enemy _e: enemies) _e.update();
         for (Projectile _p : projectiles) _p.update();
     }
     
-    private void _updateEnemies(){
-        Random r = new Random(SPAWN_TIMER);
-        int x = r.nextInt((GAME_WINDOW_WIDTH -50) - 20)+20;
-        int type = ((r.nextInt(2)) +1);//730 = 3^6 + 1
-        if(SPAWN_TIMER %730 == 0){
-            switch(SPAWN_TIMER%3){
+    private void _updateEnemies() {
+        Random r = new Random(enemySpawnTimer);
+        int x = r.nextInt((GAME_WINDOW_WIDTH -50) - 20) + 20;
+        int type = ((r.nextInt(2)) +1);
+
+        if (enemySpawnTimer % 730 == 0) {
+            switch (enemySpawnTimer % 3) {
                 case 0:
                     enemies.add(new Enemy(x, 0, Enemy.Types.BLUE));
                     break;
@@ -298,7 +294,8 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                     break;
             }
         }
-        SPAWN_TIMER++;
+
+        enemySpawnTimer++;
     }
 
     private void _checkCollisions() {
@@ -794,6 +791,13 @@ public class GameEngine extends JPanel implements Runnable, Observer {
                 // Exit game on escape press.
                 if (buttonPressed == GameActions.EXIT) {
                     gameState = GameState.EXITING;
+                }
+
+                // Skip level for testing.
+                if (buttonPressed == GameActions.SKIP_LEVEL) {
+                    gameState = GameState.ROUND_CHANGE;
+                    currentStage = new Stage(currentStage.round.next());
+                    _resetStage();
                 }
             }
 
