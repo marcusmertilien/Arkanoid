@@ -15,20 +15,27 @@ import java.awt.event.KeyEvent;
 
 public class Player extends Ship implements Observer {
 
-    private final static  int FIRING_SPEED = 30;
-    //PowerUp Attributes
-    private boolean fire;
-    private int shotCooldown;
-    private boolean slowDown;
-    private int slowDownTimer;
-    
-    private int lives;
-    
+    // Class constants
+    // ===============
+
+    private final static int FIRING_SPEED = 30;
+    private static final int DEFAULT_LIVES = 3;
+    private static final int DEFAULT_SCORE = 0;
+
     // Class fields
     // ============
 
     private HashMap<Controls, Boolean> buttonStates; // current pressed buttons
     private HashMap<Integer, Controls> controlMap;   // map of keys to player controls
+
+    public int lives;
+    public int score;
+
+    // PowerUp Attributes
+    private boolean fire;
+    private int shotCooldown;
+    private boolean slowDown;
+    private int slowDownTimer;
 
 
     // Constructors
@@ -36,7 +43,10 @@ public class Player extends Ship implements Observer {
 
     public Player(int x, int y, HashMap<Integer, Controls> controls) {
         super(x, y);
-        lives = 300000;
+
+        this.lives = DEFAULT_LIVES;
+        this.score = DEFAULT_SCORE;
+
         _initControls(controls);
         _primeCanons();
     }
@@ -108,9 +118,9 @@ public class Player extends Ship implements Observer {
     }
     
     private void _updateSlowDown(){
-        if(slowDown){
+        if(slowDown) {
             slowDownTimer--;
-            if(slowDownTimer == 0){
+            if(slowDownTimer == 0) {
                 slowDown = false;
                 speed = super.getSpeed();
             }
@@ -145,10 +155,6 @@ public class Player extends Ship implements Observer {
         }
         
     }
-  
-    public HashMap<Controls, Boolean> getButtonStates(){
-       return this.buttonStates;
-    }
     
     public void powerUp(PowerUp p){
         switch(p.type){
@@ -158,11 +164,12 @@ public class Player extends Ship implements Observer {
             case EXTEND:
                 break;
             case SLOW:
-                if(this.speed>1){
+                if (this.speed > 1) {
                     this.speed = this.speed/2;
                     slowDown = true;
                     slowDownTimer = 280;
                 }
+
                 break;
             case CATCH:
                 break;
@@ -177,16 +184,26 @@ public class Player extends Ship implements Observer {
             case PLAYER:
                 lives++;
                 break;
-            case REDUCE:                
+            case REDUCE:
                 break;
-            
         }
     }
-    
-    public int getLives(){
+
+    public int getLives() {
         return lives;
     }
-    public void setLives(int change){
-        lives = change;
+
+    public int incrementLives() {
+        return ++lives;
     }
+
+    public int decrementLives() {
+        return --lives;
+    }
+
+    public void reset() {
+        this.score = DEFAULT_SCORE;
+        this.lives = DEFAULT_LIVES;
+    }
+
 }

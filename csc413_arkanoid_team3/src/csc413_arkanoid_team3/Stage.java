@@ -23,7 +23,11 @@ public class Stage {
 
     // The rounds in the game
     public static enum Rounds {
-        ROUND_1, ROUND_2, ROUND_3, ROUND_4, ROUND_5
+        ROUND_1, ROUND_2, ROUND_3, ROUND_4, ROUND_5;
+        private static Rounds[] vals = values();
+        public Rounds next() {
+            return vals[(this.ordinal()+1)%vals.length];
+        }
     }
 
     // A hash map representing a relation between a string and a block type - used for level templating.
@@ -45,11 +49,15 @@ public class Stage {
         put(Rounds.ROUND_1, new String[][] {
             {"+", "+", "+", "+", "+", "+", "+", "+", "+", "+", "+", "+", "+"},
             {"r", "r", "r", "r", "r", "r", "r", "r", "r", "r", "r", "r", "r"},
-            {"b", "b", "b", "b", "b", "b", "b", "b", "b", "b", "b", "b", "b"},
+            {"y", "y", "y", "y", "y", "y", "y", "y", "y", "y", "y", "y", "y"},
             {"o", "o", "o", "o", "o", "o", "o", "o", "o", "o", "o", "o", "o"},
             {"p", "p", "p", "p", "p", "p", "p", "p", "p", "p", "p", "p", "p"},
-            {"g", "g", "g", "g", "g", "g", "g", "g", "g", "g", "g", "g", "g"}
+            {"g", "g", "g", "g", "g", "g", "g", "g", "g", "g", "g", "g", "g"},
+            {"r", "r", "r", "r", "r", "r", "r", "r", "r", "r", "r", "r", "r"},
+            {"b", "b", "b", "b", "b", "b", "b", "b", "b", "b", "b", "b", "b"},
+            {"w", "w", "w", "w", "w", "w", "w", "w", "w", "w", "w", "w", "w"},
         });
+
         put(Rounds.ROUND_2, new String[][] {
             {"p"},
             {"p", "c"},
@@ -63,22 +71,22 @@ public class Stage {
             {"p", "c", "b", "g", "r", "p", "c", "g", "b", "r"},
             {"p", "c", "b", "g", "r", "p", "c", "g", "b", "r", "p"},
             {"p", "c", "b", "g", "r", "p", "c", "g", "b", "r", "p", "y"},
-            {"p", "c", "b", "g", "r", "p", "c", "g", "b", "r", "p", "y", "p"},
             {"+", "+", "+", "+", "+", "+", "+", "+", "+", "+", "+", "+", "p"}
         });
+
         put(Rounds.ROUND_3, new String[][] {
-            {"w", "y", "p", "b", "r", "g", "c", "o", "+", "^", "w", "y", "p"},
-            {"w", "y", "p", "b", "r", "g", "c", "o", "+", "^", "w", "y", "p"},
-            {"w", "y", "p", "b", "r", "g", "c", "o", "+", "^", "w", "y", "p"},
-            {"w", "y", "p", "b", "r", "g", "c", "o", "+", "^", "w", "y", "p"},
-            {"w", "y", "p", "b", "r", "g", "c", "o", "+", "^", "w", "y", "p"},
-            {"w", "y", "p", "b", "r", "g", "c", "o", "+", "^", "w", "y", "p"},
-            {"w", "y", "p", "b", "r", "g", "c", "o", "+", "^", "w", "y", "p"},
-            {"w", "y", "p", "b", "r", "g", "c", "o", "+", "^", "w", "y", "p"},
-            {"w", "y", "p", "b", "r", "g", "c", "o", "+", "^", "w", "y", "p"},
-            {"w", "y", "p", "b", "r", "g", "c", "o", "+", "^", "w", "y", "p"},
-            {"w", "y", "p", "b", "r", "g", "c", "o", "+", "^", "w", "y", "p"}
+            {"+", "+", "+", "+", "+", "+", "+", "+", "+", "+", "+", "+", "+"},
+            {"w", "w", "w", "b", "b", "w", "+", "w", "r", "r", "w", "w", "w"},
+            {"w", "w", "b", "b", "b", "w", "+", "w", "r", "r", "r", "w", "w"},
+            {"w", "b", "b", "b", "b", "b", "+", "r", "r", "r", "r", "r", "w"},
+            {"b", "b", "b", "b", "b", "b", "+", "r", "r", "r", "r", "r", "r"},
+            {"b", "b", "b", "b", "b", "b", "+", "r", "r", "r", "r", "r", "r"},
+            {"w", "b", "b", "b", "b", "b", "+", "r", "r", "r", "r", "r", "w"},
+            {"w", "w", "b", "b", "b", "w", "+", "w", "r", "r", "r", "w", "w"},
+            {"w", "w", "w", "b", "b", "w", "+", "w", "r", "r", "w", "w", "w"},
+            {"+", "+", "+", "+", "+", "+", "+", "+", "+", "+", "+", "+", "+"}
         });
+
         put(Rounds.ROUND_4, new String[][]{
             {"g", "g", "g", "g", "g", "g", "g", "g", "g", "g", "g", "g", "g"}, {},
             {"w", "w", "w", "^", "^", "^", "^", "^", "^", "^", "^", "^", "^"}, {},
@@ -140,7 +148,10 @@ public class Stage {
             for (int j = 0; j < stage[i].length; j++) {
                 int x = 16 + (j*Block.BLOCK_WIDTH);
                 int y = 60 + (i*Block.BLOCK_HEIGHT);
-                blocks.add(new Block(x, y, map.get(stage[i][j])));
+
+                if (map.get(stage[i][j]) != null) {
+                    blocks.add(new Block(x, y, map.get(stage[i][j])));
+                }
             }
         }
     }

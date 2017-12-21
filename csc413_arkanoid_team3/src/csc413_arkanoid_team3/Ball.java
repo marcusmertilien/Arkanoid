@@ -18,7 +18,10 @@ public class Ball extends Actor {
     private static final int BALL_SPRITE_HEIGHT = 4;             // sprite asset height
     private static final int BALL_WIDTH = 2*BALL_SPRITE_WIDTH;   // visible ball width
     private static final int BALL_HEIGHT = 2*BALL_SPRITE_HEIGHT; // visible ball height
-    private static final int BALL_SPEED = 1;                     // default ball speed
+    private static final int BOUNCES_PER_SPEEDUP = 5;            // speed up marker
+    public static final int BALL_SPEED = 3;                      // default ball speed
+    public static final int BALL_MAX_SPEED = 6;                  // the max ball speed
+
 
     // The class' static image assets
     private static final String SPRITE_PATH = GameEngine.BALL_ASSET_PATH + "ball.png";
@@ -29,6 +32,8 @@ public class Ball extends Actor {
         BALL_ASSET = AssetLoader.getScaledInstance(rawAsset, BALL_WIDTH, BALL_HEIGHT);
     }
 
+    private int bounceCounter;
+
 
     // Constructors
     // ============
@@ -37,6 +42,7 @@ public class Ball extends Actor {
         super(x, y, BALL_WIDTH, BALL_HEIGHT, 0, 0, BALL_SPEED);
 
         this.sprite = this.BALL_ASSET;
+        this.bounceCounter = 0;
     }
 
 
@@ -61,6 +67,16 @@ public class Ball extends Actor {
     public void resetLocationE(){
         x = previousX;
         y = previousY;
+    }
+
+    public void incrementBounce() {
+        // Increase the ball speed per bounce count.
+        if (
+            bounceCounter++ % BOUNCES_PER_SPEEDUP == 0 &&
+            Math.abs(ySpeed) <= BALL_MAX_SPEED
+        ) {
+            ySpeed = (ySpeed >=0) ? ySpeed + 1: ySpeed - 1;
+        }
     }
 
 }

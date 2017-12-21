@@ -18,9 +18,6 @@ public class Ship extends Actor {
     private static final int BASE_SHIP_HEIGHT = 8;
     private static int SHIP_WIDTH = 2*BASE_SHIP_WIDTH;
     private static int SHIP_HEIGHT = 2*BASE_SHIP_HEIGHT;
-    
-    
-
     private static final int SPEED = 3;
 
     // The class' static image assets
