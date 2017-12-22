@@ -1,5 +1,6 @@
 ### CSC413 - Arkanoid (Rainbow Reef)
 
+
 ![alt text](https://i.pinimg.com/originals/09/fe/e4/09fee4cd751f5cf53b7f07651cd8573a.jpg)
 
 #### Marcus Mertilien <br />
@@ -10,5 +11,13 @@ email: marcusmertilien@gmail.com <br />
 student id: 917215044<br />
 email: thecalestonrift@gmail.com<br />
 
-#### TODO
-- Change the name of the repo to csc413-secondgame-teamNN where NN is your team number. Please remove the username from the repo.
+Arkanoid.jar file provided for easy game play.<br />
+Be sure to have at least Java SE Runtime Environment 8 installed.<br />
+
+Compiling Instructions:<br />
+This game was built using the NetBeans IDE.<br />
+1.) Clone this repository.<br />
+2.) Import this project using existing resources into NetBeans.<br />
+3.) Make sure all resources are included in the project file.<br />
+4.) Click Play button in NetBeans IDE.<br />
+
