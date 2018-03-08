@@ -4,12 +4,9 @@
 ![alt text](https://i.pinimg.com/originals/09/fe/e4/09fee4cd751f5cf53b7f07651cd8573a.jpg)
 
 #### Marcus Mertilien <br />
-student id: 916638845 <br />
 email: marcusmertilien@gmail.com <br />
 
 #### Ben Clark <br />
-student id: 917215044<br />
-email: thecalestonrift@gmail.com<br />
 
 Arkanoid.jar file provided for easy game play.<br />
 Be sure to have at least Java SE Runtime Environment 8 installed.<br />
